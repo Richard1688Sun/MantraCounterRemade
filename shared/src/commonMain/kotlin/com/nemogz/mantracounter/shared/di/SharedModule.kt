@@ -9,6 +9,11 @@ import com.nemogz.mantracounter.shared.domain.usecase.CompleteHomeworkUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.ConvertLittleHouseUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.GetCountersUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.GetLittleHouseCountUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.GetCounterByIdUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.UpdateCountersUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.UpdateCounterUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.UpdateHomeworkAmountUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.ValidateCounterCountUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.IncrementCounterUseCase
 import org.koin.dsl.module
 
@@ -27,4 +32,12 @@ val featureModule = module {
     factory { GetLittleHouseCountUseCase(get()) }
     factory { ConvertLittleHouseUseCase(get(), get()) }
     factory { CompleteHomeworkUseCase(get()) }
+    factory { GetCounterByIdUseCase(get()) }
+    factory { UpdateHomeworkAmountUseCase(get()) }
+    factory { UpdateCountersUseCase(get()) }
+    factory { UpdateCounterUseCase(get()) }
+    factory { com.nemogz.mantracounter.shared.domain.usecase.CreateCounterUseCase(get()) }
+    factory { com.nemogz.mantracounter.shared.domain.usecase.DeleteCountersUseCase(get()) }
+    factory { ValidateCounterCountUseCase() }
+
 }

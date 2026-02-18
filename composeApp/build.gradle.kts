@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
@@ -35,6 +36,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.androidx.room.runtime)
             implementation(libs.compose.ui.tooling.preview)
+            implementation("sh.calvin.reorderable:reorderable:2.4.3")
         }
         commonMain.dependencies {
             implementation(projects.shared)
@@ -46,6 +48,9 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
+            implementation(libs.androidx.navigation.compose)
+            implementation(libs.kotlinx.serialization.json)
+            implementation("sh.calvin.reorderable:reorderable:2.4.3")
         }
     }
 }

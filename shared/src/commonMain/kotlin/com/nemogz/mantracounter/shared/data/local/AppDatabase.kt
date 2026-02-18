@@ -9,7 +9,7 @@ import com.nemogz.mantracounter.shared.data.local.dao.LittleHouseDao
 import com.nemogz.mantracounter.shared.data.local.entity.CounterEntity
 import com.nemogz.mantracounter.shared.data.local.entity.LittleHouseEntity
 
-@Database(entities = [CounterEntity::class, LittleHouseEntity::class], version = 1)
+@Database(entities = [CounterEntity::class, LittleHouseEntity::class], version = 2)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun counterDao(): CounterDao

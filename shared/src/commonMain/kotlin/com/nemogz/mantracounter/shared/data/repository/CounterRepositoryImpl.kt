@@ -27,7 +27,7 @@ class CounterRepositoryImpl(
     }
 
     override suspend fun deleteCounter(id: String) {
-        counterDao.deleteCounter(id)
+        counterDao.deleteCounterById(id)
     }
 
     override suspend fun updateCounts(ids: List<String>, newCounts: List<Int>) {
@@ -36,5 +36,13 @@ class CounterRepositoryImpl(
 
     override suspend fun updateName(id: String, newName: String) {
         counterDao.updateName(id, newName)
+    }
+
+    override suspend fun updateCounter(counter: Counter) {
+        counterDao.updateCounter(counter.toEntity())
+    }
+
+    override suspend fun updateCounters(counters: List<Counter>) {
+        counterDao.updateCounters(counters.map { it.toEntity() })
     }
 }

@@ -11,7 +11,8 @@ data class CounterEntity(
     val mantraId: String, // Maps to MantraType.id
     val name: String,
     val count: Int,
-    val homeworkAmount: Int
+    val homeworkAmount: Int,
+    val sortOrder: Int
 )
 
 fun CounterEntity.toDomain(): Counter {
@@ -20,7 +21,8 @@ fun CounterEntity.toDomain(): Counter {
         mantraType = MantraType.getById(mantraId),
         name = name,
         count = count,
-        homeworkAmount = homeworkAmount
+        homeworkAmount = homeworkAmount,
+        sortOrder = sortOrder
     )
 }
 
@@ -30,6 +32,7 @@ fun Counter.toEntity(): CounterEntity {
         mantraId = mantraType.id,
         name = name,
         count = count,
-        homeworkAmount = homeworkAmount
+        homeworkAmount = homeworkAmount,
+        sortOrder = sortOrder
     )
 }

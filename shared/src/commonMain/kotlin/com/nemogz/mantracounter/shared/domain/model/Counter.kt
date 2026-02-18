@@ -13,7 +13,8 @@ data class Counter(
     val mantraType: MantraType,
     val name: String,
     val count: Int = 0,
-    val homeworkAmount: Int = 0
+    val homeworkAmount: Int = 0,
+    val sortOrder: Int = 0
 ) {
     fun increment(): Counter = copy(count = count + 1)
     fun decrement(): Counter = if (count > 0) copy(count = count - 1) else this

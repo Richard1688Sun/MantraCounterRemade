@@ -20,25 +20,26 @@ class DatabaseSeeder(
                 Counter(
                     id = "dabei",
                     mantraType = MantraType.DaBei,
-                    name = "Great Compassion Mantra" // Or use localized string resource if possible? For now hardcode or use simple names
-                    // Actually legacy uses "dabei" as original name. Let's use nicer names or match legacy?
-                    // Legacy: context.getString(R.string.dabei) -> likely "Da Bei Zhou" or Chinese.
-                    // For this migration, I will use English/Pinyin names or meaningful defaults.
+                    name = "Great Compassion Mantra",
+                    sortOrder = 0
                 ),
                 Counter(
                     id = "boruo",
                     mantraType = MantraType.BoRuo,
-                    name = "Heart Sutra"
+                    name = "Heart Sutra",
+                    sortOrder = 1
                 ),
                 Counter(
                     id = "wangshen",
                     mantraType = MantraType.WangShen,
-                    name = "Amitabha Pure Land Rebirth Mantra"
+                    name = "Amitabha Pure Land Rebirth Mantra",
+                    sortOrder = 2
                 ),
                 Counter(
                     id = "qifo",
                     mantraType = MantraType.QiFo,
-                    name = "Sapta Atituatha Tathagata Mantra"
+                    name = "Sapta Atita Tathagata Mantra",
+                    sortOrder = 3
                 )
             )
 

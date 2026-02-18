@@ -7,6 +7,9 @@ import com.nemogz.mantracounter.shared.domain.usecase.ConvertLittleHouseUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.GetCountersUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.GetLittleHouseCountUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.IncrementCounterUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.UpdateCountersUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.UpdateCounterUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.ValidateCounterCountUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +21,12 @@ class HomeViewModel(
     private val getLittleHouseCountUseCase: GetLittleHouseCountUseCase,
     private val incrementCounterUseCase: IncrementCounterUseCase,
     private val convertLittleHouseUseCase: ConvertLittleHouseUseCase,
-    private val completeHomeworkUseCase: CompleteHomeworkUseCase
+    private val completeHomeworkUseCase: CompleteHomeworkUseCase,
+    private val updateCountersUseCase: UpdateCountersUseCase, // New dependency
+    private val updateCounterUseCase: UpdateCounterUseCase,  // New dependency
+    private val validateCounterCountUseCase: ValidateCounterCountUseCase, // New dependency
+    private val createCounterUseCase: com.nemogz.mantracounter.shared.domain.usecase.CreateCounterUseCase,
+    private val deleteCountersUseCase: com.nemogz.mantracounter.shared.domain.usecase.DeleteCountersUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState(isLoading = true))
@@ -31,9 +39,11 @@ class HomeViewModel(
                 getLittleHouseCountUseCase()
             ) { counters, littleHouseCount ->
                 HomeUiState(
-                    counters = counters,
+                    counters = counters.sortedBy { it.sortOrder },
                     littleHouseCount = littleHouseCount,
-                    isLoading = false
+                    isLoading = false,
+                    isEditMode = _uiState.value.isEditMode, 
+                    selectedCounterIds = _uiState.value.selectedCounterIds
                 )
             }.collect { newState ->
                 _uiState.value = newState
@@ -41,16 +51,95 @@ class HomeViewModel(
         }
     }
 
-    fun onIncrementCounter(id: String) {
+    fun toggleEditMode() {
+        val newMode = !_uiState.value.isEditMode
+        _uiState.value = _uiState.value.copy(
+            isEditMode = newMode,
+            selectedCounterIds = if (!newMode) emptySet() else _uiState.value.selectedCounterIds
+        )
+    }
+
+    fun toggleSelection(id: String) {
+        if (!_uiState.value.isEditMode) return
+        
+        val currentSelection = _uiState.value.selectedCounterIds.toMutableSet()
+        if (currentSelection.contains(id)) {
+            currentSelection.remove(id)
+        } else {
+            currentSelection.add(id)
+        }
+        _uiState.value = _uiState.value.copy(selectedCounterIds = currentSelection)
+    }
+
+    fun clearSelection() {
+        _uiState.value = _uiState.value.copy(selectedCounterIds = emptySet())
+    }
+
+    fun deleteSelectedCounters() {
+        val selectedIds = _uiState.value.selectedCounterIds.toList()
+        if (selectedIds.isEmpty()) return
+        
         viewModelScope.launch {
-            incrementCounterUseCase(id)
-            convertLittleHouseUseCase() 
+            deleteCountersUseCase(selectedIds)
+            clearSelection()
+        }
+    }
+
+    fun onCreateCounter(name: String, targetWait: Int = 0, initialCount: Int = 0) {
+        viewModelScope.launch {
+            createCounterUseCase(name, targetWait, initialCount)
+        }
+    }
+
+    fun onIncrementCounter(id: String) {
+        val counter = _uiState.value.counters.find { it.id == id } ?: return
+        if (validateCounterCountUseCase(counter.count + 1)) {
+            viewModelScope.launch {
+                incrementCounterUseCase(id)
+            }
+        }
+    }
+
+    fun onConvertLittleHouse() {
+        viewModelScope.launch {
+            convertLittleHouseUseCase()
         }
     }
     
     fun onCompleteHomework() {
         viewModelScope.launch {
             completeHomeworkUseCase()
+        }
+    }
+
+    fun onMoveCounter(fromIndex: Int, toIndex: Int) {
+        val currentList = _uiState.value.counters.toMutableList()
+        if (fromIndex in currentList.indices && toIndex in currentList.indices) {
+            val item = currentList.removeAt(fromIndex)
+            currentList.add(toIndex, item)
+            
+            val updatedList = currentList.mapIndexed { index, counter ->
+                counter.copy(sortOrder = index)
+            }
+            _uiState.value = _uiState.value.copy(counters = updatedList)
+
+            viewModelScope.launch {
+                updateCountersUseCase(updatedList)
+            }
+        }
+    }
+
+    fun onUpdateCounter(id: String, newName: String, newCount: Int) {
+        val counter = _uiState.value.counters.find { it.id == id } ?: return
+        // No need to coerce if we validate, but coercion is safer for "update" vs "increment".
+        // Let's coerce to MAX_COUNT instead of hardcoded number, or just check validity.
+        // For direct edit, coerceAtMost(MAX) is friendlier than rejecting.
+        val cappedCount = newCount.coerceAtMost(com.nemogz.mantracounter.shared.domain.model.CounterConstants.MAX_COUNT)
+        
+        if (counter.name != newName || counter.count != cappedCount) {
+             viewModelScope.launch {
+                 updateCounterUseCase(counter.copy(name = newName, count = cappedCount))
+             }
         }
     }
 }

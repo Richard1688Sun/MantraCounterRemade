@@ -10,4 +10,6 @@ interface ICounterRepository {
     suspend fun deleteCounter(id: String)
     suspend fun updateCounts(ids: List<String>, newCounts: List<Int>)
     suspend fun updateName(id: String, newName: String)
+    suspend fun updateCounter(counter: Counter)
+    suspend fun updateCounters(counters: List<Counter>)
 }
