@@ -35,3 +35,4 @@
 ## Special Instructions
 - **Structure:** Antigravity is authorized to fully re-organize the codebase structure to work with modern Kotlin standards.
 - **Legacy Awareness:** Acknowledge that the Source was a learning project; prioritize modern reliability over mimicking the original code structure.
+- **Build Checking:** At the end of implementation always make sure has all the imports. Check for missing imports and everything preventing the application from building without actually building it.

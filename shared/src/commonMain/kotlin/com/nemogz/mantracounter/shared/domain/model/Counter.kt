@@ -13,7 +13,7 @@ data class Counter(
     val mantraType: MantraType,
     val name: String,
     val count: Int = 0,
-    val homeworkAmount: Int = 0,
+    val homeworkGoal: Int = 0,
     val sortOrder: Int = 0
 ) {
     fun increment(): Counter = copy(count = count + 1)
@@ -21,5 +21,5 @@ data class Counter(
     fun reset(): Counter = copy(count = 0)
     
     // Domain helper: Does this counter have enough for homework?
-    fun hasEnoughForHomework(): Boolean = count >= homeworkAmount
+    fun hasEnoughForHomework(): Boolean = count >= homeworkGoal
 }

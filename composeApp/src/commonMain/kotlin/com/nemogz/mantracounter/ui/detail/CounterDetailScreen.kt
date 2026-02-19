@@ -99,8 +99,8 @@ fun CounterDetailScreen(
                     // Homework Settings
                     Text("Settings", style = MaterialTheme.typography.titleLarge)
                     
-                    var homeworkInput by remember(counter.homeworkAmount) { 
-                        mutableStateOf(counter.homeworkAmount.toString()) 
+                    var homeworkInput by remember(counter.homeworkGoal) { 
+                        mutableStateOf(counter.homeworkGoal.toString()) 
                     }
 
                     Row(
@@ -114,7 +114,7 @@ fun CounterDetailScreen(
                                     homeworkInput = it 
                                 }
                             },
-                            label = { Text("Homework Amount") },
+                            label = { Text("Homework Goal") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.weight(1f)
                         )
@@ -127,7 +127,7 @@ fun CounterDetailScreen(
                     }
                     
                     Text(
-                        text = "Current Homework Amount: ${counter.homeworkAmount}",
+                        text = "Current Homework Goal: ${counter.homeworkGoal}",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }

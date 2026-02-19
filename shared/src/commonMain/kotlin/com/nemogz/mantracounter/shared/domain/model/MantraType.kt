@@ -5,7 +5,7 @@ package com.nemogz.mantracounter.shared.domain.model
  */
 enum class MantraType(
     val id: String,
-    val defaultTargetWait: Int,
+    val mantraGoalCount: Int,
     val isLittleHouseComponent: Boolean
 ) {
     DaBei("dabei", 27, true),

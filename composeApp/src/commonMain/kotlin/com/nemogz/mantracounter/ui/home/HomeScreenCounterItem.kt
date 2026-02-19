@@ -1,11 +1,15 @@
 package com.nemogz.mantracounter.ui.home
 
+import androidx.compose.ui.graphics.Color
+
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -41,7 +45,13 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.heightIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.launch
-
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.border
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.ui.unit.sp
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreenCounterItem(
@@ -84,7 +94,6 @@ fun HomeScreenCounterItem(
 
     Card(
         modifier = modifier
-            .heightIn(min = 150.dp) // Enforce minimum height for consistency, avoid fillMaxHeight in LazyGrid
             .then(rotationModifier)
             .then(if (shakeOffset.value != 0f) Modifier.offset(x = shakeOffset.value.dp) else Modifier),
         elevation = CardDefaults.cardElevation(defaultElevation = elevation),
@@ -96,7 +105,6 @@ fun HomeScreenCounterItem(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f) // Ensure Card content fills height if in a Column
                 .then(if (isEditMode) dragModifier else Modifier)
                 .combinedClickable(
                     onClick = {
@@ -125,7 +133,7 @@ fun HomeScreenCounterItem(
                     }
                 )
         ) {
-             Column(
+            Column(
                 modifier = Modifier.padding(16.dp).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -136,43 +144,85 @@ fun HomeScreenCounterItem(
                     text = counter.name, 
                     style = MaterialTheme.typography.bodyLarge, 
                     textAlign = TextAlign.Center,
-                    minLines = 2, // Enforce some minimum height consistency
                     maxLines = 2,
                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 
-                // Count and Threshold Row
+                // Count Display
                 Box(
                     modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.BottomCenter
+                    contentAlignment = Alignment.Center
                 ) {
-                    // Auto-size text logic (granular heuristic)
                     val countStr = counter.count.toString()
-                    val countStyle = when (countStr.length) {
-                        in 0..3 -> MaterialTheme.typography.displayMedium
-                        4 -> MaterialTheme.typography.displaySmall
-                        5 -> MaterialTheme.typography.headlineLarge
-                        6 -> MaterialTheme.typography.headlineMedium
-                        7 -> MaterialTheme.typography.headlineSmall
-                        else -> MaterialTheme.typography.titleLarge // 8 digits (cap) or more
-                    }
+                    val countStyle = MaterialTheme.typography.displaySmall
 
-                    Text(
-                        text = countStr,
-                        style = countStyle,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.align(Alignment.Center),
-                        maxLines = 1,
-                        softWrap = false
-                    )
-                    
-                    // Threshold / Target
-                    if (counter.mantraType.defaultTargetWait > 0) {
-                        Text(
-                            text = "/ ${counter.mantraType.defaultTargetWait}",
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 4.dp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        BasicText(
+                            text = countStr,
+                            style = countStyle.copy(color = MaterialTheme.colorScheme.primary),
+                            modifier = Modifier.weight(1f, fill = false), // Allow shrinking but don't force fill
+                            autoSize = TextAutoSize.StepBased(minFontSize = 12.sp, maxFontSize = MaterialTheme.typography.displaySmall.fontSize),
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                        )
+
+                        // Mantra Goal (Little House threshold) - Reverted to text
+                        if (counter.mantraType.mantraGoalCount > 0) {
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "/ ${counter.mantraType.mantraGoalCount}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(bottom = 6.dp) // Adjusted baseline
+                            )
+                        }
+                    }
+                }
+
+                // Progress Bars Section
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(4.dp)
+                ) {
+                    // Homework Goal Progress
+                    val progress = (counter.count.toFloat() / counter.homeworkGoal).coerceIn(0f, 1f)
+                    val isComplete = progress >= 1f
+                    val barColor = if (isComplete) Color.Green else Color.Gray
+
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Homework",
+                                style = MaterialTheme.typography.bodyMedium, // Larger label
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "${counter.homeworkGoal}",
+                                style = MaterialTheme.typography.bodyMedium, // Larger label
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        androidx.compose.material3.LinearProgressIndicator(
+                            progress = { progress }, // Direct progress, no animation
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(8.dp) // Thicker bar
+                                .clip(RoundedCornerShape(50)) // Rounded pill shape
+                                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(50)), // Debug border
+                            color = barColor,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f), // Subtler track
+                            strokeCap = StrokeCap.Round, // Rounded ends for indicator
                         )
                     }
                 }
@@ -181,25 +231,33 @@ fun HomeScreenCounterItem(
             }
             
             // Floating Icons Overlay (Selection/Star)
-            if (isEditMode) {
-                Box(
-                    modifier = Modifier.align(Alignment.TopStart).padding(8.dp)
-                ) {
-                    if (isProtected) {
-                            Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = "Protected",
-                            tint = MaterialTheme.colorScheme.error, // Red star for emphasis? Or keep secondary. User said red glowing edges.
-                            modifier = Modifier.size(24.dp)
-                        )
-                    } else {
-                        androidx.compose.material3.RadioButton(
-                            selected = isSelected,
-                            onClick = null // Handled by parent click
-                        )
+            Box(modifier = Modifier.fillMaxSize()) {
+                if (isEditMode) {
+                    Box(
+                        modifier = Modifier.align(Alignment.TopStart).padding(8.dp)
+                    ) {
+                        if (isProtected) {
+                                Icon(
+                                imageVector = androidx.compose.material.icons.Icons.Default.Star,
+                                contentDescription = "Protected",
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        } else {
+                             androidx.compose.material3.RadioButton(
+                                selected = isSelected,
+                                onClick = null // Handled by parent click
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
+
+
+
+
+
+

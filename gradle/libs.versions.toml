@@ -11,7 +11,11 @@ androidx-espresso-core = "3.6.1"
 androidx-lifecycle = "2.8.4"
 androidx-material = "1.12.0"
 androidx-test-junit = "1.2.1"
-compose-plugin = "1.7.0"
+compose-plugin = "1.10.1"
+compose-libs = "1.10.1"
+compose-material3-libs = "1.10.0-alpha05"
+
+compose-icons = "1.7.3"
 junit = "4.13.2"
 kotlin = "2.2.10"
 kotlinx-coroutines = "1.9.0"
@@ -39,11 +43,12 @@ androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle
 androidx-navigation-compose = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose" }
 
 # Compose
-compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-plugin" }
-compose-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "compose-plugin" }
-compose-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose-plugin" }
-compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose-plugin" }
-compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-plugin" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-libs" }
+compose-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "compose-libs" }
+compose-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose-libs" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose-libs" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-material3-libs" }
+compose-material-icons-core = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "compose-icons" }
 
 # Coroutines
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }

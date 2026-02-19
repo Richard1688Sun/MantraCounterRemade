@@ -7,7 +7,7 @@ class UpdateHomeworkAmountUseCase(
 ) {
     suspend operator fun invoke(counterId: String, newAmount: Int) {
         val counter = counterRepository.getCounterById(counterId) ?: return
-        val updatedCounter = counter.copy(homeworkAmount = newAmount)
+        val updatedCounter = counter.copy(homeworkGoal = newAmount)
         counterRepository.saveCounter(updatedCounter)
     }
 }

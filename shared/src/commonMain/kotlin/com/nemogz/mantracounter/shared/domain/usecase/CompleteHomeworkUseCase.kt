@@ -14,9 +14,9 @@ class CompleteHomeworkUseCase(
         val counters = counterRepository.getAllCounters().first()
         
         // 1. Filter counters that have homework requirements
-        val homeworkCounters = counters.filter { it.homeworkAmount > 0 }
+        val homeworkCounters = counters.filter { it.homeworkGoal > 0 }
         
-        if (homeworkCounters.isEmpty()) return false // Or true? If no homework, logic says trivial success? Let's say false for "No homework done".
+        if (homeworkCounters.isEmpty()) return false 
 
         // 2. Check availability
         val allSatisfied = homeworkCounters.all { it.hasEnoughForHomework() }
@@ -29,7 +29,7 @@ class CompleteHomeworkUseCase(
 
         homeworkCounters.forEach { counter ->
             idsToUpdate.add(counter.id)
-            newCounts.add(counter.count - counter.homeworkAmount)
+            newCounts.add(counter.count - counter.homeworkGoal) // Deduct goal amount
         }
 
         counterRepository.updateCounts(idsToUpdate, newCounts)

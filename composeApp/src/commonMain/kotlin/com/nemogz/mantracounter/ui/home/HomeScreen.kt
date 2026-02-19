@@ -1,6 +1,7 @@
 package com.nemogz.mantracounter.ui.home
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -269,7 +270,8 @@ fun HomeContent(
                                 counterToEdit = counter
                                 showEditDialog = true
                             },
-                            dragModifier = if (state.isEditMode) Modifier.draggableHandle() else Modifier
+                            dragModifier = if (state.isEditMode) Modifier.draggableHandle() else Modifier,
+                            modifier = Modifier.fillMaxHeight()
                         )
                     }
                 }

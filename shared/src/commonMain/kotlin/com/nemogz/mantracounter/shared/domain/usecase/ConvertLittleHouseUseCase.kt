@@ -27,19 +27,19 @@ class ConvertLittleHouseUseCase(
         }
 
         // 2. Calculate max possible sets
-        val setsDabei = dabei.count / MantraType.DaBei.defaultTargetWait
-        val setsBoruo = boruo.count / MantraType.BoRuo.defaultTargetWait
-        val setsWangshen = wangshen.count / MantraType.WangShen.defaultTargetWait
-        val setsQifo = qifo.count / MantraType.QiFo.defaultTargetWait
+            val setsDabei = dabei.count / MantraType.DaBei.mantraGoalCount
+            val setsBoruo = boruo.count / MantraType.BoRuo.mantraGoalCount
+            val setsWangshen = wangshen.count / MantraType.WangShen.mantraGoalCount
+            val setsQifo = qifo.count / MantraType.QiFo.mantraGoalCount
 
-        val minimalSets = minOf(setsDabei, setsBoruo, setsWangshen, setsQifo)
+            val minimalSets = minOf(setsDabei, setsBoruo, setsWangshen, setsQifo)
 
-        if (minimalSets > 0) {
-            // 3. Deduct counts
-            val newDabeiCount = dabei.count - (minimalSets * MantraType.DaBei.defaultTargetWait)
-            val newBoruoCount = boruo.count - (minimalSets * MantraType.BoRuo.defaultTargetWait)
-            val newWangshenCount = wangshen.count - (minimalSets * MantraType.WangShen.defaultTargetWait)
-            val newQifoCount = qifo.count - (minimalSets * MantraType.QiFo.defaultTargetWait)
+            if (minimalSets > 0) {
+                // 3. Deduct counts
+                val newDabeiCount = dabei.count - (minimalSets * MantraType.DaBei.mantraGoalCount)
+                val newBoruoCount = boruo.count - (minimalSets * MantraType.BoRuo.mantraGoalCount)
+                val newWangshenCount = wangshen.count - (minimalSets * MantraType.WangShen.mantraGoalCount)
+                val newQifoCount = qifo.count - (minimalSets * MantraType.QiFo.mantraGoalCount)
 
             // 4. Update Repositories
             // We update counters individually or in batch if repo supports it.
