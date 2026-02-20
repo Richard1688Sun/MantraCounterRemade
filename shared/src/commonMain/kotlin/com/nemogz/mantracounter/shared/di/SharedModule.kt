@@ -50,5 +50,6 @@ val featureModule = module {
     factory { com.nemogz.mantracounter.shared.domain.usecase.CreateCounterUseCase(get()) }
     factory { com.nemogz.mantracounter.shared.domain.usecase.DeleteCountersUseCase(get()) }
     factory { ValidateCounterCountUseCase() }
+    factory { com.nemogz.mantracounter.shared.domain.usecase.GetActivitiesForMonthUseCase(get()) }
 
 }

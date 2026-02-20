@@ -18,6 +18,8 @@ import kotlinx.coroutines.launch
 
 import com.nemogz.mantracounter.shared.domain.usecase.BurnLittleHouseUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.GetMissedHomeworkDaysUseCase
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 class HomeViewModel(
     private val getCountersUseCase: GetCountersUseCase,
@@ -71,8 +73,14 @@ class HomeViewModel(
             // First deduct mantra counts — returns map of ID -> deducted amount, or null
             val details = completeHomeworkUseCase()
             if (details != null) {
-                // Convert details map to a simple JSON-like string
-                val detailsStr = details.entries.joinToString(",") { "${it.key}:${it.value}" }
+                // Convert details map to a proper JSON string
+                val detailsStr = buildString {
+                    append("{")
+                    append(details.entries.joinToString(",") { (key, value) ->
+                        "\"$key\":\"$value\""
+                    })
+                    append("}")
+                }
                 // Then mark the day as completed with the details
                 catchUpHomeworkUseCase(epochDay, detailsStr)
             }
@@ -142,7 +150,20 @@ class HomeViewModel(
     
     fun onCompleteHomework() {
         viewModelScope.launch {
-            completeHomeworkUseCase()
+            val today = kotlin.time.Clock.System.now()
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .date.toEpochDays().toLong()
+            val details = completeHomeworkUseCase()
+            if (details != null) {
+                val detailsStr = buildString {
+                    append("{")
+                    append(details.entries.joinToString(",") { (key, value) ->
+                        "\"$key\":\"$value\""
+                    })
+                    append("}")
+                }
+                catchUpHomeworkUseCase(today, detailsStr)
+            }
         }
     }
 

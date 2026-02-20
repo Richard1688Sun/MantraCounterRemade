@@ -27,6 +27,9 @@ fun App() {
                         },
                         onNavigateToHomework = {
                             navController.navigate(Screen.Homework)
+                        },
+                        onNavigateToCalendar = {
+                            navController.navigate(Screen.Calendar)
                         }
                     )
                 }
@@ -41,6 +44,12 @@ fun App() {
 
                 composable<Screen.Homework> {
                     com.nemogz.mantracounter.ui.homework.HomeworkScreen(
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable<Screen.Calendar> {
+                    com.nemogz.mantracounter.ui.calendar.CalendarScreen(
                         onBack = { navController.popBackStack() }
                     )
                 }

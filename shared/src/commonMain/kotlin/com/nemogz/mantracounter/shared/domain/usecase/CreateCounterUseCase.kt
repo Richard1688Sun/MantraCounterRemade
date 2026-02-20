@@ -3,8 +3,8 @@ package com.nemogz.mantracounter.shared.domain.usecase
 import com.nemogz.mantracounter.shared.domain.model.Counter
 import com.nemogz.mantracounter.shared.domain.model.MantraType
 import com.nemogz.mantracounter.shared.domain.repository.ICounterRepository
-import kotlinx.datetime.Clock
 import kotlin.random.Random
+import kotlin.time.Clock
 
 class CreateCounterUseCase(
     private val repository: ICounterRepository

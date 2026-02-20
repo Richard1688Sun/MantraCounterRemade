@@ -27,7 +27,10 @@ kotlin {
     }
     
     sourceSets {
-        
+        all {
+            languageSettings.optIn("kotlin.time.ExperimentalTime")
+        }
+
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.appcompat)
@@ -45,6 +48,7 @@ kotlin {
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
             implementation(libs.compose.material.icons.core)
+            implementation(libs.compose.material.icons.extended)
             implementation(libs.kotlinx.datetime)
 
             
@@ -54,6 +58,7 @@ kotlin {
             implementation(libs.androidx.navigation.compose)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.reorderable)
+            implementation(libs.kizitonwose.calendar.compose.multiplatform)
         }
     }
 }

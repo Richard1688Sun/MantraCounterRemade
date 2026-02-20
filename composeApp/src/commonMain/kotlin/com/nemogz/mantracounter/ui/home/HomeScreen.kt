@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DateRange
 
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.size
@@ -36,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -62,7 +64,8 @@ import sh.calvin.reorderable.rememberReorderableLazyGridState
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
     onNavigateToDetail: (String) -> Unit,
-    onNavigateToHomework: () -> Unit
+    onNavigateToHomework: () -> Unit,
+    onNavigateToCalendar: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -96,6 +99,7 @@ fun HomeScreen(
                 onClearSelection = viewModel::clearSelection,
                 onDeleteSelected = viewModel::deleteSelectedCounters,
                 onCreateCounter = { name, initialCount -> viewModel.onCreateCounter(name, 0, initialCount) },
+                onNavigateToCalendar = onNavigateToCalendar,
                 modifier = Modifier.padding(padding)
             )
         }
@@ -117,7 +121,8 @@ fun HomeContent(
     onSelectionMake: (String) -> Unit,
     onClearSelection: () -> Unit,
     onDeleteSelected: () -> Unit,
-    onCreateCounter: (String, Int) -> Unit, // TODO: Update signature to include initialCount? No, pass it as targetWait? Wait, Viewmodel signature changed.
+    onCreateCounter: (String, Int) -> Unit,
+    onNavigateToCalendar: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     // Edit/Create Dialog State
@@ -185,13 +190,31 @@ fun HomeContent(
     }
 
     Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
-        // Little House Section
-        HomeScreenLittleHouseItem(
-            littleHouseCount = state.littleHouseCount,
-            canConvert = state.canConvertLittleHouse,
-            onConvert = onConvertLittleHouse,
-            onBurn = onBurnLittleHouse
-        )
+        // Little House Section + Calendar button
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            HomeScreenLittleHouseItem(
+                littleHouseCount = state.littleHouseCount,
+                canConvert = state.canConvertLittleHouse,
+                onConvert = onConvertLittleHouse,
+                onBurn = onBurnLittleHouse,
+                modifier = Modifier.weight(1f)
+            )
+            IconButton(
+                onClick = onNavigateToCalendar,
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = "Tracking Calendar",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
+        }
 
         // Homework Section
         HomeScreenHomeworkItem(

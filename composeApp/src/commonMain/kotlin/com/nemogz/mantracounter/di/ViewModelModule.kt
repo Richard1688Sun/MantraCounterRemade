@@ -36,9 +36,11 @@ val viewModelModule = module {
             getCountersUseCase = get(),
             updateCounterUseCase = get(),
             getMissedHomeworkDaysUseCase = get(),
-            catchUpHomeworkUseCase = get()
+            catchUpHomeworkUseCase = get(),
+            completeHomeworkUseCase = get()
         )
     }
     factory { CounterDetailViewModel(get(), get(), get(), get()) }
+    factory { com.nemogz.mantracounter.ui.calendar.CalendarViewModel(get()) }
     single { DatabaseSeeder(get(), get(), get()) }
 }

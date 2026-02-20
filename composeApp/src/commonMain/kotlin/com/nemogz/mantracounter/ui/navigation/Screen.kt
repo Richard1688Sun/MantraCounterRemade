@@ -11,4 +11,7 @@ sealed class Screen {
 
     @Serializable
     data object Homework : Screen()
+
+    @Serializable
+    data object Calendar : Screen()
 }

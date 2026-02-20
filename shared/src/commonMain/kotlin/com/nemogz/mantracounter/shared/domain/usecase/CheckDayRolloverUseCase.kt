@@ -2,9 +2,9 @@ package com.nemogz.mantracounter.shared.domain.usecase
 
 import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 
 class CheckDayRolloverUseCase(
     private val dailyActivityRepository: IDailyActivityRepository
@@ -16,7 +16,7 @@ class CheckDayRolloverUseCase(
      * fill the gap from mostRecent+1 to today.
      */
     suspend operator fun invoke() {
-        val today = Clock.System.todayIn(TimeZone.currentSystemDefault()).toEpochDays().toLong()
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
         val mostRecent = dailyActivityRepository.getMostRecentActivityDate()
 
         if (mostRecent == null) {

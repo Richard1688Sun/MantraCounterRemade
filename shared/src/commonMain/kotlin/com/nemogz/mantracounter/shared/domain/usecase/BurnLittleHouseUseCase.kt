@@ -4,9 +4,9 @@ import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
 import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRepository
 import kotlinx.coroutines.flow.first
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 
 class BurnLittleHouseUseCase(
     private val littleHouseRepository: ILittleHouseRepository,
@@ -23,7 +23,7 @@ class BurnLittleHouseUseCase(
             littleHouseRepository.incrementLittleHouseCount(-1)
 
             // Log burn in daily activity
-            val today = Clock.System.todayIn(TimeZone.currentSystemDefault()).toEpochDays().toLong()
+            val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
             val activity = dailyActivityRepository.getDailyActivityByDate(today) ?: DailyActivityEntity(date = today)
             dailyActivityRepository.insertOrUpdateActivity(
                 activity.copy(littleHousesBurned = activity.littleHousesBurned + 1)
