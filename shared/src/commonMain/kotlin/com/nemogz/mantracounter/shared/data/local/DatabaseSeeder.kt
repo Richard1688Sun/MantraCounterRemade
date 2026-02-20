@@ -4,11 +4,13 @@ import com.nemogz.mantracounter.shared.domain.model.Counter
 import com.nemogz.mantracounter.shared.domain.model.MantraType
 import com.nemogz.mantracounter.shared.domain.repository.ICounterRepository
 import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRepository
+import com.nemogz.mantracounter.shared.domain.usecase.CheckDayRolloverUseCase
 import kotlinx.coroutines.flow.first
 
 class DatabaseSeeder(
     private val counterRepository: ICounterRepository,
-    private val littleHouseRepository: ILittleHouseRepository
+    private val littleHouseRepository: ILittleHouseRepository,
+    private val checkDayRolloverUseCase: CheckDayRolloverUseCase
 ) {
     suspend fun seed() {
         // 1. Check if counters exist
@@ -48,15 +50,11 @@ class DatabaseSeeder(
 
         // 3. Ensure LittleHouse record exists
         val lhCount = littleHouseRepository.getLittleHouseCount().first()
-        // If flow returns 0 (mapped from null), we are good. 
-        // But we want to ensure the row exists so updates work.
-        // My repo implementation: `getLittleHouseCount` returns 0 if null.
-        // `setLittleHouseCount` inserts/replaces.
-        // `incrementLittleHouseCount` updates. 
-        // If row doesn't exist, `increment` might fail depending on SQL.
-        // Safe bet: set it to 0 explicitly if we just seeded counters.
         if (currentCounters.isEmpty()) {
              littleHouseRepository.setLittleHouseCount(0)
         }
+
+        // 4. Backfill Daily Activity entries (reuses CheckDayRolloverUseCase)
+        checkDayRolloverUseCase()
     }
 }

@@ -5,15 +5,18 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import com.nemogz.mantracounter.shared.data.local.dao.CounterDao
+import com.nemogz.mantracounter.shared.data.local.dao.DailyActivityDao
 import com.nemogz.mantracounter.shared.data.local.dao.LittleHouseDao
 import com.nemogz.mantracounter.shared.data.local.entity.CounterEntity
+import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
 import com.nemogz.mantracounter.shared.data.local.entity.LittleHouseEntity
 
-@Database(entities = [CounterEntity::class, LittleHouseEntity::class], version = 3)
+@Database(entities = [CounterEntity::class, LittleHouseEntity::class, DailyActivityEntity::class], version = 4)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun counterDao(): CounterDao
     abstract fun littleHouseDao(): LittleHouseDao
+    abstract fun dailyActivityDao(): DailyActivityDao
 }
 
 // Expect declaration for platform-specific constructor (standard in Room KMP)

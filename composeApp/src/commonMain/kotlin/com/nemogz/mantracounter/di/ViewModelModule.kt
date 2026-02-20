@@ -15,18 +15,30 @@ import org.koin.dsl.module
 val viewModelModule = module {
     factory { 
         HomeViewModel(
-            getCountersUseCase = get<GetCountersUseCase>(), 
-            getLittleHouseCountUseCase = get<GetLittleHouseCountUseCase>(), 
-            incrementCounterUseCase = get<IncrementCounterUseCase>(), 
-            convertLittleHouseUseCase = get<ConvertLittleHouseUseCase>(), 
-            completeHomeworkUseCase = get<CompleteHomeworkUseCase>(), 
-            updateCountersUseCase = get<UpdateCountersUseCase>(), 
-            updateCounterUseCase = get<UpdateCounterUseCase>(),
+            getCountersUseCase = get(), 
+            getLittleHouseCountUseCase = get(), 
+            incrementCounterUseCase = get(), 
+            convertLittleHouseUseCase = get(), 
+            burnLittleHouseUseCase = get(),
+            getMissedHomeworkDaysUseCase = get(),
+            completeHomeworkUseCase = get(), 
+            catchUpHomeworkUseCase = get(),
+            updateCountersUseCase = get(), 
+            updateCounterUseCase = get(),
             createCounterUseCase = get(),
             deleteCountersUseCase = get(),
-            validateCounterCountUseCase = get()
+            validateCounterCountUseCase = get(),
+            checkDayRolloverUseCase = get()
         ) 
     }
+    factory {
+        com.nemogz.mantracounter.ui.homework.HomeworkViewModel(
+            getCountersUseCase = get(),
+            updateCounterUseCase = get(),
+            getMissedHomeworkDaysUseCase = get(),
+            catchUpHomeworkUseCase = get()
+        )
+    }
     factory { CounterDetailViewModel(get(), get(), get(), get()) }
-    single { DatabaseSeeder(get(), get()) }
+    single { DatabaseSeeder(get(), get(), get()) }
 }

@@ -8,34 +8,34 @@ class CompleteHomeworkUseCase(
 ) {
     /**
      * Checks if homework can be completed and deducts counts if possible.
-     * @return true if successful, false if not enough counts.
+     * @return A map of counter ID -> deducted amount, or null if not enough counts.
      */
-    suspend operator fun invoke(): Boolean {
+    suspend operator fun invoke(): Map<String, Int>? {
         val counters = counterRepository.getAllCounters().first()
         
         // 1. Filter counters that have homework requirements
         val homeworkCounters = counters.filter { it.homeworkGoal > 0 }
         
-        if (homeworkCounters.isEmpty()) return false 
+        if (homeworkCounters.isEmpty()) return null
 
         // 2. Check availability
         val allSatisfied = homeworkCounters.all { it.hasEnoughForHomework() }
         
-        if (!allSatisfied) return false
+        if (!allSatisfied) return null
 
-        // 3. Deduct counts
+        // 3. Deduct counts and build details map
         val idsToUpdate = mutableListOf<String>()
         val newCounts = mutableListOf<Int>()
+        val details = mutableMapOf<String, Int>()
 
         homeworkCounters.forEach { counter ->
             idsToUpdate.add(counter.id)
-            newCounts.add(counter.count - counter.homeworkGoal) // Deduct goal amount
+            newCounts.add(counter.count - counter.homeworkGoal)
+            details[counter.name] = counter.homeworkGoal
         }
 
         counterRepository.updateCounts(idsToUpdate, newCounts)
         
-        // TODO: Log the homework completion time/history if needed (Repository for HomeworkHistory?)
-        
-        return true
+        return details
     }
 }

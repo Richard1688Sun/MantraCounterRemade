@@ -34,6 +34,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -58,9 +61,15 @@ import sh.calvin.reorderable.rememberReorderableLazyGridState
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
-    onNavigateToDetail: (String) -> Unit
+    onNavigateToDetail: (String) -> Unit,
+    onNavigateToHomework: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
+
+    // Trigger day rollover check whenever HomeScreen enters composition (e.g., app resume)
+    LaunchedEffect(Unit) {
+        viewModel.checkDayRollover()
+    }
 
     Scaffold { padding ->
         if (state.isLoading) {
@@ -76,7 +85,9 @@ fun HomeScreen(
                 state = state,
                 onIncrement = viewModel::onIncrementCounter,
                 onConvertLittleHouse = viewModel::onConvertLittleHouse,
-                onHomework = viewModel::onCompleteHomework,
+                onBurnLittleHouse = viewModel::onBurnLittleHouse,
+                onNavigateToHomework = onNavigateToHomework,
+                onCatchUpDay = viewModel::catchUpDay,
                 onCounterClick = onNavigateToDetail,
                 onToggleEditMode = viewModel::toggleEditMode,
                 onMove = viewModel::onMoveCounter,
@@ -96,7 +107,9 @@ fun HomeContent(
     state: HomeUiState,
     onIncrement: (String) -> Unit,
     onConvertLittleHouse: () -> Unit,
-    onHomework: () -> Unit,
+    onBurnLittleHouse: () -> Unit,
+    onNavigateToHomework: () -> Unit,
+    onCatchUpDay: (Long) -> Unit,
     onCounterClick: (String) -> Unit,
     onToggleEditMode: () -> Unit,
     onMove: (Int, Int) -> Unit,
@@ -173,32 +186,20 @@ fun HomeContent(
 
     Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
         // Little House Section
-        Card(
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("Little House Count: ${state.littleHouseCount}", style = MaterialTheme.typography.headlineSmall)
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(onClick = onConvertLittleHouse) {
-                    Text("Convert / Burn Little House")
-                }
-            }
-        }
+        HomeScreenLittleHouseItem(
+            littleHouseCount = state.littleHouseCount,
+            canConvert = state.canConvertLittleHouse,
+            onConvert = onConvertLittleHouse,
+            onBurn = onBurnLittleHouse
+        )
 
         // Homework Section
-        Card(
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("Homework", style = MaterialTheme.typography.titleMedium)
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(onClick = onHomework) {
-                    Text("Complete Homework")
-                }
-            }
-        }
+        HomeScreenHomeworkItem(
+            missedHomeworkDays = state.missedHomeworkDays,
+            canCompleteHomework = state.canCompleteHomework,
+            onCatchUpDay = onCatchUpDay,
+            onNavigateToHomework = onNavigateToHomework
+        )
 
         // Header + Edit/Done + Delete
         Row(

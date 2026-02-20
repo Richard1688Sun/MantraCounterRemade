@@ -16,17 +16,24 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
+import com.nemogz.mantracounter.shared.domain.usecase.BurnLittleHouseUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.GetMissedHomeworkDaysUseCase
+
 class HomeViewModel(
     private val getCountersUseCase: GetCountersUseCase,
     private val getLittleHouseCountUseCase: GetLittleHouseCountUseCase,
     private val incrementCounterUseCase: IncrementCounterUseCase,
     private val convertLittleHouseUseCase: ConvertLittleHouseUseCase,
+    private val burnLittleHouseUseCase: BurnLittleHouseUseCase,
+    private val getMissedHomeworkDaysUseCase: GetMissedHomeworkDaysUseCase,
     private val completeHomeworkUseCase: CompleteHomeworkUseCase,
+    private val catchUpHomeworkUseCase: com.nemogz.mantracounter.shared.domain.usecase.CatchUpHomeworkUseCase,
     private val updateCountersUseCase: UpdateCountersUseCase, // New dependency
     private val updateCounterUseCase: UpdateCounterUseCase,  // New dependency
     private val validateCounterCountUseCase: ValidateCounterCountUseCase, // New dependency
     private val createCounterUseCase: com.nemogz.mantracounter.shared.domain.usecase.CreateCounterUseCase,
-    private val deleteCountersUseCase: com.nemogz.mantracounter.shared.domain.usecase.DeleteCountersUseCase
+    private val deleteCountersUseCase: com.nemogz.mantracounter.shared.domain.usecase.DeleteCountersUseCase,
+    private val checkDayRolloverUseCase: com.nemogz.mantracounter.shared.domain.usecase.CheckDayRolloverUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState(isLoading = true))
@@ -36,17 +43,38 @@ class HomeViewModel(
         viewModelScope.launch {
             combine(
                 getCountersUseCase(), 
-                getLittleHouseCountUseCase()
-            ) { counters, littleHouseCount ->
+                getLittleHouseCountUseCase(),
+                getMissedHomeworkDaysUseCase()
+            ) { counters, littleHouseCount, missedDays ->
                 HomeUiState(
                     counters = counters.sortedBy { it.sortOrder },
                     littleHouseCount = littleHouseCount,
+                    missedHomeworkDays = missedDays,
                     isLoading = false,
                     isEditMode = _uiState.value.isEditMode, 
                     selectedCounterIds = _uiState.value.selectedCounterIds
                 )
             }.collect { newState ->
                 _uiState.value = newState
+            }
+        }
+    }
+
+    fun checkDayRollover() {
+        viewModelScope.launch {
+            checkDayRolloverUseCase()
+        }
+    }
+
+    fun catchUpDay(epochDay: Long) {
+        viewModelScope.launch {
+            // First deduct mantra counts — returns map of ID -> deducted amount, or null
+            val details = completeHomeworkUseCase()
+            if (details != null) {
+                // Convert details map to a simple JSON-like string
+                val detailsStr = details.entries.joinToString(",") { "${it.key}:${it.value}" }
+                // Then mark the day as completed with the details
+                catchUpHomeworkUseCase(epochDay, detailsStr)
             }
         }
     }
@@ -103,6 +131,12 @@ class HomeViewModel(
     fun onConvertLittleHouse() {
         viewModelScope.launch {
             convertLittleHouseUseCase()
+        }
+    }
+
+    fun onBurnLittleHouse() {
+        viewModelScope.launch {
+            burnLittleHouseUseCase()
         }
     }
     

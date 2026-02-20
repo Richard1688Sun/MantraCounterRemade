@@ -8,4 +8,7 @@ sealed class Screen {
 
     @Serializable
     data class Detail(val counterId: String) : Screen()
+
+    @Serializable
+    data object Homework : Screen()
 }

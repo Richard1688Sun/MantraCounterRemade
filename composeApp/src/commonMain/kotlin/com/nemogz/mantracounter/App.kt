@@ -24,6 +24,9 @@ fun App() {
                     HomeScreen(
                         onNavigateToDetail = { counterId ->
                             navController.navigate(Screen.Detail(counterId))
+                        },
+                        onNavigateToHomework = {
+                            navController.navigate(Screen.Homework)
                         }
                     )
                 }
@@ -32,6 +35,12 @@ fun App() {
                     val detail: Screen.Detail = backStackEntry.toRoute()
                     CounterDetailScreen(
                         counterId = detail.counterId,
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable<Screen.Homework> {
+                    com.nemogz.mantracounter.ui.homework.HomeworkScreen(
                         onBack = { navController.popBackStack() }
                     )
                 }

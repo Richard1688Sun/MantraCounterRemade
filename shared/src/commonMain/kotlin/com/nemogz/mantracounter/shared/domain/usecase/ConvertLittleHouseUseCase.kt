@@ -3,11 +3,17 @@ package com.nemogz.mantracounter.shared.domain.usecase
 import com.nemogz.mantracounter.shared.domain.model.MantraType
 import com.nemogz.mantracounter.shared.domain.repository.ICounterRepository
 import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRepository
+import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
+import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 
 class ConvertLittleHouseUseCase(
     private val counterRepository: ICounterRepository,
-    private val littleHouseRepository: ILittleHouseRepository
+    private val littleHouseRepository: ILittleHouseRepository,
+    private val dailyActivityRepository: IDailyActivityRepository
 ) {
     /**
      * Attempts to convert counts into LittleHouses.
@@ -34,26 +40,32 @@ class ConvertLittleHouseUseCase(
 
             val minimalSets = minOf(setsDabei, setsBoruo, setsWangshen, setsQifo)
 
-            if (minimalSets > 0) {
+            // Only convert 1 little house at a time
+            val setsToConvert = if (minimalSets > 0) 1 else 0
+
+            if (setsToConvert > 0) {
                 // 3. Deduct counts
-                val newDabeiCount = dabei.count - (minimalSets * MantraType.DaBei.mantraGoalCount)
-                val newBoruoCount = boruo.count - (minimalSets * MantraType.BoRuo.mantraGoalCount)
-                val newWangshenCount = wangshen.count - (minimalSets * MantraType.WangShen.mantraGoalCount)
-                val newQifoCount = qifo.count - (minimalSets * MantraType.QiFo.mantraGoalCount)
+                val newDabeiCount = dabei.count - (setsToConvert * MantraType.DaBei.mantraGoalCount)
+                val newBoruoCount = boruo.count - (setsToConvert * MantraType.BoRuo.mantraGoalCount)
+                val newWangshenCount = wangshen.count - (setsToConvert * MantraType.WangShen.mantraGoalCount)
+                val newQifoCount = qifo.count - (setsToConvert * MantraType.QiFo.mantraGoalCount)
 
             // 4. Update Repositories
-            // We update counters individually or in batch if repo supports it.
-            // Using batch update helper would be better, but for now individual saves are fine or we add batch method.
-            // I added updateCounts to ICounterRepository earlier!
-            
             counterRepository.updateCounts(
                 ids = listOf(dabei.id, boruo.id, wangshen.id, qifo.id),
                 newCounts = listOf(newDabeiCount, newBoruoCount, newWangshenCount, newQifoCount)
             )
 
-            littleHouseRepository.incrementLittleHouseCount(minimalSets)
+            littleHouseRepository.incrementLittleHouseCount(setsToConvert)
+
+            // Log conversion in daily activity
+            val today = Clock.System.todayIn(TimeZone.currentSystemDefault()).toEpochDays().toLong()
+            val activity = dailyActivityRepository.getDailyActivityByDate(today) ?: DailyActivityEntity(date = today)
+            dailyActivityRepository.insertOrUpdateActivity(
+                activity.copy(littleHousesConverted = activity.littleHousesConverted + setsToConvert)
+            )
         }
 
-        return minimalSets
+        return setsToConvert
     }
 }

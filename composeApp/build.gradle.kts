@@ -45,6 +45,7 @@ kotlin {
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
             implementation(libs.compose.material.icons.core)
+            implementation(libs.kotlinx.datetime)
 
             
             implementation(libs.koin.core)
@@ -52,7 +53,7 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.androidx.navigation.compose)
             implementation(libs.kotlinx.serialization.json)
-            implementation("sh.calvin.reorderable:reorderable:2.4.3")
+            implementation(libs.reorderable)
         }
     }
 }

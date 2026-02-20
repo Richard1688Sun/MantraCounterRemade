@@ -28,8 +28,12 @@ class MantraApplication : Application() {
 
         // Seed Database
         CoroutineScope(Dispatchers.IO).launch {
-            val seeder: com.nemogz.mantracounter.shared.data.local.DatabaseSeeder by inject()
-            seeder.seed()
+            try {
+                val seeder: com.nemogz.mantracounter.shared.data.local.DatabaseSeeder by inject()
+                seeder.seed()
+            } catch (e: Exception) {
+                android.util.Log.e("MantraApp", "Seeder failed", e)
+            }
         }
     }
 }
