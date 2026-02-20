@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
-import com.nemogz.mantracounter.shared.domain.usecase.BurnLittleHouseUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.GetMissedHomeworkDaysUseCase
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -26,7 +25,6 @@ class HomeViewModel(
     private val getLittleHouseCountUseCase: GetLittleHouseCountUseCase,
     private val incrementCounterUseCase: IncrementCounterUseCase,
     private val convertLittleHouseUseCase: ConvertLittleHouseUseCase,
-    private val burnLittleHouseUseCase: BurnLittleHouseUseCase,
     private val getMissedHomeworkDaysUseCase: GetMissedHomeworkDaysUseCase,
     private val completeHomeworkUseCase: CompleteHomeworkUseCase,
     private val catchUpHomeworkUseCase: com.nemogz.mantracounter.shared.domain.usecase.CatchUpHomeworkUseCase,
@@ -142,12 +140,6 @@ class HomeViewModel(
         }
     }
 
-    fun onBurnLittleHouse() {
-        viewModelScope.launch {
-            burnLittleHouseUseCase()
-        }
-    }
-    
     fun onCompleteHomework() {
         viewModelScope.launch {
             val today = kotlin.time.Clock.System.now()

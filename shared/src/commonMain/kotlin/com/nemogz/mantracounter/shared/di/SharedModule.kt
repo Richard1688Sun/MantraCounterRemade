@@ -3,8 +3,10 @@ package com.nemogz.mantracounter.shared.di
 import com.nemogz.mantracounter.shared.data.local.AppDatabase
 import com.nemogz.mantracounter.shared.data.repository.CounterRepositoryImpl
 import com.nemogz.mantracounter.shared.data.repository.LittleHouseRepositoryImpl
+import com.nemogz.mantracounter.shared.data.repository.LittleHouseRecipientRepositoryImpl
 import com.nemogz.mantracounter.shared.domain.repository.ICounterRepository
 import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRepository
+import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRecipientRepository
 import com.nemogz.mantracounter.shared.domain.usecase.CompleteHomeworkUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.ConvertLittleHouseUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.GetCountersUseCase
@@ -20,6 +22,11 @@ import com.nemogz.mantracounter.shared.data.repository.DailyActivityRepositoryIm
 import com.nemogz.mantracounter.shared.domain.usecase.BurnLittleHouseUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.GetMissedHomeworkDaysUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.CatchUpHomeworkUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.AllocateLittleHouseUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.CreateLittleHouseRecipientUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.DeleteLittleHouseRecipientUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.GetLittleHouseRecipientsUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.UpdateLittleHouseRecipientUseCase
 import org.koin.dsl.module
 
 val featureModule = module {
@@ -27,11 +34,13 @@ val featureModule = module {
     single { get<AppDatabase>().counterDao() }
     single { get<AppDatabase>().littleHouseDao() }
     single { get<AppDatabase>().dailyActivityDao() }
+    single { get<AppDatabase>().littleHouseRecipientDao() }
 
     // 2. Repositories
     single<ICounterRepository> { CounterRepositoryImpl(get()) }
     single<ILittleHouseRepository> { LittleHouseRepositoryImpl(get()) }
     single<IDailyActivityRepository> { DailyActivityRepositoryImpl(get()) }
+    single<ILittleHouseRecipientRepository> { LittleHouseRecipientRepositoryImpl(get()) }
 
     // 3. Use Cases
     factory { IncrementCounterUseCase(get()) }
@@ -52,4 +61,11 @@ val featureModule = module {
     factory { ValidateCounterCountUseCase() }
     factory { com.nemogz.mantracounter.shared.domain.usecase.GetActivitiesForMonthUseCase(get()) }
 
+    // Little House Recipient Use Cases
+    factory { GetLittleHouseRecipientsUseCase(get()) }
+    factory { CreateLittleHouseRecipientUseCase(get()) }
+    factory { UpdateLittleHouseRecipientUseCase(get()) }
+    factory { DeleteLittleHouseRecipientUseCase(get()) }
+    factory { AllocateLittleHouseUseCase(get(), get(), get()) }
+    factory { com.nemogz.mantracounter.shared.domain.usecase.UnallocateLittleHouseUseCase(get(), get(), get()) }
 }

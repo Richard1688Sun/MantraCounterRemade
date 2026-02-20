@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.nemogz.mantracounter.ui.detail.CounterDetailScreen
 import com.nemogz.mantracounter.ui.home.HomeScreen
+import com.nemogz.mantracounter.ui.littlehouse.LittleHouseScreen
 import com.nemogz.mantracounter.ui.navigation.Screen
 
 @Composable
@@ -30,6 +31,9 @@ fun App() {
                         },
                         onNavigateToCalendar = {
                             navController.navigate(Screen.Calendar)
+                        },
+                        onNavigateToLittleHouse = {
+                            navController.navigate(Screen.LittleHouse)
                         }
                     )
                 }
@@ -50,6 +54,12 @@ fun App() {
 
                 composable<Screen.Calendar> {
                     com.nemogz.mantracounter.ui.calendar.CalendarScreen(
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable<Screen.LittleHouse> {
+                    LittleHouseScreen(
                         onBack = { navController.popBackStack() }
                     )
                 }

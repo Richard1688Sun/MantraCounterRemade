@@ -191,40 +191,12 @@ fun HomeScreenCounterItem(
                     verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(4.dp)
                 ) {
                     // Homework Goal Progress
-                    val progress = (counter.count.toFloat() / counter.homeworkGoal).coerceIn(0f, 1f)
-                    val isComplete = progress >= 1f
-                    val barColor = if (isComplete) Color.Green else Color.Gray
-
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Homework",
-                                style = MaterialTheme.typography.bodyMedium, // Larger label
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                text = "${counter.homeworkGoal}",
-                                style = MaterialTheme.typography.bodyMedium, // Larger label
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        androidx.compose.material3.LinearProgressIndicator(
-                            progress = { progress }, // Direct progress, no animation
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(8.dp) // Thicker bar
-                                .clip(RoundedCornerShape(50)) // Rounded pill shape
-                                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(50)), // Debug border
-                            color = barColor,
-                            trackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f), // Subtler track
-                            strokeCap = StrokeCap.Round, // Rounded ends for indicator
-                        )
-                    }
+                    com.nemogz.mantracounter.ui.components.GoalProgressBar(
+                        label = "Homework",
+                        current = counter.count,
+                        goal = counter.homeworkGoal,
+                        valueLabel = "${counter.homeworkGoal}"
+                    )
                 }
                 
                 Spacer(modifier = Modifier.height(8.dp))

@@ -1,0 +1,89 @@
+package com.nemogz.mantracounter.ui.components
+
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+
+/**
+ * A reusable labelled progress bar.
+ *
+ * @param label     Left-hand label (e.g. "Homework", recipient name).
+ * @param current   Current count towards the goal.
+ * @param goal      The target count. Must be > 0.
+ * @param modifier  Modifier applied to the outer Column.
+ * @param completeColor  Bar colour when the goal is reached.
+ * @param incompleteColor  Bar colour while still in progress.
+ * @param showBorder  Whether to draw an outline around the track.
+ * @param barHeight  Height of the progress bar.
+ * @param valueLabel Optional right-hand label override. Defaults to "current / goal".
+ */
+@Composable
+fun GoalProgressBar(
+    label: String,
+    current: Int,
+    goal: Int,
+    modifier: Modifier = Modifier,
+    completeColor: Color = Color.Green,
+    incompleteColor: Color = Color.Gray,
+    showBorder: Boolean = true,
+    barHeight: Dp = 8.dp,
+    valueLabel: String? = null
+) {
+    val progress = if (goal > 0) (current.toFloat() / goal).coerceIn(0f, 1f) else 0f
+    val isComplete = progress >= 1f
+    val barColor = if (isComplete) completeColor else incompleteColor
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = valueLabel ?: "$current / $goal",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        LinearProgressIndicator(
+            progress = { progress },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(barHeight)
+                .clip(RoundedCornerShape(50))
+                .then(
+                    if (showBorder) Modifier.border(
+                        1.dp,
+                        MaterialTheme.colorScheme.outline,
+                        RoundedCornerShape(50)
+                    ) else Modifier
+                ),
+            color = barColor,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f),
+            strokeCap = StrokeCap.Round
+        )
+    }
+}
+

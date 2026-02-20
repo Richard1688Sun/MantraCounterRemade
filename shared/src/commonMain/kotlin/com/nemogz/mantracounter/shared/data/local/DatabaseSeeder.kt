@@ -1,16 +1,19 @@
 package com.nemogz.mantracounter.shared.data.local
 
 import com.nemogz.mantracounter.shared.domain.model.Counter
+import com.nemogz.mantracounter.shared.domain.model.LittleHouseRecipient
 import com.nemogz.mantracounter.shared.domain.model.MantraType
 import com.nemogz.mantracounter.shared.domain.repository.ICounterRepository
 import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRepository
+import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRecipientRepository
 import com.nemogz.mantracounter.shared.domain.usecase.CheckDayRolloverUseCase
 import kotlinx.coroutines.flow.first
 
 class DatabaseSeeder(
     private val counterRepository: ICounterRepository,
     private val littleHouseRepository: ILittleHouseRepository,
-    private val checkDayRolloverUseCase: CheckDayRolloverUseCase
+    private val checkDayRolloverUseCase: CheckDayRolloverUseCase,
+    private val recipientRepository: ILittleHouseRecipientRepository
 ) {
     suspend fun seed() {
         // 1. Check if counters exist
@@ -54,7 +57,20 @@ class DatabaseSeeder(
              littleHouseRepository.setLittleHouseCount(0)
         }
 
-        // 4. Backfill Daily Activity entries (reuses CheckDayRolloverUseCase)
+        // 4. Ensure default "Self" recipient exists
+        val recipientCount = recipientRepository.getCount()
+        if (recipientCount == 0) {
+            recipientRepository.insert(
+                LittleHouseRecipient(
+                    id = LittleHouseRecipient.DEFAULT_SELF_ID,
+                    name = "Self",
+                    goal = 0,
+                    sortOrder = 0
+                )
+            )
+        }
+
+        // 5. Backfill Daily Activity entries (reuses CheckDayRolloverUseCase)
         checkDayRolloverUseCase()
     }
 }

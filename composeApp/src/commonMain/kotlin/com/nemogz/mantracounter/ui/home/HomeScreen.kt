@@ -65,7 +65,8 @@ fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
     onNavigateToDetail: (String) -> Unit,
     onNavigateToHomework: () -> Unit,
-    onNavigateToCalendar: () -> Unit
+    onNavigateToCalendar: () -> Unit,
+    onNavigateToLittleHouse: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -88,7 +89,7 @@ fun HomeScreen(
                 state = state,
                 onIncrement = viewModel::onIncrementCounter,
                 onConvertLittleHouse = viewModel::onConvertLittleHouse,
-                onBurnLittleHouse = viewModel::onBurnLittleHouse,
+                onNavigateToLittleHouse = onNavigateToLittleHouse,
                 onNavigateToHomework = onNavigateToHomework,
                 onCatchUpDay = viewModel::catchUpDay,
                 onCounterClick = onNavigateToDetail,
@@ -111,7 +112,7 @@ fun HomeContent(
     state: HomeUiState,
     onIncrement: (String) -> Unit,
     onConvertLittleHouse: () -> Unit,
-    onBurnLittleHouse: () -> Unit,
+    onNavigateToLittleHouse: () -> Unit,
     onNavigateToHomework: () -> Unit,
     onCatchUpDay: (Long) -> Unit,
     onCounterClick: (String) -> Unit,
@@ -200,7 +201,7 @@ fun HomeContent(
                 littleHouseCount = state.littleHouseCount,
                 canConvert = state.canConvertLittleHouse,
                 onConvert = onConvertLittleHouse,
-                onBurn = onBurnLittleHouse,
+                onNavigateToLittleHouse = onNavigateToLittleHouse,
                 modifier = Modifier.weight(1f)
             )
             IconButton(

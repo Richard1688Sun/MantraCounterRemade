@@ -10,5 +10,6 @@ data class DailyActivityEntity(
     val homeworkCompleted: Boolean = false,
     val homeworkDetails: String = "", // JSON string mapping Mantra ID -> Completed Count
     val littleHousesConverted: Int = 0,
-    val littleHousesBurned: Int = 0
+    val littleHousesBurned: Int = 0,
+    val littleHouseBurnDetails: String = "" // JSON: {"recipientName": count, ...}
 )

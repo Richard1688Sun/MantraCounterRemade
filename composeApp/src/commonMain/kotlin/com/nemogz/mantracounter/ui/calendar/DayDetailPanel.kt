@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
+import com.nemogz.mantracounter.shared.domain.model.LittleHouseRecipient
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
@@ -33,6 +34,7 @@ import kotlinx.serialization.json.jsonPrimitive
 internal fun DayDetailPanel(
     selectedDate: LocalDate?,
     activity: DailyActivityEntity?,
+    recipients: List<LittleHouseRecipient> = emptyList(),
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -70,6 +72,69 @@ internal fun DayDetailPanel(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
+                // Recipient burn/goal overview
+                if (recipients.isNotEmpty()) {
+                    Text(
+                        text = "Little House Progress",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    recipients.forEach { recipient ->
+                        if (recipient.goal > 0) {
+                            com.nemogz.mantracounter.ui.components.GoalProgressBar(
+                                label = recipient.name,
+                                current = recipient.burnedCount,
+                                goal = recipient.goal,
+                                completeColor = MaterialTheme.colorScheme.tertiary,
+                                incompleteColor = MaterialTheme.colorScheme.primary,
+                                showBorder = false,
+                                modifier = Modifier.padding(vertical = 2.dp)
+                            )
+                        } else {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = recipient.name,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.weight(1f).padding(end = 16.dp)
+                                )
+                                Text(
+                                    text = "${recipient.burnedCount} burned",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    }
+                    // Total row
+                    val totalBurned = recipients.sumOf { it.burnedCount }
+                    val totalGoal = recipients.filter { it.goal > 0 }.sumOf { it.goal }
+                    if (totalGoal > 0) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        com.nemogz.mantracounter.ui.components.GoalProgressBar(
+                            label = "Total",
+                            current = totalBurned,
+                            goal = totalGoal,
+                            completeColor = MaterialTheme.colorScheme.tertiary,
+                            incompleteColor = MaterialTheme.colorScheme.primary,
+                            showBorder = false
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
                 if (activity == null) {
                     Text(
                         text = "No activity recorded",
@@ -81,6 +146,43 @@ internal fun DayDetailPanel(
                     Spacer(modifier = Modifier.height(8.dp))
                     DetailRow("Little Houses Burned", activity.littleHousesBurned.toString())
                     Spacer(modifier = Modifier.height(8.dp))
+
+                    // Burn details by recipient
+                    if (activity.littleHouseBurnDetails.isNotBlank()) {
+                        val burnDetails = parseBurnDetails(activity.littleHouseBurnDetails)
+                        if (burnDetails.isNotEmpty()) {
+                            Text(
+                                text = "Burn Breakdown",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            burnDetails.forEach { (recipientName, count) ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = recipientName,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.weight(1f).padding(end = 16.dp)
+                                    )
+                                    Text(
+                                        text = count,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
 
                     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
                     Spacer(modifier = Modifier.height(8.dp))
@@ -185,5 +287,18 @@ private fun parseHomeworkDetails(json: String): List<Pair<String, String>> {
 internal fun formatDate(date: LocalDate): String {
     val monthName = date.month.name.lowercase().replaceFirstChar { it.uppercase() }
     return "$monthName ${date.day}, ${date.year}"
+}
+
+private fun parseBurnDetails(json: String): List<Pair<String, String>> {
+    if (json.isBlank()) return emptyList()
+
+    try {
+        val jsonObj = Json.parseToJsonElement(json).jsonObject
+        return jsonObj.entries.map { (key, value) ->
+            key to value.jsonPrimitive.content
+        }
+    } catch (_: Exception) { /* not valid JSON */ }
+
+    return emptyList()
 }
 

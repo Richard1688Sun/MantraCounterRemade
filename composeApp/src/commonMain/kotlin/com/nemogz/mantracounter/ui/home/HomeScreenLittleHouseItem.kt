@@ -27,11 +27,10 @@ fun HomeScreenLittleHouseItem(
     littleHouseCount: Int,
     canConvert: Boolean,
     onConvert: () -> Unit,
-    onBurn: () -> Unit,
+    onNavigateToLittleHouse: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showConvertDialog by remember { mutableStateOf(false) }
-    var showBurnDialog by remember { mutableStateOf(false) }
 
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
@@ -48,7 +47,7 @@ fun HomeScreenLittleHouseItem(
                     Text("Convert")
                 }
                 Button(
-                    onClick = { showBurnDialog = true },
+                    onClick = onNavigateToLittleHouse,
                     enabled = littleHouseCount > 0,
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
@@ -65,16 +64,6 @@ fun HomeScreenLittleHouseItem(
             confirmText = "Convert",
             onConfirm = onConvert,
             onDismiss = { showConvertDialog = false }
-        )
-    }
-
-    if (showBurnDialog) {
-        ConfirmActionDialog(
-            title = "Burn Little House",
-            body = "This will burn 1 Little House. This action cannot be undone. Are you sure?",
-            confirmText = "Burn",
-            onConfirm = onBurn,
-            onDismiss = { showBurnDialog = false }
         )
     }
 }
