@@ -1,6 +1,5 @@
 package com.nemogz.mantracounter.ui.littlehouse
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,24 +8,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +29,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -52,7 +45,8 @@ import androidx.compose.ui.unit.dp
 import com.nemogz.mantracounter.shared.domain.model.LittleHouseRecipient
 import com.nemogz.mantracounter.ui.components.ConfirmActionDialog
 import com.nemogz.mantracounter.ui.components.DatePickerDialog
-import com.nemogz.mantracounter.ui.components.GoalProgressBar
+import com.nemogz.mantracounter.ui.components.EditableItemGrid
+import com.nemogz.mantracounter.ui.components.appCardColors
 import kotlinx.datetime.LocalDate
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
@@ -67,8 +61,8 @@ fun LittleHouseScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     var showCreateDialog by remember { mutableStateOf(false) }
+    var showDeleteConfirmDialog by remember { mutableStateOf(false) }
     var recipientToEdit by remember { mutableStateOf<LittleHouseRecipient?>(null) }
-    var recipientToDelete by remember { mutableStateOf<LittleHouseRecipient?>(null) }
 
     // Show error as snackbar
     LaunchedEffect(state.error) {
@@ -86,13 +80,13 @@ fun LittleHouseScreen(
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { showCreateDialog = true }) {
-                Icon(Icons.Default.Add, contentDescription = "Add Recipient")
-            }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
@@ -109,7 +103,7 @@ fun LittleHouseScreen(
             ) {
                 // Little House count header
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                    colors = appCardColors(MaterialTheme.colorScheme.primaryContainer),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -129,28 +123,52 @@ fun LittleHouseScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    text = "Recipients",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(state.recipients, key = { it.id }) { recipient ->
-                        RecipientCard(
+                EditableItemGrid(
+                    items = state.recipients,
+                    itemKey = { it.id },
+                    columns = 1,
+                    title = "Offering Recipients",
+                    isEditMode = state.isEditMode,
+                    hasSelection = state.selectedRecipientIds.isNotEmpty(),
+                    onToggleEditMode = viewModel::toggleEditMode,
+                    onAdd = { showCreateDialog = true },
+                    onDeleteSelected = { showDeleteConfirmDialog = true },
+                    onMove = viewModel::onMoveRecipient,
+                    onClearSelection = viewModel::clearSelection,
+                    itemContent = { recipient, dragModifier ->
+                        LittleHouseRecipientItem(
                             recipient = recipient,
+                            isEditMode = state.isEditMode,
+                            isSelected = state.selectedRecipientIds.contains(recipient.id),
+                            onSelectionToggle = { viewModel.toggleSelection(recipient.id) },
                             canAllocate = state.littleHouseCount > 0,
                             onAllocate = { viewModel.onAllocate(recipient.id) },
                             onUnallocate = { viewModel.onUnallocate(recipient.id) },
                             onEdit = { recipientToEdit = recipient },
-                            onDelete = { recipientToDelete = recipient }
+                            dragModifier = dragModifier
                         )
                     }
-                }
+                )
             }
         }
+    }
+
+    // Bulk delete confirmation
+    if (showDeleteConfirmDialog) {
+        val selectedNames = state.recipients
+            .filter { it.id in state.selectedRecipientIds }
+            .joinToString(", ") { it.name }
+
+        ConfirmActionDialog(
+            title = "Delete Recipients?",
+            body = "Are you sure you want to delete: $selectedNames?",
+            confirmText = "Delete",
+            onConfirm = {
+                viewModel.deleteSelectedRecipients()
+                showDeleteConfirmDialog = false
+            },
+            onDismiss = { showDeleteConfirmDialog = false }
+        )
     }
 
     // Create dialog
@@ -174,130 +192,6 @@ fun LittleHouseScreen(
                 recipientToEdit = null
             }
         )
-    }
-
-    // Delete confirmation
-    recipientToDelete?.let { recipient ->
-        ConfirmActionDialog(
-            title = "Delete Recipient",
-            body = "Are you sure you want to delete \"${recipient.name}\"? This action cannot be undone.",
-            confirmText = "Delete",
-            onConfirm = { viewModel.onDeleteRecipient(recipient.id) },
-            onDismiss = { recipientToDelete = null }
-        )
-    }
-}
-
-@Composable
-private fun RecipientCard(
-    recipient: LittleHouseRecipient,
-    canAllocate: Boolean,
-    onAllocate: () -> Unit,
-    onUnallocate: () -> Unit,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = if (recipient.isGoalComplete)
-                MaterialTheme.colorScheme.tertiaryContainer
-            else
-                MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = recipient.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    if (recipient.goal > 0) {
-                        Text(
-                            text = "${recipient.burnedCount} / ${recipient.goal} burned",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    } else {
-                        Text(
-                            text = "${recipient.burnedCount} burned",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    recipient.targetFinishDate?.let { epochDay ->
-                        val date = LocalDate.fromEpochDays(epochDay.toInt())
-                        val monthName = date.month.name.lowercase().replaceFirstChar { it.uppercase() }
-                        Text(
-                            text = "Target: $monthName ${date.day}, ${date.year}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
-                Row {
-                    IconButton(onClick = onEdit) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit")
-                    }
-                    if (!recipient.isDefault) {
-                        IconButton(onClick = onDelete) {
-                            Icon(
-                                Icons.Default.Delete,
-                                contentDescription = "Delete",
-                                tint = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Progress bar (only if goal > 0)
-            if (recipient.goal > 0) {
-                Spacer(modifier = Modifier.height(8.dp))
-                GoalProgressBar(
-                    label = "Burned",
-                    current = recipient.burnedCount,
-                    goal = recipient.goal,
-                    completeColor = MaterialTheme.colorScheme.tertiary,
-                    incompleteColor = MaterialTheme.colorScheme.primary,
-                    showBorder = false
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Button(
-                    onClick = onAllocate,
-                    enabled = canAllocate && !recipient.isGoalComplete,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(if (recipient.isGoalComplete) "Goal Complete ✅" else "Allocate")
-                }
-                Button(
-                    onClick = onUnallocate,
-                    enabled = recipient.burnedCount > 0,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer
-                    )
-                ) {
-                    Text("Unallocate")
-                }
-            }
-        }
     }
 }
 
@@ -493,9 +387,3 @@ private fun EditRecipientDialog(
         )
     }
 }
-
-
-
-
-
-

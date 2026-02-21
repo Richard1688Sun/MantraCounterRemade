@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.nemogz.mantracounter.ui.theme.AppTheme
 import com.nemogz.mantracounter.ui.detail.CounterDetailScreen
 import com.nemogz.mantracounter.ui.home.HomeScreen
 import com.nemogz.mantracounter.ui.littlehouse.LittleHouseScreen
@@ -16,8 +17,8 @@ import com.nemogz.mantracounter.ui.navigation.Screen
 
 @Composable
 fun App() {
-    MaterialTheme {
-        Surface(modifier = Modifier.fillMaxSize()) {
+    AppTheme {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             val navController = rememberNavController()
             
             NavHost(navController = navController, startDestination = Screen.Home) {

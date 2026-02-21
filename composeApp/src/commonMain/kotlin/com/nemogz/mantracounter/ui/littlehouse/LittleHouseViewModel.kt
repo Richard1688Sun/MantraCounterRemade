@@ -38,7 +38,9 @@ class LittleHouseViewModel(
                 LittleHouseUiState(
                     recipients = recipients.sortedBy { it.sortOrder },
                     littleHouseCount = littleHouseCount,
-                    isLoading = false
+                    isLoading = false,
+                    isEditMode = _uiState.value.isEditMode,
+                    selectedRecipientIds = _uiState.value.selectedRecipientIds
                 )
             }.collect { newState ->
                 _uiState.value = newState
@@ -79,6 +81,61 @@ class LittleHouseViewModel(
     fun onDeleteRecipient(id: String) {
         viewModelScope.launch {
             deleteRecipientUseCase(id)
+        }
+    }
+
+    fun toggleEditMode() {
+        val newMode = !_uiState.value.isEditMode
+        _uiState.value = _uiState.value.copy(
+            isEditMode = newMode,
+            selectedRecipientIds = if (!newMode) emptySet() else _uiState.value.selectedRecipientIds
+        )
+    }
+
+    fun toggleSelection(id: String) {
+        if (!_uiState.value.isEditMode) return
+        // Don't allow selecting the default "Self" recipient
+        if (id == LittleHouseRecipient.DEFAULT_SELF_ID) return
+
+        val currentSelection = _uiState.value.selectedRecipientIds.toMutableSet()
+        if (currentSelection.contains(id)) {
+            currentSelection.remove(id)
+        } else {
+            currentSelection.add(id)
+        }
+        _uiState.value = _uiState.value.copy(selectedRecipientIds = currentSelection)
+    }
+
+    fun clearSelection() {
+        _uiState.value = _uiState.value.copy(selectedRecipientIds = emptySet())
+    }
+
+    fun deleteSelectedRecipients() {
+        val selectedIds = _uiState.value.selectedRecipientIds.toList()
+        if (selectedIds.isEmpty()) return
+
+        viewModelScope.launch {
+            selectedIds.forEach { id ->
+                deleteRecipientUseCase(id)
+            }
+            clearSelection()
+        }
+    }
+
+    fun onMoveRecipient(fromIndex: Int, toIndex: Int) {
+        val currentList = _uiState.value.recipients.toMutableList()
+        if (fromIndex in currentList.indices && toIndex in currentList.indices) {
+            val item = currentList.removeAt(fromIndex)
+            currentList.add(toIndex, item)
+
+            val updatedList = currentList.mapIndexed { index, recipient ->
+                recipient.copy(sortOrder = index)
+            }
+            _uiState.value = _uiState.value.copy(recipients = updatedList)
+
+            viewModelScope.launch {
+                updatedList.forEach { updateRecipientUseCase(it) }
+            }
         }
     }
 

@@ -37,10 +37,15 @@ class UnallocateLittleHouseUseCase(
         val updatedBurnDetails = decrementBurnDetailsJson(activity.littleHouseBurnDetails, recipient.name)
         val newBurnedCount = (activity.littleHousesBurned - 1).coerceAtLeast(0)
 
+        // Build allocation details from all recipients (post-decrement state)
+        val allRecipients = recipientRepository.getAll().first()
+        val details = buildAllocationDetailsJson(allRecipients, activity.allocationDetails, updatedBurnDetails)
+
         dailyActivityRepository.insertOrUpdateActivity(
             activity.copy(
                 littleHousesBurned = newBurnedCount,
-                littleHouseBurnDetails = updatedBurnDetails
+                littleHouseBurnDetails = updatedBurnDetails,
+                allocationDetails = details
             )
         )
 
@@ -98,4 +103,3 @@ class UnallocateLittleHouseUseCase(
         }
     }
 }
-

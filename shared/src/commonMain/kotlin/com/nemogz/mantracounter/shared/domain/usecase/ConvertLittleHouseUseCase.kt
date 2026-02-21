@@ -61,8 +61,27 @@ class ConvertLittleHouseUseCase(
             // Log conversion in daily activity
             val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
             val activity = dailyActivityRepository.getDailyActivityByDate(today) ?: DailyActivityEntity(date = today)
+
+            // Log little house deductions in mantraRecitedDetails
+            var updatedMantraDetails = activity.mantraRecitedDetails
+            val deductions = listOf(
+                dabei.name to (dabei.count to newDabeiCount),
+                boruo.name to (boruo.count to newBoruoCount),
+                wangshen.name to (wangshen.count to newWangshenCount),
+                qifo.name to (qifo.count to newQifoCount)
+            )
+            for ((name, counts) in deductions) {
+                val (oldCount, newCount) = counts
+                updatedMantraDetails = updateMantraRecitedForCountChange(
+                    updatedMantraDetails, name, oldCount, newCount, MantraChangeReason.LITTLE_HOUSE
+                )
+            }
+
             dailyActivityRepository.insertOrUpdateActivity(
-                activity.copy(littleHousesConverted = activity.littleHousesConverted + setsToConvert)
+                activity.copy(
+                    littleHousesConverted = activity.littleHousesConverted + setsToConvert,
+                    mantraRecitedDetails = updatedMantraDetails
+                )
             )
         }
 

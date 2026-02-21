@@ -27,8 +27,9 @@ val viewModelModule = module {
             createCounterUseCase = get(),
             deleteCountersUseCase = get(),
             validateCounterCountUseCase = get(),
-            checkDayRolloverUseCase = get()
-        ) 
+            checkDayRolloverUseCase = get(),
+            setCounterCountUseCase = get()
+        )
     }
     factory {
         com.nemogz.mantracounter.ui.homework.HomeworkViewModel(

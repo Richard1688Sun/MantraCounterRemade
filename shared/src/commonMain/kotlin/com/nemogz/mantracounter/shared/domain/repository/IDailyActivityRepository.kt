@@ -11,4 +11,8 @@ interface IDailyActivityRepository {
     fun getAllActivitiesFlow(): Flow<List<DailyActivityEntity>>
     suspend fun insertOrUpdateActivity(activity: DailyActivityEntity)
     suspend fun getActivitiesBetweenDates(startDate: Long, endDate: Long): List<DailyActivityEntity>
+    /** Returns all activities whose homework was completed on [date]. */
+    suspend fun getActivitiesCompletedOnDate(date: Long): List<DailyActivityEntity>
+    /** Returns a count of activities whose homework was completed on [date]. */
+    suspend fun countActivitiesCompletedOnDate(date: Long): Int
 }

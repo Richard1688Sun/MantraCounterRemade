@@ -7,11 +7,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.nemogz.mantracounter.ui.components.ConfirmActionDialog
+import com.nemogz.mantracounter.ui.components.appCardColors
 
 @Composable
 fun HomeScreenLittleHouseItem(
@@ -33,7 +40,7 @@ fun HomeScreenLittleHouseItem(
     var showConvertDialog by remember { mutableStateOf(false) }
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        colors = appCardColors(MaterialTheme.colorScheme.primaryContainer),
         modifier = modifier.fillMaxWidth().padding(bottom = 8.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -46,12 +53,20 @@ fun HomeScreenLittleHouseItem(
                 ) {
                     Text("Convert")
                 }
-                Button(
+                OutlinedButton(
                     onClick = onNavigateToLittleHouse,
-                    enabled = littleHouseCount > 0,
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    )
                 ) {
-                    Text("Burn")
+                    Text("Offerings")
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
                 }
             }
         }

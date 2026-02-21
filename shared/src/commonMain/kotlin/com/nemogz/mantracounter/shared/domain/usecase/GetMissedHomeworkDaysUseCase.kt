@@ -16,10 +16,11 @@ class GetMissedHomeworkDaysUseCase(
      * and the date is before today, or we can check all recorded false days.
      */
     operator fun invoke(): Flow<List<Long>> {
-        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
         return dailyActivityRepository.getAllActivitiesFlow().map { activities ->
+            // Recompute today on each emission so date changes are picked up
+            val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
             activities
-                .filter { !it.homeworkCompleted && it.date <= today }
+                .filter { it.homeworkCompletedDate == null && it.date <= today }
                 .map { it.date }
         }
     }

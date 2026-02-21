@@ -9,6 +9,7 @@ import com.nemogz.mantracounter.shared.domain.usecase.GetLittleHouseCountUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.IncrementCounterUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.UpdateCountersUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.UpdateCounterUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.SetCounterCountUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.ValidateCounterCountUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,13 +34,18 @@ class HomeViewModel(
     private val validateCounterCountUseCase: ValidateCounterCountUseCase, // New dependency
     private val createCounterUseCase: com.nemogz.mantracounter.shared.domain.usecase.CreateCounterUseCase,
     private val deleteCountersUseCase: com.nemogz.mantracounter.shared.domain.usecase.DeleteCountersUseCase,
-    private val checkDayRolloverUseCase: com.nemogz.mantracounter.shared.domain.usecase.CheckDayRolloverUseCase
+    private val checkDayRolloverUseCase: com.nemogz.mantracounter.shared.domain.usecase.CheckDayRolloverUseCase,
+    private val setCounterCountUseCase: SetCounterCountUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState(isLoading = true))
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
+        // Run checkDayRollover immediately on ViewModel creation
+        viewModelScope.launch {
+            checkDayRolloverUseCase()
+        }
         viewModelScope.launch {
             combine(
                 getCountersUseCase(), 
@@ -177,16 +183,8 @@ class HomeViewModel(
     }
 
     fun onUpdateCounter(id: String, newName: String, newCount: Int) {
-        val counter = _uiState.value.counters.find { it.id == id } ?: return
-        // No need to coerce if we validate, but coercion is safer for "update" vs "increment".
-        // Let's coerce to MAX_COUNT instead of hardcoded number, or just check validity.
-        // For direct edit, coerceAtMost(MAX) is friendlier than rejecting.
-        val cappedCount = newCount.coerceAtMost(com.nemogz.mantracounter.shared.domain.model.CounterConstants.MAX_COUNT)
-        
-        if (counter.name != newName || counter.count != cappedCount) {
-             viewModelScope.launch {
-                 updateCounterUseCase(counter.copy(name = newName, count = cappedCount))
-             }
+        viewModelScope.launch {
+            setCounterCountUseCase(id, newName, newCount)
         }
     }
 }

@@ -35,13 +35,18 @@ class AllocateLittleHouseUseCase(
         val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
         val activity = dailyActivityRepository.getDailyActivityByDate(today) ?: DailyActivityEntity(date = today)
 
-        // Update burn details JSON — store by recipient name for calendar display
+        // Update burn details JSON
         val updatedBurnDetails = updateBurnDetailsJson(activity.littleHouseBurnDetails, recipient.name)
+
+        // Build allocation details from all recipients (post-increment state)
+        val allRecipients = recipientRepository.getAll().first()
+        val details = buildAllocationDetailsJson(allRecipients, activity.allocationDetails, updatedBurnDetails)
 
         dailyActivityRepository.insertOrUpdateActivity(
             activity.copy(
                 littleHousesBurned = activity.littleHousesBurned + 1,
-                littleHouseBurnDetails = updatedBurnDetails
+                littleHouseBurnDetails = updatedBurnDetails,
+                allocationDetails = details
             )
         )
 
@@ -97,5 +102,3 @@ class AllocateLittleHouseUseCase(
         }
     }
 }
-
-

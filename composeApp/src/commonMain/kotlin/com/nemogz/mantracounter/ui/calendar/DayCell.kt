@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
+import com.nemogz.mantracounter.ui.theme.appColors
 
 @Composable
 internal fun DayCell(
@@ -35,21 +36,22 @@ internal fun DayCell(
     val isInMonth = day.position == DayPosition.MonthDate
 
     val hasRecord = activity != null
-    val hasCompletedHomework = activity?.homeworkCompleted == true
+    val hasCompletedHomework = activity?.homeworkCompletedDate != null
     val hasConverted = (activity?.littleHousesConverted ?: 0) > 0
     val hasBurned = (activity?.littleHousesBurned ?: 0) > 0
 
     // Build list of dot colors to show
+    val appColors = MaterialTheme.appColors
     val dots = mutableListOf<Color>()
     if (isInMonth && hasRecord) {
-        // Dot 1: grey if no homework done, green if homework completed
-        dots.add(if (hasCompletedHomework) Color(0xFF4CAF50) else Color(0xFFBDBDBD))
+        // Dot 1: outline-grey if no homework done, tertiary-green if homework completed
+        dots.add(if (hasCompletedHomework) appColors.homeworkCompleted else appColors.homeworkNotCompleted)
     }
     if (isInMonth && hasConverted) {
-        dots.add(Color(0xFFFFB300)) // golden yellow
+        dots.add(appColors.converted)
     }
     if (isInMonth && hasBurned) {
-        dots.add(Color(0xFFFF9800)) // orange
+        dots.add(appColors.burned)
     }
 
     val backgroundColor = when {
@@ -100,11 +102,7 @@ internal fun DayCell(
                         )
                     }
                 }
-            } else {
-                // Invisible spacer to keep layout consistent
-                Box(modifier = Modifier.size(5.dp))
             }
         }
     }
 }
-

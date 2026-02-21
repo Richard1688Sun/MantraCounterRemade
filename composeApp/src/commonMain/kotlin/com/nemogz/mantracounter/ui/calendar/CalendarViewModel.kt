@@ -2,8 +2,8 @@ package com.nemogz.mantracounter.ui.calendar
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
 import com.nemogz.mantracounter.shared.domain.usecase.GetActivitiesForMonthUseCase
-import com.nemogz.mantracounter.shared.domain.usecase.GetLittleHouseRecipientsUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +15,7 @@ import kotlin.time.Clock
 
 class CalendarViewModel(
     private val getActivitiesForMonthUseCase: GetActivitiesForMonthUseCase,
-    private val getRecipientsUseCase: GetLittleHouseRecipientsUseCase
+    private val dailyActivityRepository: IDailyActivityRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CalendarUiState(isLoading = true))
@@ -27,7 +27,6 @@ class CalendarViewModel(
     init {
         val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         loadMonth(today.year, today.month.ordinal + 1, forceReload = true)
-        loadRecipients()
     }
 
     fun onMonthChanged(year: Int, month: Int) {
@@ -36,28 +35,23 @@ class CalendarViewModel(
 
     fun onDaySelected(date: LocalDate) {
         _uiState.value = _uiState.value.copy(selectedDate = date)
+        // Load which days had their homework completed on this date via SQL query
+        viewModelScope.launch {
+            val epochDay = date.toEpochDays().toLong()
+            val completedHere = dailyActivityRepository.getActivitiesCompletedOnDate(epochDay)
+            _uiState.value = _uiState.value.copy(homeworksCompletedOnSelectedDate = completedHere)
+        }
     }
 
     /**
-     * Reloads all cached months and recipients. Call this when navigating back to the calendar
-     * so that any changes (e.g. allocated/unallocated little houses) are reflected.
+     * Reloads all cached months. Call when navigating back so changes are reflected.
      */
     fun refresh() {
         val monthsToReload = loadedMonths.toList()
         loadedMonths.clear()
-        // Clear existing data so stale entries are removed
         _uiState.value = _uiState.value.copy(activitiesByDate = emptyMap())
         for ((year, month) in monthsToReload) {
             loadMonth(year, month)
-        }
-        loadRecipients()
-    }
-
-    private fun loadRecipients() {
-        viewModelScope.launch {
-            getRecipientsUseCase().collect { recipients ->
-                _uiState.value = _uiState.value.copy(recipients = recipients)
-            }
         }
     }
 

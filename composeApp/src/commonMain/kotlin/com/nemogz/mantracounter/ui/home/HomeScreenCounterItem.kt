@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -43,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.heightIn
+import com.nemogz.mantracounter.ui.components.SvgImage
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.StrokeCap
@@ -52,6 +54,12 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.ui.unit.sp
+import com.nemogz.mantracounter.ui.components.GoalProgressBar
+import com.nemogz.mantracounter.ui.components.selectableCardColors
+import mantracounterremade.composeapp.generated.resources.Res
+import mantracounterremade.composeapp.generated.resources.ic_lotus
+import org.jetbrains.compose.resources.painterResource
+
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreenCounterItem(
@@ -97,9 +105,7 @@ fun HomeScreenCounterItem(
             .then(rotationModifier)
             .then(if (shakeOffset.value != 0f) Modifier.offset(x = shakeOffset.value.dp) else Modifier),
         elevation = CardDefaults.cardElevation(defaultElevation = elevation),
-        colors = if (isSelected) CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer) 
-                 else if (isEditMode) CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant) 
-                 else CardDefaults.cardColors(),
+        colors = selectableCardColors(isSelected = isSelected, isEditMode = isEditMode),
         border = borderStroke
     ) {
         Box(
@@ -191,7 +197,7 @@ fun HomeScreenCounterItem(
                     verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(4.dp)
                 ) {
                     // Homework Goal Progress
-                    com.nemogz.mantracounter.ui.components.GoalProgressBar(
+                    GoalProgressBar(
                         label = "Homework",
                         current = counter.count,
                         goal = counter.homeworkGoal,
@@ -209,11 +215,11 @@ fun HomeScreenCounterItem(
                         modifier = Modifier.align(Alignment.TopStart).padding(8.dp)
                     ) {
                         if (isProtected) {
-                                Icon(
-                                imageVector = androidx.compose.material.icons.Icons.Default.Star,
-                                contentDescription = "Protected",
+                            SvgImage(
+                                resource = Res.getUri("drawable/ic_lotus.svg"),
+                                contentDescription = "Lotus Icon",
                                 tint = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(20.dp)
                             )
                         } else {
                              androidx.compose.material3.RadioButton(

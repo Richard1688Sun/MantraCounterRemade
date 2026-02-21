@@ -33,4 +33,12 @@ interface DailyActivityDao {
 
     @Query("SELECT * FROM daily_activity WHERE date >= :startDate AND date <= :endDate ORDER BY date ASC")
     suspend fun getActivitiesBetweenDates(startDate: Long, endDate: Long): List<DailyActivityEntity>
+
+    /** Returns all rows whose homework was performed on [date] (i.e. homeworkCompletedDate == date). */
+    @Query("SELECT * FROM daily_activity WHERE homeworkCompletedDate = :date ORDER BY date ASC")
+    suspend fun getActivitiesCompletedOnDate(date: Long): List<DailyActivityEntity>
+
+    /** Returns a count of rows whose homework was performed on [date]. */
+    @Query("SELECT COUNT(*) FROM daily_activity WHERE homeworkCompletedDate = :date")
+    suspend fun countActivitiesCompletedOnDate(date: Long): Int
 }

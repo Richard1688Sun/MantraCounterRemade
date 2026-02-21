@@ -41,4 +41,12 @@ class DailyActivityRepositoryImpl(
     override suspend fun getActivitiesBetweenDates(startDate: Long, endDate: Long): List<DailyActivityEntity> {
         return dao.getActivitiesBetweenDates(startDate, endDate)
     }
+
+    override suspend fun getActivitiesCompletedOnDate(date: Long): List<DailyActivityEntity> {
+        return dao.getActivitiesCompletedOnDate(date)
+    }
+
+    override suspend fun countActivitiesCompletedOnDate(date: Long): Int {
+        return dao.countActivitiesCompletedOnDate(date)
+    }
 }

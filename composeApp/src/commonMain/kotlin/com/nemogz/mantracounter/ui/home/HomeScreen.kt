@@ -1,44 +1,29 @@
 package com.nemogz.mantracounter.ui.home
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.ButtonDefaults
 
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -47,17 +32,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.Modifier
-
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.nemogz.mantracounter.shared.domain.model.Counter
+import com.nemogz.mantracounter.ui.components.EditableItemGrid
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
-import sh.calvin.reorderable.ReorderableItem
-import sh.calvin.reorderable.rememberReorderableLazyGridState
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
@@ -70,9 +51,10 @@ fun HomeScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    // Trigger day rollover check whenever HomeScreen enters composition (e.g., app resume)
-    LaunchedEffect(Unit) {
+    // Trigger day rollover check on every app resume (handles date changes while backgrounded)
+    LifecycleResumeEffect(Unit) {
         viewModel.checkDayRollover()
+        onPauseOrDispose { }
     }
 
     Scaffold { padding ->
@@ -206,12 +188,16 @@ fun HomeContent(
             )
             IconButton(
                 onClick = onNavigateToCalendar,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 8.dp),
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                )
             ) {
                 Icon(
                     imageVector = Icons.Default.DateRange,
                     contentDescription = "Tracking Calendar",
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = MaterialTheme.colorScheme.onTertiaryContainer,
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -225,105 +211,34 @@ fun HomeContent(
             onNavigateToHomework = onNavigateToHomework
         )
 
-        // Header + Edit/Done + Delete
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("Mantras", style = MaterialTheme.typography.titleMedium)
-            
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                if (state.isEditMode) {
-                     // Delete Button
-                    TextButton(
-                        onClick = { showDeleteConfirmDialog = true },
-                        enabled = state.selectedCounterIds.isNotEmpty(),
-                        colors = androidx.compose.material3.ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                    ) {
-                        Text("Delete")
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
-                
-                Button(onClick = { 
-                    if (state.isEditMode) {
-                         onClearSelection()
-                    }
-                    onToggleEditMode() 
-                }) {
-                    Text(if (state.isEditMode) "Done" else "Edit")
-                }
+        EditableItemGrid(
+            items = state.counters,
+            itemKey = { it.id },
+            columns = 2,
+            title = "Mantras",
+            isEditMode = state.isEditMode,
+            hasSelection = state.selectedCounterIds.isNotEmpty(),
+            onToggleEditMode = onToggleEditMode,
+            onAdd = { showCreateDialog = true },
+            onDeleteSelected = { showDeleteConfirmDialog = true },
+            onMove = onMove,
+            onClearSelection = onClearSelection,
+            itemContent = { counter, dragModifier ->
+                HomeScreenCounterItem(
+                    counter = counter,
+                    isEditMode = state.isEditMode,
+                    isSelected = state.selectedCounterIds.contains(counter.id),
+                    onSelectionToggle = { onSelectionMake(counter.id) },
+                    onClick = { onCounterClick(counter.id) },
+                    onEdit = {
+                        counterToEdit = counter
+                        showEditDialog = true
+                    },
+                    dragModifier = dragModifier,
+                    modifier = Modifier.fillMaxHeight()
+                )
             }
-        }
-
-        val gridState = rememberLazyGridState()
-        val reorderableState = rememberReorderableLazyGridState(gridState) { from, to ->
-            // Adjust indices if "Add New" item is present? 
-            // "Add New" item is not in state.counters, it's artificially added.
-            // If we drag "Add New", we should probably disable it.
-            // But reorderable library works on keys. "Add New" has a unique key.
-            // We need to make sure we don't crash if "Add New" is involved in swap.
-            // Ideally, "Add New" is not reorderable.
-            if (from.key != "add_new_button" && to.key != "add_new_button") {
-                onMove(from.index, to.index)
-            }
-        }
-
-        LazyVerticalGrid(
-            state = gridState,
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(vertical = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            items(state.counters, key = { it.id }) { counter ->
-                ReorderableItem(reorderableState, key = counter.id) { isDragging ->
-                    val elevation by animateDpAsState(if (isDragging) 16.dp else 0.dp)
-                    
-                    Box(
-                        modifier = Modifier
-                            .shadow(elevation)
-                    ) {
-                        HomeScreenCounterItem(
-                            counter = counter,
-                            isEditMode = state.isEditMode,
-                            isSelected = state.selectedCounterIds.contains(counter.id),
-                            onSelectionToggle = { onSelectionMake(counter.id) },
-                            onClick = { onCounterClick(counter.id) },
-                            onEdit = {
-                                counterToEdit = counter
-                                showEditDialog = true
-                            },
-                            dragModifier = if (state.isEditMode) Modifier.draggableHandle() else Modifier,
-                            modifier = Modifier.fillMaxHeight()
-                        )
-                    }
-                }
-            }
-            
-            // "Add New" Item - Only in Edit Mode
-            if (state.isEditMode) {
-                item(key = "add_new_button") {
-                    Card(
-                        modifier = Modifier
-                            .heightIn(min = 150.dp) // Match min height of counter items
-                            .clickable { showCreateDialog = true },
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                         border = androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary) // Dashed border would be nice but requires DrawModifier
-                    ) {
-                        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize().weight(1f)) {
-                            Icon(
-                                imageVector = androidx.compose.material.icons.Icons.Default.Add,
-                                contentDescription = "Add New",
-                                modifier = Modifier.size(48.dp),
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                }
-            }
-        }
+        )
     }
 }
 

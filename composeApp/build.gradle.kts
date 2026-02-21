@@ -39,23 +39,27 @@ kotlin {
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.androidx.room.runtime)
             implementation(libs.compose.ui.tooling.preview)
-            implementation("sh.calvin.reorderable:reorderable:2.4.3")
+            implementation(libs.reorderable)
         }
         commonMain.dependencies {
             implementation(projects.shared)
-            
+
             implementation(libs.compose.ui)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
             implementation(libs.compose.material.icons.core)
             implementation(libs.compose.material.icons.extended)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.compose.components.resources)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.svg)
 
             
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.androidx.navigation.compose)
+            implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.reorderable)
             implementation(libs.kizitonwose.calendar.compose.multiplatform)

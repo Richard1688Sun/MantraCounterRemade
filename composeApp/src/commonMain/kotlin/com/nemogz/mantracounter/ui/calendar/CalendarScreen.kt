@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -54,6 +55,7 @@ import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import kotlin.time.Clock
+import com.nemogz.mantracounter.ui.theme.appColors
 
 @OptIn(KoinExperimentalAPI::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -106,7 +108,12 @@ fun CalendarScreen(
                             contentDescription = "Back"
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             )
         }
     ) { padding ->
@@ -237,14 +244,15 @@ fun CalendarScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    val colors = MaterialTheme.appColors
                     LegendDualItem(
-                        noColor = Color(0xFFBDBDBD),
-                        yesColor = Color(0xFF4CAF50),
+                        noColor = colors.homeworkNotCompleted,
+                        yesColor = colors.homeworkCompleted,
                         noLabel = "No HW",
                         yesLabel = "HW Done"
                     )
-                    LegendItem(color = Color(0xFFFFB300), label = "Converted")
-                    LegendItem(color = Color(0xFFFF9800), label = "Burned")
+                    LegendItem(color = colors.converted, label = "Converted")
+                    LegendItem(color = colors.burned, label = "Burned")
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -253,7 +261,15 @@ fun CalendarScreen(
                 DayDetailPanel(
                     selectedDate = state.selectedDate,
                     activity = state.selectedDate?.let { state.activitiesByDate[it] },
-                    recipients = state.recipients,
+                    homeworksCompletedHere = state.homeworksCompletedOnSelectedDate,
+                    onJumpToDate = { targetDate ->
+                        viewModel.onDaySelected(targetDate)
+                        coroutineScope.launch {
+                            calendarState.animateScrollToMonth(
+                                YearMonth(targetDate.year, targetDate.month)
+                            )
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
@@ -308,4 +324,3 @@ fun CalendarScreen(
         )
     }
 }
-
