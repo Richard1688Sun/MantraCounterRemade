@@ -65,6 +65,7 @@ private data class AllocationDisplayEntry(
 private data class MantraRecitedDisplayEntry(
     val name: String,
     val recited: Int,
+    val subtracted: Int,
     val homework: Int,
     val littleHouse: Int,
     val start: Int,
@@ -332,9 +333,14 @@ private fun MantraBreakdownRow(entry: MantraRecitedDisplayEntry) {
         }
         val appColors = MaterialTheme.appColors
         val breakdownIndent = 16.dp
-        if (entry.recited > 0) {
-            ColoredDetailLine("Recited", "+${entry.recited}", appColors.recitedMantraDot, appColors.recitedMantraRow, indent = breakdownIndent)
+        
+        val netRecited = entry.recited - entry.subtracted
+        if (netRecited > 0) {
+            ColoredDetailLine("Recited", "+$netRecited", appColors.recitedMantraDot, appColors.recitedMantraRow, indent = breakdownIndent)
+        } else if (netRecited < 0) {
+            ColoredDetailLine("Recited", netRecited.toString(), appColors.homeworkDeductionDot, appColors.homeworkDeductionRow, indent = breakdownIndent)
         }
+
         if (entry.homework > 0) {
             ColoredDetailLine("Homework", "-${entry.homework}", appColors.homeworkDeductionDot, appColors.homeworkDeductionRow, indent = breakdownIndent)
         }
@@ -478,6 +484,7 @@ private fun parseMantraRecitedSnapshot(json: String): List<MantraRecitedDisplayE
             MantraRecitedDisplayEntry(
                 name = name,
                 recited = obj["recited"]?.jsonPrimitive?.int ?: 0,
+                subtracted = obj["subtracted"]?.jsonPrimitive?.int ?: 0,
                 homework = obj["homework"]?.jsonPrimitive?.int ?: 0,
                 littleHouse = obj["littleHouse"]?.jsonPrimitive?.int ?: 0,
                 start = obj["start"]?.jsonPrimitive?.int ?: 0,

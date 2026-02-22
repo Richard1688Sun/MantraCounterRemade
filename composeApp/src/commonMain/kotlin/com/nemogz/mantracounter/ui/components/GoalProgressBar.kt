@@ -51,7 +51,8 @@ fun GoalProgressBar(
     barHeight: Dp = 8.dp,
     valueLabel: String? = null,
     todayCount: Int = 0,
-    todayColor: Color = MaterialTheme.appColors.progressBarComplete
+    todayColor: Color = MaterialTheme.appColors.progressBarComplete,
+    textStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium
 ) {
     val progress = if (goal > 0) (current.toFloat() / goal).coerceIn(0f, 1f) else 0f
     
@@ -76,12 +77,12 @@ fun GoalProgressBar(
         ) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodyMedium,
+                style = textStyle,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text = displayLabel,
-                style = MaterialTheme.typography.bodyMedium,
+                style = textStyle,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

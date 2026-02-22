@@ -20,7 +20,8 @@ class CounterDetailViewModel(
     private val getCounterByIdUseCase: GetCounterByIdUseCase,
     private val incrementCounterUseCase: IncrementCounterUseCase,
     private val updateHomeworkAmountUseCase: UpdateHomeworkAmountUseCase,
-    private val validateCounterCountUseCase: com.nemogz.mantracounter.shared.domain.usecase.ValidateCounterCountUseCase
+    private val validateCounterCountUseCase: com.nemogz.mantracounter.shared.domain.usecase.ValidateCounterCountUseCase,
+    private val setCounterCountUseCase: com.nemogz.mantracounter.shared.domain.usecase.SetCounterCountUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CounterDetailUiState())
@@ -43,6 +44,20 @@ class CounterDetailViewModel(
         if (validateCounterCountUseCase(currentCounter.count + 1)) {
             viewModelScope.launch {
                 incrementCounterUseCase(currentCounter.id)
+                refreshCounter(currentCounter.id)
+            }
+        }
+    }
+
+    fun onDecrement() {
+        val currentCounter = uiState.value.counter ?: return
+        if (currentCounter.count > 0) {
+            viewModelScope.launch {
+                setCounterCountUseCase(
+                    counterId = currentCounter.id,
+                    newName = currentCounter.name,
+                    newCount = currentCounter.count - 1
+                )
                 refreshCounter(currentCounter.id)
             }
         }

@@ -40,7 +40,7 @@ val viewModelModule = module {
             completeHomeworkUseCase = get()
         )
     }
-    factory { CounterDetailViewModel(get(), get(), get(), get()) }
+    factory { CounterDetailViewModel(get(), get(), get(), get(), get()) }
     factory { com.nemogz.mantracounter.ui.calendar.CalendarViewModel(get(), get()) }
     factory {
         com.nemogz.mantracounter.ui.littlehouse.LittleHouseViewModel(

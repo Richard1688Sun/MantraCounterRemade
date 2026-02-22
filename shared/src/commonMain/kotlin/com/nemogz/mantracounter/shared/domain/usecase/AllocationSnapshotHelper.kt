@@ -110,6 +110,7 @@ internal fun parseBurnDetailsToMap(json: String): Map<String, Int> {
  */
 data class MantraRecitedEntry(
     val recited: Int,    // net additions from user increment / set
+    val subtracted: Int, // user decrements
     val homework: Int,   // total deducted by homework
     val littleHouse: Int, // total deducted by little house conversion
     val start: Int,      // mantra count at start of day (first interaction)
@@ -143,6 +144,7 @@ internal fun parseMantraRecitedDetails(json: String): Map<String, MantraRecitedE
             val fields = parseIntFieldsFromObject(valueStr)
             result[key] = MantraRecitedEntry(
                 recited = fields["recited"] ?: 0,
+                subtracted = fields["subtracted"] ?: 0,
                 homework = fields["homework"] ?: 0,
                 littleHouse = fields["littleHouse"] ?: 0,
                 start = fields["start"] ?: 0,
@@ -161,7 +163,7 @@ internal fun buildMantraRecitedDetailsJson(entries: Map<String, MantraRecitedEnt
     return buildString {
         append("{")
         append(entries.entries.joinToString(",") { (name, e) ->
-            "\"${escapeJsonString(name)}\":{\"recited\":${e.recited},\"homework\":${e.homework},\"littleHouse\":${e.littleHouse},\"start\":${e.start},\"end\":${e.end}}"
+            "\"${escapeJsonString(name)}\":{\"recited\":${e.recited},\"subtracted\":${e.subtracted},\"homework\":${e.homework},\"littleHouse\":${e.littleHouse},\"start\":${e.start},\"end\":${e.end}}"
         })
         append("}")
     }
@@ -192,10 +194,13 @@ internal fun updateMantraRecitedForCountChange(
 
     if (existing != null) {
         entries[mantraName] = when (reason) {
-            MantraChangeReason.RECITED -> existing.copy(
-                recited = (existing.recited + delta).coerceAtLeast(0),
-                end = newCount
-            )
+            MantraChangeReason.RECITED -> {
+                if (delta > 0) {
+                    existing.copy(recited = existing.recited + delta, end = newCount)
+                } else {
+                    existing.copy(subtracted = existing.subtracted + (-delta), end = newCount)
+                }
+            }
             MantraChangeReason.HOMEWORK -> existing.copy(
                 homework = (existing.homework + (-delta)).coerceAtLeast(0), // delta is negative, store as positive
                 end = newCount
@@ -208,16 +213,19 @@ internal fun updateMantraRecitedForCountChange(
     } else {
         // First interaction today — start is the old count
         entries[mantraName] = when (reason) {
-            MantraChangeReason.RECITED -> MantraRecitedEntry(
-                recited = delta.coerceAtLeast(0), homework = 0, littleHouse = 0,
-                start = oldCount, end = newCount
-            )
+            MantraChangeReason.RECITED -> {
+                if (delta > 0) {
+                    MantraRecitedEntry(recited = delta, subtracted = 0, homework = 0, littleHouse = 0, start = oldCount, end = newCount)
+                } else {
+                    MantraRecitedEntry(recited = 0, subtracted = -delta, homework = 0, littleHouse = 0, start = oldCount, end = newCount)
+                }
+            }
             MantraChangeReason.HOMEWORK -> MantraRecitedEntry(
-                recited = 0, homework = (-delta).coerceAtLeast(0), littleHouse = 0,
+                recited = 0, subtracted = 0, homework = (-delta).coerceAtLeast(0), littleHouse = 0,
                 start = oldCount, end = newCount
             )
             MantraChangeReason.LITTLE_HOUSE -> MantraRecitedEntry(
-                recited = 0, homework = 0, littleHouse = (-delta).coerceAtLeast(0),
+                recited = 0, subtracted = 0, homework = 0, littleHouse = (-delta).coerceAtLeast(0),
                 start = oldCount, end = newCount
             )
         }
