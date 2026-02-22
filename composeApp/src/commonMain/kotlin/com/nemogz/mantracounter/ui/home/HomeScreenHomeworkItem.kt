@@ -54,7 +54,7 @@ fun HomeScreenHomeworkItem(
         modifier = modifier.fillMaxWidth().padding(bottom = 16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Homework", style = MaterialTheme.typography.titleMedium)
+            Text("Homework", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
             Spacer(modifier = Modifier.height(8.dp))
             if (missedHomeworkDays.isNotEmpty()) {
                 Text(

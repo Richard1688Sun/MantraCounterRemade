@@ -109,7 +109,7 @@ fun LittleHouseScreen(
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
                             text = "Available Little Houses",
-                            style = MaterialTheme.typography.titleSmall,
+                            style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Text(

@@ -76,7 +76,7 @@ fun <T> EditableItemGrid(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(title, style = MaterialTheme.typography.titleMedium)
+        Text(title, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             if (isEditMode) {

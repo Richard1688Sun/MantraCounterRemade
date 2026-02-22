@@ -47,7 +47,7 @@ fun HomeScreenLittleHouseItem(
             Text(
                 "Little House Count: $littleHouseCount",
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

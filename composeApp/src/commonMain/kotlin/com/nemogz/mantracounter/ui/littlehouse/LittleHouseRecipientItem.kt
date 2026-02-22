@@ -131,6 +131,7 @@ fun LittleHouseRecipientItem(
                 Text(
                     text = recipient.name,
                     style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
                     fontWeight = FontWeight.Bold
                 )
 

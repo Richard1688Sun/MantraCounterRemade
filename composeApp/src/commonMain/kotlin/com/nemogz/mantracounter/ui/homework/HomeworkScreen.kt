@@ -56,9 +56,10 @@ fun HomeworkScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 item {
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         "Set the daily homework goal for each mantra.",
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -81,6 +82,7 @@ fun HomeworkScreen(
                             Text(
                                 text = counter.name,
                                 style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.weight(1f).padding(end = 16.dp)
