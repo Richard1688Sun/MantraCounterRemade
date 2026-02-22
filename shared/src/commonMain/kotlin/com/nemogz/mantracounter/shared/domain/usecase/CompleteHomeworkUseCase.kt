@@ -1,6 +1,7 @@
 package com.nemogz.mantracounter.shared.domain.usecase
 
 import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
+import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import com.nemogz.mantracounter.shared.domain.repository.ICounterRepository
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
 import kotlinx.coroutines.flow.first
@@ -14,7 +15,7 @@ class CompleteHomeworkUseCase(
 ) {
     /**
      * Checks if homework can be completed and deducts counts if possible.
-     * Also logs the deductions in mantraRecitedDetails as homework reason.
+     * Also logs the deductions in mantra details as homework reason.
      * @return A map of counter name -> deducted amount, or null if not enough counts.
      */
     suspend operator fun invoke(): Map<String, Int>? {
@@ -48,21 +49,25 @@ class CompleteHomeworkUseCase(
 
         counterRepository.updateCounts(idsToUpdate, newCounts)
 
-        // 4. Log homework deductions in mantraRecitedDetails
+        // 4. Log homework deductions in mantra details
         val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
-        val activity = dailyActivityRepository.getDailyActivityByDate(today) ?: DailyActivityEntity(date = today)
-        var updatedMantraDetails = activity.mantraRecitedDetails
+        val activity = dailyActivityRepository.getDailyActivityByDate(today) ?: DailyActivity(DailyActivityEntity(date = today), emptyList(), emptyList())
+        var updatedActivity = activity
 
         homeworkCounters.forEach { counter ->
             val oldCount = oldCounts[counter.name] ?: counter.count
             val newCount = oldCount - counter.homeworkGoal
-            updatedMantraDetails = updateMantraRecitedForCountChange(
-                updatedMantraDetails, counter.name, oldCount, newCount, MantraChangeReason.HOMEWORK
+            updatedActivity = updateMantraRecitedForCountChange(
+                updatedActivity, counter.name, oldCount, newCount, counter.homeworkGoal
             )
         }
 
         dailyActivityRepository.insertOrUpdateActivity(
-            activity.copy(mantraRecitedDetails = updatedMantraDetails)
+            updatedActivity.copy(
+                activity = updatedActivity.activity.copy(
+                    homeworkCompletedDate = today
+                )
+            )
         )
 
         return details

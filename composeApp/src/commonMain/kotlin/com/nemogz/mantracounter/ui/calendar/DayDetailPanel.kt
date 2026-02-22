@@ -43,41 +43,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
+import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import com.nemogz.mantracounter.ui.components.GoalProgressBar
 import com.nemogz.mantracounter.ui.components.appCardColors
 import com.nemogz.mantracounter.ui.theme.appColors
 import kotlinx.datetime.LocalDate
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
-
-// ── Data models for display ──
-
-private data class AllocationDisplayEntry(
-    val name: String,
-    val start: Int,
-    val end: Int,
-    val goal: Int
-)
-
-private data class MantraRecitedDisplayEntry(
-    val name: String,
-    val recited: Int,
-    val subtracted: Int,
-    val homework: Int,
-    val littleHouse: Int,
-    val start: Int,
-    val end: Int
-)
 
 @Composable
 internal fun DayDetailPanel(
     selectedDate: LocalDate?,
-    activity: DailyActivityEntity?,
+    activity: DailyActivity?,
     /** Days whose homework was completed on selectedDate (from SQL query). */
-    homeworksCompletedHere: List<DailyActivityEntity> = emptyList(),
+    homeworksCompletedHere: List<DailyActivity> = emptyList(),
     /** Called when the user taps a navigation link to jump to another date. */
     onJumpToDate: (LocalDate) -> Unit = {},
     modifier: Modifier = Modifier
@@ -125,7 +102,7 @@ internal fun DayDetailPanel(
                 } else {
                     // ── Section 1: Homework Section ──
                     ExpandableSection(title = "Homework", initiallyExpanded = true) {
-                        val hwCompletionDate = activity.homeworkCompletedDate?.let {
+                        val hwCompletionDate = activity.activity.homeworkCompletedDate?.let {
                             LocalDate.fromEpochDays(it.toInt())
                         }
 
@@ -166,30 +143,12 @@ internal fun DayDetailPanel(
                             }
                         }
 
-                        if (hwCompletionDate != null && activity.homeworkDetails.isNotBlank()) {
-                            val hwDetails = parseFlatJsonDetails(activity.homeworkDetails)
-                            if (hwDetails.isNotEmpty()) {
-                                Spacer(modifier = Modifier.height(8.dp))
-                                SubExpandableSection("Homework Details") {
-                                    hwDetails.forEach { (name, count) ->
-                                        DetailRow(
-                                            label = name,
-                                            value = count,
-                                            labelStyle = MaterialTheme.typography.bodyMedium,
-                                            labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
                         if (homeworksCompletedHere.isNotEmpty()) {
-                            val sortedHomeworks = homeworksCompletedHere.sortedByDescending { it.date }
+                            val sortedHomeworks = homeworksCompletedHere.sortedByDescending { it.activity.date }
                             Spacer(modifier = Modifier.height(8.dp))
                             SubExpandableSection("Homeworks Completed (${sortedHomeworks.size})") {
                                 sortedHomeworks.forEach { completedActivity ->
-                                    val forDate = LocalDate.fromEpochDays(completedActivity.date.toInt())
+                                    val forDate = LocalDate.fromEpochDays(completedActivity.activity.date.toInt())
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -229,34 +188,33 @@ internal fun DayDetailPanel(
 
                     // ── Section 2: Little House Section ──
                     ExpandableSection(title = "Little Houses") {
-                        DetailRow("Converted Today", activity.littleHousesConverted.toString())
+                        DetailRow("Converted Today", activity.activity.littleHousesConverted.toString())
 
-                        val allocEntries = parseAllocationDetailsSnapshot(activity.allocationDetails)
-                        if (allocEntries.isNotEmpty()) {
-                            val totalAllocatedToday = allocEntries.sumOf { (it.end - it.start).coerceAtLeast(0) }
+                        if (activity.allocations.isNotEmpty()) {
+                            val totalAllocatedToday = activity.allocations.sumOf { (it.endCount - it.startCount).coerceAtLeast(0) }
                             DetailRow("Allocated Today", totalAllocatedToday.toString())
 
                             Spacer(modifier = Modifier.height(8.dp))
                             SubExpandableSection("Allocation Breakdown") {
-                                allocEntries.forEach { entry ->
-                                    if (entry.goal > 0) {
+                                activity.allocations.forEach { entry ->
+                                    if (entry.allocationGoal > 0) {
                                         GoalProgressBar(
-                                            label = entry.name,
-                                            current = entry.end,
-                                            goal = entry.goal,
-                                            todayCount = (entry.end - entry.start).coerceAtLeast(0),
+                                            label = entry.recipientName,
+                                            current = entry.endCount,
+                                            goal = entry.allocationGoal,
+                                            todayCount = (entry.endCount - entry.startCount).coerceAtLeast(0),
                                             showBorder = false,
-                                            modifier = Modifier.padding(vertical = 2.dp)
+                                            modifier = Modifier.padding(vertical = 2.dp),
                                         )
                                     } else {
-                                        val todayAllocated = (entry.end - entry.start).coerceAtLeast(0)
+                                        val todayAllocated = (entry.endCount - entry.startCount).coerceAtLeast(0)
                                         Row(
                                             modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
                                             horizontalArrangement = Arrangement.SpaceBetween,
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Text(
-                                                text = entry.name,
+                                                text = entry.recipientName,
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 color = MaterialTheme.colorScheme.onSurface,
                                                 maxLines = 1,
@@ -265,7 +223,7 @@ internal fun DayDetailPanel(
                                             )
                                             Text(
                                                 text = buildString {
-                                                    append("${entry.end} total")
+                                                    append("${entry.endCount} total")
                                                     if (todayAllocated > 0) append(" (+$todayAllocated today)")
                                                 },
                                                 style = MaterialTheme.typography.bodyMedium,
@@ -285,15 +243,27 @@ internal fun DayDetailPanel(
 
                     // ── Section 3: Mantra Section ──
                     ExpandableSection(title = "Mantras") {
-                        val mantraEntries = parseMantraRecitedSnapshot(activity.mantraRecitedDetails)
-                        val totalRecited = mantraEntries.sumOf { it.recited }
-                        DetailRow("Total Mantras Recited", totalRecited.toString())
+                        // We count only newly recited amounts for the total
+                        val totalRecitedThisDay = activity.mantras.sumOf { (it.endCount - it.startCount).coerceAtLeast(0) }
+                        DetailRow("Total Net Mantras Recited", totalRecitedThisDay.toString())
 
-                        if (mantraEntries.isNotEmpty()) {
+                        if (activity.mantras.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(8.dp))
                             SubExpandableSection("Mantra Breakdown") {
-                                mantraEntries.forEach { entry ->
-                                    MantraBreakdownRow(entry)
+                                activity.mantras.forEach { entry ->
+                                    val hwCompletionDate = activity.activity.homeworkCompletedDate?.let {
+                                        LocalDate.fromEpochDays(it.toInt())
+                                    }
+                                    val homeworkCompletedToday = hwCompletionDate == selectedDate
+
+                                    MantraBreakdownRow(
+                                        name = entry.mantraName,
+                                        start = entry.startCount,
+                                        end = entry.endCount,
+                                        homeworkGoal = entry.homeworkGoal,
+                                        littleHousesConvertedToday = activity.activity.littleHousesConverted,
+                                        homeworkCompletedToday = homeworkCompletedToday
+                                    )
                                 }
                             }
                         }
@@ -304,10 +274,10 @@ internal fun DayDetailPanel(
     }
 }
 
-// ── Mantra Breakdown Row with color-coded additions/deductions ──
+// ── Mantra Breakdown Row ──
 
 @Composable
-private fun MantraBreakdownRow(entry: MantraRecitedDisplayEntry) {
+private fun MantraBreakdownRow(name: String, start: Int, end: Int, homeworkGoal: Int, littleHousesConvertedToday: Int, homeworkCompletedToday: Boolean) {
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
         // Header: mantra name and start → end
         Row(
@@ -316,7 +286,7 @@ private fun MantraBreakdownRow(entry: MantraRecitedDisplayEntry) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = entry.name,
+                text = name,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -325,7 +295,7 @@ private fun MantraBreakdownRow(entry: MantraRecitedDisplayEntry) {
                 modifier = Modifier.weight(1f).padding(end = 16.dp)
             )
             Text(
-                text = "${entry.start} → ${entry.end}",
+                text = "$start → $end",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -334,18 +304,42 @@ private fun MantraBreakdownRow(entry: MantraRecitedDisplayEntry) {
         val appColors = MaterialTheme.appColors
         val breakdownIndent = 16.dp
         
-        val netRecited = entry.recited - entry.subtracted
-        if (netRecited > 0) {
-            ColoredDetailLine("Recited", "+$netRecited", appColors.recitedMantraDot, appColors.recitedMantraRow, indent = breakdownIndent)
-        } else if (netRecited < 0) {
-            ColoredDetailLine("Recited", netRecited.toString(), appColors.homeworkDeductionDot, appColors.homeworkDeductionRow, indent = breakdownIndent)
+        val netChange = end - start
+        
+        // Reverse engineer the breakdown
+        var littleHouseDeductions = 0
+        if (littleHousesConvertedToday > 0) {
+           val perHouseGoal = when(name) {
+               "Great Compassion Mantra" -> 27
+               "Heart Sutra" -> 49
+               "Amitabha Pure Land Rebirth Mantra" -> 84
+               "Sapta Atita Tathagata Mantra" -> 87
+               else -> 0
+           }
+           littleHouseDeductions = perHouseGoal * littleHousesConvertedToday
         }
+        
+        val homeworkDeductions = if (homeworkCompletedToday) homeworkGoal else 0
+        
+        val totalDeductions = littleHouseDeductions + homeworkDeductions
+        val grossRecited = netChange + totalDeductions
 
-        if (entry.homework > 0) {
-            ColoredDetailLine("Homework", "-${entry.homework}", appColors.homeworkDeductionDot, appColors.homeworkDeductionRow, indent = breakdownIndent)
+        // Only show gross recited if it's > 0 or if there were deductions
+        if (grossRecited > 0) {
+            ColoredDetailLine("Gross Recited", "+$grossRecited", appColors.recitedMantraDot, appColors.recitedMantraRow, indent = breakdownIndent)
         }
-        if (entry.littleHouse > 0) {
-            ColoredDetailLine("Little House", "-${entry.littleHouse}", appColors.littleHouseDeductionDot, appColors.littleHouseDeductionRow, indent = breakdownIndent)
+        
+        if (homeworkDeductions > 0) {
+            ColoredDetailLine("Homework Deduction", "-$homeworkDeductions", appColors.homeworkDeductionDot, appColors.homeworkDeductionRow, indent = breakdownIndent)
+        }
+        
+        if (littleHouseDeductions > 0) {
+            ColoredDetailLine("Little House Deduction", "-$littleHouseDeductions", appColors.homeworkDeductionDot, appColors.homeworkDeductionRow, indent = breakdownIndent)
+        }
+        
+        if (netChange != 0) {
+           val sign = if (netChange > 0) "+" else ""
+           ColoredDetailLine("Net Change", "$sign$netChange", if (netChange > 0) appColors.recitedMantraDot else appColors.homeworkDeductionDot, Color.Transparent, indent = breakdownIndent)
         }
     }
 }
@@ -455,62 +449,6 @@ private fun DetailRow(
             color = MaterialTheme.colorScheme.primary
         )
     }
-}
-
-// ── Parsers ──
-
-private fun parseAllocationDetailsSnapshot(json: String): List<AllocationDisplayEntry> {
-    if (json.isBlank()) return emptyList()
-    try {
-        val root = Json.parseToJsonElement(json).jsonObject
-        return root.entries.map { (name, value) ->
-            val obj = value.jsonObject
-            AllocationDisplayEntry(
-                name = name,
-                start = obj["start"]?.jsonPrimitive?.int ?: 0,
-                end = obj["end"]?.jsonPrimitive?.int ?: 0,
-                goal = obj["goal"]?.jsonPrimitive?.int ?: 0
-            )
-        }
-    } catch (_: Exception) { return emptyList() }
-}
-
-private fun parseMantraRecitedSnapshot(json: String): List<MantraRecitedDisplayEntry> {
-    if (json.isBlank()) return emptyList()
-    try {
-        val root = Json.parseToJsonElement(json).jsonObject
-        return root.entries.map { (name, value) ->
-            val obj = value.jsonObject
-            MantraRecitedDisplayEntry(
-                name = name,
-                recited = obj["recited"]?.jsonPrimitive?.int ?: 0,
-                subtracted = obj["subtracted"]?.jsonPrimitive?.int ?: 0,
-                homework = obj["homework"]?.jsonPrimitive?.int ?: 0,
-                littleHouse = obj["littleHouse"]?.jsonPrimitive?.int ?: 0,
-                start = obj["start"]?.jsonPrimitive?.int ?: 0,
-                end = obj["end"]?.jsonPrimitive?.int ?: 0
-            )
-        }
-    } catch (_: Exception) { return emptyList() }
-}
-
-private fun parseFlatJsonDetails(json: String): List<Pair<String, String>> {
-    if (json.isBlank()) return emptyList()
-    try {
-        val jsonObj = Json.parseToJsonElement(json).jsonObject
-        return jsonObj.entries.map { (key, value) ->
-            key to value.jsonPrimitive.content
-        }
-    } catch (_: Exception) { /* not valid JSON */ }
-    // Fallback: "key:value,key:value"
-    try {
-        return json.split(",").mapNotNull { entry ->
-            val parts = entry.split(":", limit = 2)
-            if (parts.size == 2) parts[0].trim() to parts[1].trim()
-            else null
-        }
-    } catch (_: Exception) { /* also failed */ }
-    return emptyList()
 }
 
 internal fun formatDate(date: LocalDate): String {

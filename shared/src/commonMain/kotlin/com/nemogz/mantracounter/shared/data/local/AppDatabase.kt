@@ -13,14 +13,21 @@ import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
 import com.nemogz.mantracounter.shared.data.local.entity.LittleHouseEntity
 import com.nemogz.mantracounter.shared.data.local.entity.LittleHouseRecipientEntity
 
+import com.nemogz.mantracounter.shared.data.local.dao.LittleHouseAllocationDetailsDao
+import com.nemogz.mantracounter.shared.data.local.dao.MantraAndHomeworkDetailsDao
+import com.nemogz.mantracounter.shared.data.local.entity.LittleHouseAllocationDetailsEntity
+import com.nemogz.mantracounter.shared.data.local.entity.MantraAndHomeworkDetailsEntity
+
 @Database(
     entities = [
         CounterEntity::class,
         LittleHouseEntity::class,
         DailyActivityEntity::class,
-        LittleHouseRecipientEntity::class
+        LittleHouseRecipientEntity::class,
+        LittleHouseAllocationDetailsEntity::class,
+        MantraAndHomeworkDetailsEntity::class
     ],
-    version = 3
+    version = 4
 )
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -28,6 +35,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun littleHouseDao(): LittleHouseDao
     abstract fun dailyActivityDao(): DailyActivityDao
     abstract fun littleHouseRecipientDao(): LittleHouseRecipientDao
+    abstract fun littleHouseAllocationDetailsDao(): LittleHouseAllocationDetailsDao
+    abstract fun mantraAndHomeworkDetailsDao(): MantraAndHomeworkDetailsDao
 }
 
 

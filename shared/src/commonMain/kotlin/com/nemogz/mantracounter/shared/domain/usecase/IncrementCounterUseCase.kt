@@ -1,6 +1,7 @@
 package com.nemogz.mantracounter.shared.domain.usecase
 
 import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
+import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import com.nemogz.mantracounter.shared.domain.repository.ICounterRepository
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
 import kotlinx.datetime.TimeZone
@@ -19,12 +20,10 @@ class IncrementCounterUseCase(
 
         // Log mantra recited in daily activity
         val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
-        val activity = dailyActivityRepository.getDailyActivityByDate(today) ?: DailyActivityEntity(date = today)
-        val updatedMantraDetails = updateMantraRecitedForCountChange(
-            activity.mantraRecitedDetails, counter.name, oldCount, newCounter.count
+        val activity = dailyActivityRepository.getDailyActivityByDate(today) ?: DailyActivity(DailyActivityEntity(date = today), emptyList(), emptyList())
+        val updatedActivity = updateMantraRecitedForCountChange(
+            activity, counter.name, oldCount, newCounter.count, counter.homeworkGoal
         )
-        dailyActivityRepository.insertOrUpdateActivity(
-            activity.copy(mantraRecitedDetails = updatedMantraDetails)
-        )
+        dailyActivityRepository.insertOrUpdateActivity(updatedActivity)
     }
 }

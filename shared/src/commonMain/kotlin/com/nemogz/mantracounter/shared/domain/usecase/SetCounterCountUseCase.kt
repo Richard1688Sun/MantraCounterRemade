@@ -2,6 +2,7 @@ package com.nemogz.mantracounter.shared.domain.usecase
 
 import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
 import com.nemogz.mantracounter.shared.domain.model.CounterConstants
+import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import com.nemogz.mantracounter.shared.domain.repository.ICounterRepository
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
 import kotlinx.datetime.TimeZone
@@ -14,7 +15,7 @@ class SetCounterCountUseCase(
 ) {
     /**
      * Updates a counter's name and count. The difference (positive or negative)
-     * is tracked in mantraRecitedDetails for the day.
+     * is tracked in mantra details for the day.
      */
     suspend operator fun invoke(counterId: String, newName: String, newCount: Int) {
         val counter = counterRepository.getCounterById(counterId) ?: return
@@ -29,14 +30,11 @@ class SetCounterCountUseCase(
         // Log the delta (positive or negative) as mantra recited
         if (cappedCount != oldCount) {
             val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
-            val activity = dailyActivityRepository.getDailyActivityByDate(today) ?: DailyActivityEntity(date = today)
-            val updatedMantraDetails = updateMantraRecitedForCountChange(
-                activity.mantraRecitedDetails, counter.name, oldCount, cappedCount
+            val activity = dailyActivityRepository.getDailyActivityByDate(today) ?: DailyActivity(DailyActivityEntity(date = today), emptyList(), emptyList())
+            val updatedActivity = updateMantraRecitedForCountChange(
+                activity, counter.name, oldCount, cappedCount, counter.homeworkGoal
             )
-            dailyActivityRepository.insertOrUpdateActivity(
-                activity.copy(mantraRecitedDetails = updatedMantraDetails)
-            )
+            dailyActivityRepository.insertOrUpdateActivity(updatedActivity)
         }
     }
 }
-

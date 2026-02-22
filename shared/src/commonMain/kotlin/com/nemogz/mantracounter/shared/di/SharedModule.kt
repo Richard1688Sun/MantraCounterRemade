@@ -20,7 +20,6 @@ import com.nemogz.mantracounter.shared.domain.usecase.IncrementCounterUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.SetCounterCountUseCase
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
 import com.nemogz.mantracounter.shared.data.repository.DailyActivityRepositoryImpl
-import com.nemogz.mantracounter.shared.domain.usecase.BurnLittleHouseUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.GetMissedHomeworkDaysUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.CatchUpHomeworkUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.AllocateLittleHouseUseCase
@@ -36,11 +35,13 @@ val featureModule = module {
     single { get<AppDatabase>().littleHouseDao() }
     single { get<AppDatabase>().dailyActivityDao() }
     single { get<AppDatabase>().littleHouseRecipientDao() }
+    single { get<AppDatabase>().littleHouseAllocationDetailsDao() }
+    single { get<AppDatabase>().mantraAndHomeworkDetailsDao() }
 
     // 2. Repositories
     single<ICounterRepository> { CounterRepositoryImpl(get()) }
     single<ILittleHouseRepository> { LittleHouseRepositoryImpl(get()) }
-    single<IDailyActivityRepository> { DailyActivityRepositoryImpl(get()) }
+    single<IDailyActivityRepository> { DailyActivityRepositoryImpl(get(), get(), get()) }
     single<ILittleHouseRecipientRepository> { LittleHouseRecipientRepositoryImpl(get()) }
 
     // 3. Use Cases
@@ -48,10 +49,9 @@ val featureModule = module {
     factory { GetCountersUseCase(get()) }
     factory { GetLittleHouseCountUseCase(get()) }
     factory { ConvertLittleHouseUseCase(get(), get(), get()) }
-    factory { BurnLittleHouseUseCase(get(), get()) }
     factory { GetMissedHomeworkDaysUseCase(get()) }
     factory { CatchUpHomeworkUseCase(get()) }
-    factory { com.nemogz.mantracounter.shared.domain.usecase.CheckDayRolloverUseCase(get()) }
+    factory { com.nemogz.mantracounter.shared.domain.usecase.CheckDayRolloverUseCase(get(), get(), get()) }
     factory { CompleteHomeworkUseCase(get(), get()) }
     factory { GetCounterByIdUseCase(get()) }
     factory { UpdateHomeworkAmountUseCase(get()) }

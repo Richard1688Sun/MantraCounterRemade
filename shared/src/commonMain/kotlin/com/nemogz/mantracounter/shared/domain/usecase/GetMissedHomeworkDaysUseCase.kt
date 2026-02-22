@@ -20,8 +20,8 @@ class GetMissedHomeworkDaysUseCase(
             // Recompute today on each emission so date changes are picked up
             val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
             activities
-                .filter { it.homeworkCompletedDate == null && it.date <= today }
-                .map { it.date }
+                .filter { it.activity.homeworkCompletedDate == null && it.activity.date <= today }
+                .map { it.activity.date }
         }
     }
 }

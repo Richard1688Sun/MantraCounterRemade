@@ -22,13 +22,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
-import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
+import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import com.nemogz.mantracounter.ui.theme.appColors
 
 @Composable
 internal fun DayCell(
     day: CalendarDay,
-    activity: DailyActivityEntity?,
+    activity: DailyActivity?,
     isSelected: Boolean,
     isToday: Boolean,
     onClick: () -> Unit
@@ -36,9 +36,9 @@ internal fun DayCell(
     val isInMonth = day.position == DayPosition.MonthDate
 
     val hasRecord = activity != null
-    val hasCompletedHomework = activity?.homeworkCompletedDate != null
-    val hasConverted = (activity?.littleHousesConverted ?: 0) > 0
-    val hasBurned = (activity?.littleHousesBurned ?: 0) > 0
+    val hasCompletedHomework = activity?.activity?.homeworkCompletedDate != null
+    val hasConverted = (activity?.activity?.littleHousesConverted ?: 0) > 0
+    val hasBurned = (activity?.allocations?.sumOf { (it.endCount - it.startCount).coerceAtLeast(0) } ?: 0) > 0
 
     // Build list of dot colors to show
     val appColors = MaterialTheme.appColors

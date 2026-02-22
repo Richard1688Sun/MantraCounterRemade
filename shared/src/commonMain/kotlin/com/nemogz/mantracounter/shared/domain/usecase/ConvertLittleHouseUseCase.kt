@@ -5,6 +5,7 @@ import com.nemogz.mantracounter.shared.domain.repository.ICounterRepository
 import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRepository
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
 import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
+import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -33,22 +34,22 @@ class ConvertLittleHouseUseCase(
         }
 
         // 2. Calculate max possible sets
-            val setsDabei = dabei.count / MantraType.DaBei.mantraGoalCount
-            val setsBoruo = boruo.count / MantraType.BoRuo.mantraGoalCount
-            val setsWangshen = wangshen.count / MantraType.WangShen.mantraGoalCount
-            val setsQifo = qifo.count / MantraType.QiFo.mantraGoalCount
+        val setsDabei = dabei.count / MantraType.DaBei.mantraGoalCount
+        val setsBoruo = boruo.count / MantraType.BoRuo.mantraGoalCount
+        val setsWangshen = wangshen.count / MantraType.WangShen.mantraGoalCount
+        val setsQifo = qifo.count / MantraType.QiFo.mantraGoalCount
 
-            val minimalSets = minOf(setsDabei, setsBoruo, setsWangshen, setsQifo)
+        val minimalSets = minOf(setsDabei, setsBoruo, setsWangshen, setsQifo)
 
-            // Only convert 1 little house at a time
-            val setsToConvert = if (minimalSets > 0) 1 else 0
+        // Only convert 1 little house at a time
+        val setsToConvert = if (minimalSets > 0) 1 else 0
 
-            if (setsToConvert > 0) {
-                // 3. Deduct counts
-                val newDabeiCount = dabei.count - (setsToConvert * MantraType.DaBei.mantraGoalCount)
-                val newBoruoCount = boruo.count - (setsToConvert * MantraType.BoRuo.mantraGoalCount)
-                val newWangshenCount = wangshen.count - (setsToConvert * MantraType.WangShen.mantraGoalCount)
-                val newQifoCount = qifo.count - (setsToConvert * MantraType.QiFo.mantraGoalCount)
+        if (setsToConvert > 0) {
+            // 3. Deduct counts
+            val newDabeiCount = dabei.count - (setsToConvert * MantraType.DaBei.mantraGoalCount)
+            val newBoruoCount = boruo.count - (setsToConvert * MantraType.BoRuo.mantraGoalCount)
+            val newWangshenCount = wangshen.count - (setsToConvert * MantraType.WangShen.mantraGoalCount)
+            val newQifoCount = qifo.count - (setsToConvert * MantraType.QiFo.mantraGoalCount)
 
             // 4. Update Repositories
             counterRepository.updateCounts(
@@ -60,27 +61,27 @@ class ConvertLittleHouseUseCase(
 
             // Log conversion in daily activity
             val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
-            val activity = dailyActivityRepository.getDailyActivityByDate(today) ?: DailyActivityEntity(date = today)
+            val activity = dailyActivityRepository.getDailyActivityByDate(today) ?: DailyActivity(DailyActivityEntity(date = today), emptyList(), emptyList())
 
-            // Log little house deductions in mantraRecitedDetails
-            var updatedMantraDetails = activity.mantraRecitedDetails
+            // Log little house deductions
+            var updatedActivity = activity
             val deductions = listOf(
-                dabei.name to (dabei.count to newDabeiCount),
-                boruo.name to (boruo.count to newBoruoCount),
-                wangshen.name to (wangshen.count to newWangshenCount),
-                qifo.name to (qifo.count to newQifoCount)
+                dabei to newDabeiCount,
+                boruo to newBoruoCount,
+                wangshen to newWangshenCount,
+                qifo to newQifoCount
             )
-            for ((name, counts) in deductions) {
-                val (oldCount, newCount) = counts
-                updatedMantraDetails = updateMantraRecitedForCountChange(
-                    updatedMantraDetails, name, oldCount, newCount, MantraChangeReason.LITTLE_HOUSE
+            for ((counter, newCount) in deductions) {
+                updatedActivity = updateMantraRecitedForCountChange(
+                    updatedActivity, counter.name, counter.count, newCount, counter.homeworkGoal
                 )
             }
 
             dailyActivityRepository.insertOrUpdateActivity(
-                activity.copy(
-                    littleHousesConverted = activity.littleHousesConverted + setsToConvert,
-                    mantraRecitedDetails = updatedMantraDetails
+                updatedActivity.copy(
+                    activity = updatedActivity.activity.copy(
+                        littleHousesConverted = updatedActivity.activity.littleHousesConverted + setsToConvert
+                    )
                 )
             )
         }
