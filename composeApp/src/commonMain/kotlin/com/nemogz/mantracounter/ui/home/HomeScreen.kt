@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ButtonDefaults
 
 import androidx.compose.material3.Scaffold
@@ -47,7 +48,8 @@ fun HomeScreen(
     onNavigateToDetail: (String) -> Unit,
     onNavigateToHomework: () -> Unit,
     onNavigateToCalendar: () -> Unit,
-    onNavigateToLittleHouse: () -> Unit
+    onNavigateToLittleHouse: () -> Unit,
+    onNavigateToSettings: () -> Unit = {}
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -83,6 +85,7 @@ fun HomeScreen(
                 onDeleteSelected = viewModel::deleteSelectedCounters,
                 onCreateCounter = { name, initialCount -> viewModel.onCreateCounter(name, 0, initialCount) },
                 onNavigateToCalendar = onNavigateToCalendar,
+                onNavigateToSettings = onNavigateToSettings,
                 modifier = Modifier.padding(padding)
             )
         }
@@ -106,6 +109,7 @@ fun HomeContent(
     onDeleteSelected: () -> Unit,
     onCreateCounter: (String, Int) -> Unit,
     onNavigateToCalendar: () -> Unit,
+    onNavigateToSettings: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     // Edit/Create Dialog State
@@ -181,25 +185,46 @@ fun HomeContent(
         ) {
             HomeScreenLittleHouseItem(
                 littleHouseCount = state.littleHouseCount,
+                convertibleCount = state.convertibleLittleHouseCount,
                 canConvert = state.canConvertLittleHouse,
                 onConvert = onConvertLittleHouse,
                 onNavigateToLittleHouse = onNavigateToLittleHouse,
                 modifier = Modifier.weight(1f)
             )
-            IconButton(
-                onClick = onNavigateToCalendar,
+            Column(
                 modifier = Modifier.padding(top = 8.dp),
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer
-                )
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.DateRange,
-                    contentDescription = "Tracking Calendar",
-                    tint = MaterialTheme.colorScheme.onTertiaryContainer,
-                    modifier = Modifier.size(28.dp)
-                )
+                IconButton(
+                    onClick = onNavigateToCalendar,
+                    modifier = Modifier.size(52.dp),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "Tracking Calendar",
+                        tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+                IconButton(
+                    onClick = onNavigateToSettings,
+                    modifier = Modifier.size(52.dp),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Settings",
+                        tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
             }
         }
 

@@ -106,7 +106,7 @@ fun CounterDetailScreen(
                         val completedLh = counter.count / lhGoal
                         
                         GoalProgressBar(
-                            label = "Sufficient Little Houses: $completedLh",
+                            label = "Convertible Little Houses: $completedLh",
                             current = counter.count % lhGoal,
                             goal = lhGoal,
                             incompleteColor = Color(0xFFFFCA28), // Golden color
@@ -138,8 +138,8 @@ fun CounterDetailScreen(
                             .weight(1f),
                         shape = androidx.compose.ui.graphics.RectangleShape,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     ) {
                         Text(

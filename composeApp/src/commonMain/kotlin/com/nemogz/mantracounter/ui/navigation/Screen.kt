@@ -17,4 +17,7 @@ sealed class Screen {
 
     @Serializable
     data object LittleHouse : Screen()
+
+    @Serializable
+    data object Settings : Screen()
 }

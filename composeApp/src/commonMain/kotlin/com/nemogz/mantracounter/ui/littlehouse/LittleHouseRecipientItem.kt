@@ -44,6 +44,7 @@ import com.nemogz.mantracounter.shared.domain.model.LittleHouseRecipient
 import com.nemogz.mantracounter.ui.components.GoalProgressBar
 import com.nemogz.mantracounter.ui.components.SvgImage
 import com.nemogz.mantracounter.ui.components.selectableCardColors
+import com.nemogz.mantracounter.ui.theme.LocalCustomColors
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import mantracounterremade.composeapp.generated.resources.Res
@@ -174,11 +175,15 @@ fun LittleHouseRecipientItem(
                         onClick = onAllocate,
                         enabled = canAllocate && !recipient.isGoalComplete,
                         modifier = Modifier.weight(1f).height(36.dp),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp)
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            contentColor = MaterialTheme.colorScheme.onSecondary
+                        ),
                     ) {
                         Text(
                             if (recipient.isGoalComplete) "Goal Complete ✅" else "Allocate",
-                            style = MaterialTheme.typography.labelMedium
+                            style = MaterialTheme.typography.labelLarge
                         )
                     }
                     Button(
@@ -191,7 +196,7 @@ fun LittleHouseRecipientItem(
                             contentColor = MaterialTheme.colorScheme.onErrorContainer
                         )
                     ) {
-                        Text("Unallocate", style = MaterialTheme.typography.labelMedium)
+                        Text("Unallocate", style = MaterialTheme.typography.labelLarge)
                     }
                 }
             }
@@ -205,7 +210,7 @@ fun LittleHouseRecipientItem(
                         SvgImage(
                             resource = Res.getUri("drawable/ic_lotus.svg"),
                             contentDescription = "Lotus Icon",
-                            tint = MaterialTheme.colorScheme.error,
+                            tint = LocalCustomColors.current.lotus,
                             modifier = Modifier.size(20.dp)
                         )
                     } else {

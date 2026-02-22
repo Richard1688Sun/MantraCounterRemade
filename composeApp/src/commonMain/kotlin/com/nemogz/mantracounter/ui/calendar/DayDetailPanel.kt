@@ -62,7 +62,7 @@ internal fun DayDetailPanel(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        colors = appCardColors(MaterialTheme.colorScheme.surfaceVariant),
+        colors = appCardColors(MaterialTheme.colorScheme.secondaryContainer),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -203,7 +203,6 @@ internal fun DayDetailPanel(
                                             current = entry.endCount,
                                             goal = entry.allocationGoal,
                                             todayCount = (entry.endCount - entry.startCount).coerceAtLeast(0),
-                                            showBorder = false,
                                             modifier = Modifier.padding(vertical = 2.dp),
                                         )
                                     } else {

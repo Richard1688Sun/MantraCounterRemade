@@ -28,4 +28,16 @@ data class HomeUiState(
                 counter != null && counter.count >= type.mantraGoalCount
             }
         }
+
+    /** Number of Little Houses that can be converted from current counts */
+    val convertibleLittleHouseCount: Int
+        get() {
+            val coreTypes = listOf(MantraType.DaBei, MantraType.BoRuo, MantraType.WangShen, MantraType.QiFo)
+            val counts = coreTypes.map { type ->
+                val counter = counters.find { it.mantraType == type }
+                if (counter == null || type.mantraGoalCount == 0) 0
+                else counter.count / type.mantraGoalCount
+            }
+            return counts.minOrNull() ?: 0
+        }
 }

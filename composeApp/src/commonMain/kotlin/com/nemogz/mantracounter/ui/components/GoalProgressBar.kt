@@ -90,7 +90,7 @@ fun GoalProgressBar(
 
         if (hasTodaySegment) {
             // Two-segment bar using Canvas
-            val trackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f)
+            val trackColor = Color.Transparent
             val borderColor = MaterialTheme.colorScheme.outline
 
             Canvas(
@@ -124,11 +124,11 @@ fun GoalProgressBar(
                     )
                 }
 
-                // Today's additions segment (today color) - Anchored to the right
+                // Today's additions segment (today color) - Anchored after prior progress
                 if (progress > priorProgress) {
                     val todayProgressLength = progress - priorProgress
                     val width = size.width * todayProgressLength
-                    val startX = size.width - width
+                    val startX = size.width * priorProgress
                     
                     drawRoundRect(
                         color = todayColor,
@@ -154,7 +154,7 @@ fun GoalProgressBar(
                         ) else Modifier
                     ),
                 color = barColor,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f),
+                trackColor = Color.Transparent,
                 strokeCap = StrokeCap.Round
             )
         }

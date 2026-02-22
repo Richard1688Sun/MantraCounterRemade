@@ -87,7 +87,10 @@ fun <T> EditableItemGrid(
                         contentColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Text("Add")
+                    Text(
+                        text = "Add",
+                        style = MaterialTheme.typography.labelLarge,
+                    )
                 }
                 Spacer(modifier = Modifier.width(4.dp))
                 // Delete Button
@@ -96,9 +99,12 @@ fun <T> EditableItemGrid(
                     enabled = hasSelection,
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = MaterialTheme.colorScheme.error
-                    )
+                    ),
                 ) {
-                    Text("Delete")
+                    Text(
+                        text = "Delete",
+                        style = MaterialTheme.typography.labelLarge,
+                    )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
             }
@@ -115,7 +121,10 @@ fun <T> EditableItemGrid(
                     contentColor = MaterialTheme.colorScheme.onTertiaryContainer
                 )
             ) {
-                Text(if (isEditMode) "Done" else "Edit")
+                Text(
+                    text = if (isEditMode) "Done" else "Edit",
+                    style = MaterialTheme.typography.labelLarge,
+                )
             }
         }
     }

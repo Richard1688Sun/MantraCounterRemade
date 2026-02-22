@@ -32,6 +32,7 @@ import com.nemogz.mantracounter.ui.components.appCardColors
 @Composable
 fun HomeScreenLittleHouseItem(
     littleHouseCount: Int,
+    convertibleCount: Int,
     canConvert: Boolean,
     onConvert: () -> Unit,
     onNavigateToLittleHouse: () -> Unit,
@@ -49,6 +50,13 @@ fun HomeScreenLittleHouseItem(
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
+            if (convertibleCount > 0) {
+                Text(
+                    text = "Convertible: $convertibleCount",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(

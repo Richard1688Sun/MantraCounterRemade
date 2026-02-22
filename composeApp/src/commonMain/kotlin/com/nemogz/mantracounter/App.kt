@@ -14,6 +14,7 @@ import com.nemogz.mantracounter.ui.detail.CounterDetailScreen
 import com.nemogz.mantracounter.ui.home.HomeScreen
 import com.nemogz.mantracounter.ui.littlehouse.LittleHouseScreen
 import com.nemogz.mantracounter.ui.navigation.Screen
+import com.nemogz.mantracounter.ui.settings.SettingsScreen
 
 @Composable
 fun App() {
@@ -35,6 +36,9 @@ fun App() {
                         },
                         onNavigateToLittleHouse = {
                             navController.navigate(Screen.LittleHouse)
+                        },
+                        onNavigateToSettings = {
+                            navController.navigate(Screen.Settings)
                         }
                     )
                 }
@@ -62,6 +66,12 @@ fun App() {
                 composable<Screen.LittleHouse> {
                     LittleHouseScreen(
                         onBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable<Screen.Settings> {
+                    SettingsScreen(
+                        onNavigateBack = { navController.popBackStack() }
                     )
                 }
             }
