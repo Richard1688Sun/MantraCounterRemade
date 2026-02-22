@@ -40,7 +40,7 @@ fun HomeScreenLittleHouseItem(
     var showConvertDialog by remember { mutableStateOf(false) }
 
     Card(
-        colors = appCardColors(MaterialTheme.colorScheme.primaryContainer),
+        colors = appCardColors(MaterialTheme.colorScheme.pinkContainer),
         modifier = modifier.fillMaxWidth().padding(bottom = 8.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
