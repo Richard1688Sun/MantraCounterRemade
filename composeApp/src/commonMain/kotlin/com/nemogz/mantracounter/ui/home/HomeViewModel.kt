@@ -135,7 +135,7 @@ class HomeViewModel(
         val counter = _uiState.value.counters.find { it.id == id } ?: return
         if (validateCounterCountUseCase(counter.count + 1)) {
             viewModelScope.launch {
-                incrementCounterUseCase(id)
+                incrementCounterUseCase(counter)
             }
         }
     }
@@ -183,8 +183,14 @@ class HomeViewModel(
     }
 
     fun onUpdateCounter(id: String, newName: String, newCount: Int) {
+        val counter = _uiState.value.counters.find { it.id == id } ?: return
         viewModelScope.launch {
-            setCounterCountUseCase(id, newName, newCount)
+            if (counter.name != newName) {
+                updateCounterUseCase(counter.copy(name = newName))
+            }
+            if (counter.count != newCount) {
+                setCounterCountUseCase(counter, newCount)
+            }
         }
     }
 }

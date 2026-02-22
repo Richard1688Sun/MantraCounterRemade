@@ -55,8 +55,8 @@ val featureModule = module {
     factory { CompleteHomeworkUseCase(get(), get()) }
     factory { GetCounterByIdUseCase(get()) }
     factory { UpdateHomeworkAmountUseCase(get()) }
-    factory { UpdateCountersUseCase(get()) }
-    factory { UpdateCounterUseCase(get()) }
+    factory { UpdateCountersUseCase(get(), get()) }
+    factory { UpdateCounterUseCase(get(), get()) }
     factory { com.nemogz.mantracounter.shared.domain.usecase.CreateCounterUseCase(get()) }
     factory { com.nemogz.mantracounter.shared.domain.usecase.DeleteCountersUseCase(get()) }
     factory { ValidateCounterCountUseCase() }

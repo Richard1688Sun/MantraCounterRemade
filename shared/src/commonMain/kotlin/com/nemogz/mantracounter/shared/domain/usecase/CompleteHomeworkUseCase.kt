@@ -58,7 +58,7 @@ class CompleteHomeworkUseCase(
             val oldCount = oldCounts[counter.name] ?: counter.count
             val newCount = oldCount - counter.homeworkGoal
             updatedActivity = updateMantraRecitedForCountChange(
-                updatedActivity, counter.name, oldCount, newCount, counter.homeworkGoal
+                updatedActivity, counter, oldCount, newCount, counter.homeworkGoal
             )
         }
 

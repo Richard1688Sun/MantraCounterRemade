@@ -53,7 +53,9 @@ class CheckDayRolloverUseCase(
             MantraAndHomeworkDetailsEntity(
                 key = Uuid.random().toString(),
                 dailyActivityDate = date,
+                mantraId = it.id,
                 mantraName = it.name,
+                mantraSortOrder = it.sortOrder,
                 startCount = it.count,
                 endCount = it.count,
                 homeworkGoal = it.homeworkGoal
@@ -64,6 +66,7 @@ class CheckDayRolloverUseCase(
             LittleHouseAllocationDetailsEntity(
                 key = Uuid.random().toString(),
                 dailyActivityDate = date,
+                recipientId = it.id,
                 recipientName = it.name,
                 recipientSortOrder = it.sortOrder,
                 recipientTargetFinishDate = it.targetFinishDate,

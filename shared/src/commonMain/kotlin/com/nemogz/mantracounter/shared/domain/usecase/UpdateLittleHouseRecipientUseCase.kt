@@ -19,8 +19,13 @@ class UpdateLittleHouseRecipientUseCase(
         val activity = dailyActivityRepository.getDailyActivityByDate(today) ?: return
         
         val updatedAllocations = activity.allocations.map { 
-            if (it.recipientName == recipient.name) {
-                it.copy(allocationGoal = recipient.goal)
+            if (it.recipientId == recipient.id) {
+                it.copy(
+                    recipientName = recipient.name,
+                    recipientSortOrder = recipient.sortOrder,
+                    recipientTargetFinishDate = recipient.targetFinishDate,
+                    allocationGoal = recipient.goal
+                )
             } else {
                 it
             }

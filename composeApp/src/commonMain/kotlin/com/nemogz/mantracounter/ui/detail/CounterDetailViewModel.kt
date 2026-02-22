@@ -43,7 +43,7 @@ class CounterDetailViewModel(
         val currentCounter = uiState.value.counter ?: return
         if (validateCounterCountUseCase(currentCounter.count + 1)) {
             viewModelScope.launch {
-                incrementCounterUseCase(currentCounter.id)
+                incrementCounterUseCase(currentCounter)
                 refreshCounter(currentCounter.id)
             }
         }
@@ -54,9 +54,8 @@ class CounterDetailViewModel(
         if (currentCounter.count > 0) {
             viewModelScope.launch {
                 setCounterCountUseCase(
-                    counterId = currentCounter.id,
-                    newName = currentCounter.name,
-                    newCount = currentCounter.count - 1
+                    counter = currentCounter,
+                    amount = currentCounter.count - 1
                 )
                 refreshCounter(currentCounter.id)
             }

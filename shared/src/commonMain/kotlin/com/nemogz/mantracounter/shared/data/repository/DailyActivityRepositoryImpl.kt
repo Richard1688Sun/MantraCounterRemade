@@ -73,14 +73,35 @@ class DailyActivityRepositoryImpl(
             dao.updateActivity(activity.activity)
         }
         
-        allocationDao.deleteDetailsByDate(activity.activity.date)
-        if (activity.allocations.isNotEmpty()) {
-            allocationDao.insertDetails(activity.allocations)
+        val existingAllocations = allocationDao.getDetailsByDate(activity.activity.date).associateBy { it.key }
+        activity.allocations.forEach { newAlloc ->
+            if (existingAllocations.containsKey(newAlloc.key)) {
+                allocationDao.updateMutableFields(
+                    key = newAlloc.key,
+                    endCount = newAlloc.endCount,
+                    allocationGoal = newAlloc.allocationGoal,
+                    recipientSortOrder = newAlloc.recipientSortOrder,
+                    recipientTargetFinishDate = newAlloc.recipientTargetFinishDate,
+                    recipientName = newAlloc.recipientName
+                )
+            } else {
+                allocationDao.insertDetail(newAlloc)
+            }
         }
 
-        mantraDao.deleteDetailsByDate(activity.activity.date)
-        if (activity.mantras.isNotEmpty()) {
-            mantraDao.insertDetails(activity.mantras)
+        val existingMantras = mantraDao.getDetailsByDate(activity.activity.date).associateBy { it.key }
+        activity.mantras.forEach { newMantra ->
+            if (existingMantras.containsKey(newMantra.key)) {
+                mantraDao.updateMutableFields(
+                    key = newMantra.key,
+                    endCount = newMantra.endCount,
+                    homeworkGoal = newMantra.homeworkGoal,
+                    mantraSortOrder = newMantra.mantraSortOrder,
+                    mantraName = newMantra.mantraName
+                )
+            } else {
+                mantraDao.insertDetail(newMantra)
+            }
         }
     }
 

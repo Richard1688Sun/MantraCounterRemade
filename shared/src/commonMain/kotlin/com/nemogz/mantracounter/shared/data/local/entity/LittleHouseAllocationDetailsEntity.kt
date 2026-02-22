@@ -20,6 +20,7 @@ data class LittleHouseAllocationDetailsEntity(
     @PrimaryKey
     val key: String,
     val dailyActivityDate: Long, // FK to DailyActivityEntity
+    val recipientId: String,
     val recipientName: String,
     val recipientSortOrder: Int,
     val recipientTargetFinishDate: Long?,

@@ -73,7 +73,7 @@ class ConvertLittleHouseUseCase(
             )
             for ((counter, newCount) in deductions) {
                 updatedActivity = updateMantraRecitedForCountChange(
-                    updatedActivity, counter.name, counter.count, newCount, counter.homeworkGoal
+                    updatedActivity, counter, counter.count, newCount, counter.homeworkGoal
                 )
             }
 

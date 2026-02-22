@@ -93,9 +93,15 @@ fun CounterDetailScreen(
                         .padding(padding),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Spacer(modifier = Modifier.height(24.dp))
+                    val showLittleHouseProgress = counter.mantraType.isLittleHouseComponent && counter.mantraType.mantraGoalCount > 0
+                    val showHomeworkProgress = counter.homeworkGoal > 0
+
+                    if (showLittleHouseProgress || showHomeworkProgress) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
                     // Progress bars near the top
-                    if (counter.mantraType.isLittleHouseComponent && counter.mantraType.mantraGoalCount > 0) {
+                    if (showLittleHouseProgress) {
                         val lhGoal = counter.mantraType.mantraGoalCount
                         val completedLh = counter.count / lhGoal
                         
@@ -110,7 +116,7 @@ fun CounterDetailScreen(
                         )
                     }
 
-                    if (counter.homeworkGoal > 0) {
+                    if (showHomeworkProgress) {
                         GoalProgressBar(
                             label = "Homework",
                             current = counter.count,
@@ -120,13 +126,16 @@ fun CounterDetailScreen(
                         )
                     }
 
+                    if (showLittleHouseProgress || showHomeworkProgress) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
                     // Big Counter Button
                     Button(
                         onClick = viewModel::onIncrement,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f)
-                            .padding(top = 24.dp),
+                            .weight(1f),
                         shape = androidx.compose.ui.graphics.RectangleShape,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,

@@ -16,17 +16,14 @@ interface MantraAndHomeworkDetailsDao {
     @Query("SELECT * FROM mantra_and_homework_details WHERE dailyActivityDate = :date")
     fun getDetailsByDateFlow(date: Long): Flow<List<MantraAndHomeworkDetailsEntity>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertDetails(details: List<MantraAndHomeworkDetailsEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertDetail(detail: MantraAndHomeworkDetailsEntity)
 
-    @Update
-    suspend fun updateDetails(details: List<MantraAndHomeworkDetailsEntity>)
-
-    @Update
-    suspend fun updateDetail(detail: MantraAndHomeworkDetailsEntity)
+    @Query("UPDATE mantra_and_homework_details SET endCount = :endCount, homeworkGoal = :homeworkGoal, mantraSortOrder = :mantraSortOrder, mantraName = :mantraName WHERE `key` = :key")
+    suspend fun updateMutableFields(key: String, endCount: Int, homeworkGoal: Int, mantraSortOrder: Int, mantraName: String)
 
     @Query("DELETE FROM mantra_and_homework_details WHERE dailyActivityDate = :date")
     suspend fun deleteDetailsByDate(date: Long)

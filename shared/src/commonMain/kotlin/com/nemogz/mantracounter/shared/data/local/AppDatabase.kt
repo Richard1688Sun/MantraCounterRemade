@@ -27,7 +27,7 @@ import com.nemogz.mantracounter.shared.data.local.entity.MantraAndHomeworkDetail
         LittleHouseAllocationDetailsEntity::class,
         MantraAndHomeworkDetailsEntity::class
     ],
-    version = 4
+    version = 5
 )
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {

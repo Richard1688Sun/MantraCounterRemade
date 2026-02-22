@@ -19,7 +19,9 @@ data class MantraAndHomeworkDetailsEntity(
     @PrimaryKey
     val key: String,
     val dailyActivityDate: Long, // FK to DailyActivityEntity
+    val mantraId: String,
     val mantraName: String,
+    val mantraSortOrder: Int,
     val startCount: Int,
     val endCount: Int,
     val homeworkGoal: Int

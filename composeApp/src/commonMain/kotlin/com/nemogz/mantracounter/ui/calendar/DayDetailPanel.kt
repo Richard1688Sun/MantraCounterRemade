@@ -324,9 +324,12 @@ private fun MantraBreakdownRow(name: String, start: Int, end: Int, homeworkGoal:
         val totalDeductions = littleHouseDeductions + homeworkDeductions
         val grossRecited = netChange + totalDeductions
 
-        // Only show gross recited if it's > 0 or if there were deductions
-        if (grossRecited > 0) {
-            ColoredDetailLine("Gross Recited", "+$grossRecited", appColors.recitedMantraDot, appColors.recitedMantraRow, indent = breakdownIndent)
+        // Show gross recited if it's != 0 (can be negative if setting a smaller count explicitly) or if there were deductions
+        if (grossRecited != 0) {
+            val sign = if (grossRecited > 0) "+" else ""
+            val color = if (grossRecited > 0) appColors.recitedMantraDot else appColors.homeworkDeductionDot
+            val rowColor = if (grossRecited > 0) appColors.recitedMantraRow else appColors.homeworkDeductionRow
+            ColoredDetailLine("Gross Recited", "$sign$grossRecited", color, rowColor, indent = breakdownIndent)
         }
         
         if (homeworkDeductions > 0) {
