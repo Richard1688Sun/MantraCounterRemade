@@ -93,10 +93,7 @@ fun LittleHouseRecipientItem(
         colors = selectableCardColors(
             isSelected = isSelected,
             isEditMode = isEditMode,
-            defaultColor = if (recipient.isGoalComplete)
-                MaterialTheme.colorScheme.tertiaryContainer
-            else
-                MaterialTheme.colorScheme.surfaceContainerLow
+            isComplete = recipient.isGoalComplete
         ),
         border = borderStroke
     ) {
@@ -144,8 +141,6 @@ fun LittleHouseRecipientItem(
                         label = "Offered",
                         current = recipient.burnedCount,
                         goal = recipient.goal,
-                        completeColor = MaterialTheme.colorScheme.tertiary,
-                        incompleteColor = MaterialTheme.colorScheme.primary,
                         showBorder = false
                     )
                     Spacer(modifier = Modifier.height(4.dp))

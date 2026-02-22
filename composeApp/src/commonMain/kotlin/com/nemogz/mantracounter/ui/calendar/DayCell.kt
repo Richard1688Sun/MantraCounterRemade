@@ -45,13 +45,13 @@ internal fun DayCell(
     val dots = mutableListOf<Color>()
     if (isInMonth && hasRecord) {
         // Dot 1: outline-grey if no homework done, tertiary-green if homework completed
-        dots.add(if (hasCompletedHomework) appColors.homeworkCompleted else appColors.homeworkNotCompleted)
+        dots.add(if (hasCompletedHomework) appColors.homeworkCompletedDot else appColors.homeworkNotCompletedDot)
     }
     if (isInMonth && hasConverted) {
-        dots.add(appColors.converted)
+        dots.add(appColors.convertedHouseDot)
     }
     if (isInMonth && hasBurned) {
-        dots.add(appColors.burned)
+        dots.add(appColors.burnedHouseDot)
     }
 
     val backgroundColor = when {

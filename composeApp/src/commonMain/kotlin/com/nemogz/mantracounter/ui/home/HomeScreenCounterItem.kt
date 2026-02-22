@@ -58,6 +58,7 @@ import com.nemogz.mantracounter.ui.components.GoalProgressBar
 import com.nemogz.mantracounter.ui.components.selectableCardColors
 import mantracounterremade.composeapp.generated.resources.Res
 import mantracounterremade.composeapp.generated.resources.ic_lotus
+import com.nemogz.mantracounter.ui.theme.LocalCustomColors
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
@@ -218,7 +219,7 @@ fun HomeScreenCounterItem(
                             SvgImage(
                                 resource = Res.getUri("drawable/ic_lotus.svg"),
                                 contentDescription = "Lotus Icon",
-                                tint = MaterialTheme.colorScheme.error,
+                                tint = LocalCustomColors.current.lotus,
                                 modifier = Modifier.size(20.dp)
                             )
                         } else {

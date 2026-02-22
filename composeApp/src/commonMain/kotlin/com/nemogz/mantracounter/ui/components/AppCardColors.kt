@@ -5,6 +5,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 
 /**
  * App-standard [CardColors] using the theme's [MaterialTheme.colorScheme.surfaceContainerLow]
@@ -15,8 +16,9 @@ import androidx.compose.ui.graphics.Color
  */
 @Composable
 fun appCardColors(
-    containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow
-): CardColors = CardDefaults.cardColors(containerColor = containerColor)
+    containerColor: Color = MaterialTheme.colorScheme.secondaryContainer,
+    contentColor: Color = MaterialTheme.colorScheme.onSecondaryContainer
+): CardColors = CardDefaults.cardColors(containerColor = containerColor, contentColor = contentColor)
 
 /**
  * App-standard [CardColors] for **selectable / editable** list items.
@@ -33,13 +35,16 @@ fun appCardColors(
 fun selectableCardColors(
     isSelected: Boolean,
     isEditMode: Boolean,
-    selectedColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    isComplete: Boolean = false,
+    selectedColor: Color = lerp(MaterialTheme.colorScheme.secondaryContainer, Color.Black, 0.1f),
     editColor: Color    = MaterialTheme.colorScheme.secondaryContainer,
+    completeColor: Color = MaterialTheme.colorScheme.tertiaryContainer,
     defaultColor: Color = MaterialTheme.colorScheme.secondaryContainer
 ): CardColors = appCardColors(
     containerColor = when {
         isSelected -> selectedColor
         isEditMode -> editColor
+        isComplete -> completeColor
         else       -> defaultColor
     }
 )

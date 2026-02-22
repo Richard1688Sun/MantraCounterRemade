@@ -3,6 +3,7 @@ package com.nemogz.mantracounter.ui.calendar
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
 import com.nemogz.mantracounter.ui.components.GoalProgressBar
@@ -106,7 +108,7 @@ internal fun DayDetailPanel(
                 // Date header
                 Text(
                     text = formatDate(selectedDate),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -120,173 +122,178 @@ internal fun DayDetailPanel(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 } else {
-                    // ── Section 1: Homework Status ──
-                    val hwCompletionDate = activity.homeworkCompletedDate?.let {
-                        LocalDate.fromEpochDays(it.toInt())
-                    }
+                    // ── Section 1: Homework Section ──
+                    ExpandableSection(title = "Homework", initiallyExpanded = true) {
+                        val hwCompletionDate = activity.homeworkCompletedDate?.let {
+                            LocalDate.fromEpochDays(it.toInt())
+                        }
 
-                    if (hwCompletionDate == null) {
-                        DetailRow("Homework", "❌ Not Completed")
-                    } else if (hwCompletionDate == selectedDate) {
-                        // Completed on the same day — no jump link needed
-                        DetailRow("Homework", "✅ Completed")
-                    } else {
-                        // Completed on a different day — show clickable link
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Homework",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f).padding(end = 16.dp)
-                            )
-                            Text(
-                                text = buildAnnotatedString {
-                                    append("✅ Done on ")
-                                    withStyle(
-                                        SpanStyle(
-                                            color = MaterialTheme.colorScheme.primary,
-                                            textDecoration = TextDecoration.Underline,
-                                            fontWeight = FontWeight.SemiBold
+                        if (hwCompletionDate == null) {
+                            DetailRow("Status", "❌ Not Completed")
+                        } else if (hwCompletionDate == selectedDate) {
+                            DetailRow("Status", "✅ Completed")
+                        } else {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Status",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.weight(1f).padding(end = 16.dp)
+                                )
+                                Text(
+                                    text = buildAnnotatedString {
+                                        append("✅ Done on ")
+                                        withStyle(
+                                            SpanStyle(
+                                                color = MaterialTheme.colorScheme.primary,
+                                                textDecoration = TextDecoration.Underline,
+                                                fontWeight = FontWeight.SemiBold
+                                            )
+                                        ) {
+                                            append(formatDate(hwCompletionDate))
+                                        }
+                                    },
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier.clickable { onJumpToDate(hwCompletionDate) }
+                                )
+                            }
+                        }
+
+                        if (hwCompletionDate != null && activity.homeworkDetails.isNotBlank()) {
+                            val hwDetails = parseFlatJsonDetails(activity.homeworkDetails)
+                            if (hwDetails.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                SubExpandableSection("Homework Details") {
+                                    hwDetails.forEach { (name, count) ->
+                                        DetailRow(
+                                            label = name,
+                                            value = count,
+                                            labelStyle = MaterialTheme.typography.bodyMedium,
+                                            labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            fontWeight = FontWeight.Medium
                                         )
-                                    ) {
-                                        append(formatDate(hwCompletionDate))
                                     }
-                                },
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.clickable { onJumpToDate(hwCompletionDate) }
-                            )
-                        }
-                    }
-
-                    // ── Section 2: Homework Detail (only if completed) ──
-                    if (hwCompletionDate != null && activity.homeworkDetails.isNotBlank()) {
-                        val hwDetails = parseFlatJsonDetails(activity.homeworkDetails)
-                        if (hwDetails.isNotEmpty()) {
-                            ExpandableSection(title = "Homework Detail") {
-                                hwDetails.forEach { (name, count) ->
-                                    DetailRow(name, count)
                                 }
                             }
                         }
-                    }
 
-                    // ── Section 3: Homeworks completed HERE (catch-ups done on this day) ──
-                    if (homeworksCompletedHere.isNotEmpty()) {
-                        val sortedHomeworks = homeworksCompletedHere.sortedByDescending { it.date }
-                        val sectionTitle = "Homeworks Completed (${sortedHomeworks.size})"
-                        ExpandableSection(title = sectionTitle, initiallyExpanded = true) {
-                            sortedHomeworks.forEach { completedActivity ->
-                                val forDate = LocalDate.fromEpochDays(completedActivity.date.toInt())
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 2.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = "For",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                        modifier = Modifier.padding(end = 8.dp)
-                                    )
-                                    Text(
-                                        text = buildAnnotatedString {
-                                            withStyle(
-                                                SpanStyle(
-                                                    color = MaterialTheme.colorScheme.primary,
-                                                    textDecoration = TextDecoration.Underline,
-                                                    fontWeight = FontWeight.SemiBold
-                                                )
-                                            ) {
-                                                append(formatDate(forDate))
-                                            }
-                                        },
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        modifier = Modifier.clickable { onJumpToDate(forDate) }
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    SectionDivider()
-
-                    // ── Section 4: Little Houses Converted ──
-                    DetailRow("Little Houses Converted", activity.littleHousesConverted.toString())
-
-                    SectionDivider()
-
-                    // ── Section 5: Little House Allocations ──
-                    val allocEntries = parseAllocationDetailsSnapshot(activity.allocationDetails)
-
-                    if (allocEntries.isNotEmpty()) {
-                        val totalAllocatedToday = allocEntries.sumOf { (it.end - it.start).coerceAtLeast(0) }
-                        DetailRow("Little Houses Allocated", totalAllocatedToday.toString())
-
-                        ExpandableSection(title = "Allocation Breakdown") {
-                            allocEntries.forEach { entry ->
-                                if (entry.goal > 0) {
-                                    GoalProgressBar(
-                                        label = entry.name,
-                                        current = entry.end,
-                                        goal = entry.goal,
-                                        todayCount = (entry.end - entry.start).coerceAtLeast(0),
-                                        todayColor = MaterialTheme.colorScheme.secondary,
-                                        completeColor = MaterialTheme.colorScheme.tertiary,
-                                        incompleteColor = MaterialTheme.colorScheme.primary,
-                                        showBorder = false,
-                                        modifier = Modifier.padding(vertical = 2.dp)
-                                    )
-                                } else {
-                                    val todayAllocated = (entry.end - entry.start).coerceAtLeast(0)
+                        if (homeworksCompletedHere.isNotEmpty()) {
+                            val sortedHomeworks = homeworksCompletedHere.sortedByDescending { it.date }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            SubExpandableSection("Homeworks Completed (${sortedHomeworks.size})") {
+                                sortedHomeworks.forEach { completedActivity ->
+                                    val forDate = LocalDate.fromEpochDays(completedActivity.date.toInt())
                                     Row(
-                                        modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 2.dp),
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = entry.name,
+                                            text = "For",
                                             style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurface,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                            modifier = Modifier.weight(1f).padding(end = 16.dp)
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            fontWeight = FontWeight.Medium,
+                                            modifier = Modifier.padding(end = 8.dp)
                                         )
                                         Text(
-                                            text = buildString {
-                                                append("${entry.end} total")
-                                                if (todayAllocated > 0) append(" (+$todayAllocated today)")
+                                            text = buildAnnotatedString {
+                                                withStyle(
+                                                    SpanStyle(
+                                                        color = MaterialTheme.colorScheme.primary,
+                                                        textDecoration = TextDecoration.Underline,
+                                                        fontWeight = FontWeight.SemiBold
+                                                    )
+                                                ) {
+                                                    append(formatDate(forDate))
+                                                }
                                             },
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = MaterialTheme.colorScheme.primary
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            modifier = Modifier.clickable { onJumpToDate(forDate) }
                                         )
                                     }
                                 }
                             }
                         }
-                    } else {
-                        DetailRow("Little Houses Allocated", "0")
                     }
 
                     SectionDivider()
 
-                    // ── Section 6: Mantra Recited ──
-                    val mantraEntries = parseMantraRecitedSnapshot(activity.mantraRecitedDetails)
-                    val totalRecited = mantraEntries.sumOf { it.recited }
-                    DetailRow("Mantras Recited", totalRecited.toString())
+                    // ── Section 2: Little House Section ──
+                    ExpandableSection(title = "Little Houses") {
+                        DetailRow("Converted Today", activity.littleHousesConverted.toString())
 
-                    if (mantraEntries.isNotEmpty()) {
-                        ExpandableSection(title = "Mantra Breakdown") {
-                            mantraEntries.forEach { entry ->
-                                MantraBreakdownRow(entry)
+                        val allocEntries = parseAllocationDetailsSnapshot(activity.allocationDetails)
+                        if (allocEntries.isNotEmpty()) {
+                            val totalAllocatedToday = allocEntries.sumOf { (it.end - it.start).coerceAtLeast(0) }
+                            DetailRow("Allocated Today", totalAllocatedToday.toString())
+
+                            Spacer(modifier = Modifier.height(8.dp))
+                            SubExpandableSection("Allocation Breakdown") {
+                                allocEntries.forEach { entry ->
+                                    if (entry.goal > 0) {
+                                        GoalProgressBar(
+                                            label = entry.name,
+                                            current = entry.end,
+                                            goal = entry.goal,
+                                            todayCount = (entry.end - entry.start).coerceAtLeast(0),
+                                            showBorder = false,
+                                            modifier = Modifier.padding(vertical = 2.dp)
+                                        )
+                                    } else {
+                                        val todayAllocated = (entry.end - entry.start).coerceAtLeast(0)
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = entry.name,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.onSurface,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                modifier = Modifier.weight(1f).padding(end = 16.dp)
+                                            )
+                                            Text(
+                                                text = buildString {
+                                                    append("${entry.end} total")
+                                                    if (todayAllocated > 0) append(" (+$todayAllocated today)")
+                                                },
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            DetailRow("Allocated Today", "0")
+                        }
+                    }
+
+                    SectionDivider()
+
+                    // ── Section 3: Mantra Section ──
+                    ExpandableSection(title = "Mantras") {
+                        val mantraEntries = parseMantraRecitedSnapshot(activity.mantraRecitedDetails)
+                        val totalRecited = mantraEntries.sumOf { it.recited }
+                        DetailRow("Total Mantras Recited", totalRecited.toString())
+
+                        if (mantraEntries.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            SubExpandableSection("Mantra Breakdown") {
+                                mantraEntries.forEach { entry ->
+                                    MantraBreakdownRow(entry)
+                                }
                             }
                         }
                     }
@@ -311,7 +318,7 @@ private fun MantraBreakdownRow(entry: MantraRecitedDisplayEntry) {
                 text = entry.name,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f).padding(end = 16.dp)
@@ -323,24 +330,24 @@ private fun MantraBreakdownRow(entry: MantraRecitedDisplayEntry) {
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
-        // Breakdown lines — color-coded
         val appColors = MaterialTheme.appColors
+        val breakdownIndent = 16.dp
         if (entry.recited > 0) {
-            ColoredDetailLine("  Recited", "+${entry.recited}", appColors.recited)
+            ColoredDetailLine("Recited", "+${entry.recited}", appColors.recitedMantraDot, appColors.recitedMantraRow, indent = breakdownIndent)
         }
         if (entry.homework > 0) {
-            ColoredDetailLine("  Homework", "-${entry.homework}", appColors.homework)
+            ColoredDetailLine("Homework", "-${entry.homework}", appColors.homeworkDeductionDot, appColors.homeworkDeductionRow, indent = breakdownIndent)
         }
         if (entry.littleHouse > 0) {
-            ColoredDetailLine("  Little House", "-${entry.littleHouse}", appColors.littleHouse)
+            ColoredDetailLine("Little House", "-${entry.littleHouse}", appColors.littleHouseDeductionDot, appColors.littleHouseDeductionRow, indent = breakdownIndent)
         }
     }
 }
 
 @Composable
-private fun ColoredDetailLine(label: String, value: String, valueColor: Color) {
+private fun ColoredDetailLine(label: String, value: String, valueColor: Color, backgroundColor: Color = Color.Transparent, indent: Dp = 0.dp) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 1.dp),
+        modifier = Modifier.fillMaxWidth().background(backgroundColor).padding(vertical = 1.dp).padding(start = indent),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -372,6 +379,8 @@ private fun ExpandableSection(
     title: String,
     modifier: Modifier = Modifier,
     initiallyExpanded: Boolean = false,
+    titleStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.titleLarge,
+    titleColor: Color = MaterialTheme.colorScheme.onSurface,
     content: @Composable () -> Unit
 ) {
     var expanded by remember { mutableStateOf(initiallyExpanded) }
@@ -387,9 +396,9 @@ private fun ExpandableSection(
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleSmall,
+                style = titleStyle,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = titleColor
             )
             Icon(
                 imageVector = if (expanded) Icons.Default.KeyboardArrowUp
@@ -412,7 +421,13 @@ private fun ExpandableSection(
 }
 
 @Composable
-private fun DetailRow(label: String, value: String) {
+private fun DetailRow(
+    label: String,
+    value: String,
+    labelStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.titleMedium,
+    labelColor: Color = MaterialTheme.colorScheme.onSurface,
+    fontWeight: FontWeight = FontWeight.Normal
+) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -420,15 +435,16 @@ private fun DetailRow(label: String, value: String) {
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface,
+            style = labelStyle,
+            color = labelColor,
+            fontWeight = fontWeight,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f).padding(end = 16.dp)
         )
         Text(
             text = value,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.primary
         )
@@ -493,4 +509,21 @@ private fun parseFlatJsonDetails(json: String): List<Pair<String, String>> {
 internal fun formatDate(date: LocalDate): String {
     val monthName = date.month.name.lowercase().replaceFirstChar { it.uppercase() }
     return "$monthName ${date.day}, ${date.year}"
+}
+
+@Composable
+private fun SubExpandableSection(
+    title: String,
+    modifier: Modifier = Modifier,
+    initiallyExpanded: Boolean = false,
+    content: @Composable () -> Unit
+) {
+    ExpandableSection(
+        title = title,
+        modifier = modifier.padding(bottom = 4.dp),
+        initiallyExpanded = initiallyExpanded,
+        titleStyle = MaterialTheme.typography.titleMedium,
+        titleColor = MaterialTheme.colorScheme.onSurface,
+        content = content
+    )
 }

@@ -246,13 +246,13 @@ fun CalendarScreen(
                 ) {
                     val colors = MaterialTheme.appColors
                     LegendDualItem(
-                        noColor = colors.homeworkNotCompleted,
-                        yesColor = colors.homeworkCompleted,
+                        noColor = colors.homeworkNotCompletedDot,
+                        yesColor = colors.homeworkCompletedDot,
                         noLabel = "No HW",
                         yesLabel = "HW Done"
                     )
-                    LegendItem(color = colors.converted, label = "Converted")
-                    LegendItem(color = colors.burned, label = "Burned")
+                    LegendItem(color = colors.convertedHouseDot, label = "Converted")
+                    LegendItem(color = colors.burnedHouseDot, label = "Burned")
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))

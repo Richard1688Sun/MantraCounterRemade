@@ -40,16 +40,24 @@ fun HomeScreenLittleHouseItem(
     var showConvertDialog by remember { mutableStateOf(false) }
 
     Card(
-        colors = appCardColors(MaterialTheme.colorScheme.pinkContainer),
+        colors = appCardColors(MaterialTheme.colorScheme.primaryContainer),
         modifier = modifier.fillMaxWidth().padding(bottom = 8.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Little House Count: $littleHouseCount", style = MaterialTheme.typography.headlineSmall)
+            Text(
+                "Little House Count: $littleHouseCount",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
             Spacer(modifier = Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
                     onClick = { showConvertDialog = true },
-                    enabled = canConvert
+                    enabled = canConvert,
+                    colors = ButtonDefaults.buttonColors (
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    )
                 ) {
                     Text("Convert")
                 }

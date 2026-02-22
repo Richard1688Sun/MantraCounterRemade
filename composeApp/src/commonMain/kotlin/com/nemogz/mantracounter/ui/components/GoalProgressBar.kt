@@ -1,5 +1,7 @@
 package com.nemogz.mantracounter.ui.components
 
+import com.nemogz.mantracounter.ui.theme.appColors
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
@@ -31,7 +33,6 @@ import androidx.compose.ui.unit.dp
  * @param current   Current count towards the goal.
  * @param goal      The target count. Must be > 0.
  * @param modifier  Modifier applied to the outer Column.
- * @param completeColor  Bar colour when the goal is reached.
  * @param incompleteColor  Bar colour while still in progress.
  * @param showBorder  Whether to draw an outline around the track.
  * @param barHeight  Height of the progress bar.
@@ -45,26 +46,21 @@ fun GoalProgressBar(
     current: Int,
     goal: Int,
     modifier: Modifier = Modifier,
-    completeColor: Color = Color.Unspecified,
-    incompleteColor: Color = Color.Unspecified,
+    incompleteColor: Color = MaterialTheme.appColors.progressBarIncomplete,
     showBorder: Boolean = true,
     barHeight: Dp = 8.dp,
     valueLabel: String? = null,
     todayCount: Int = 0,
-    todayColor: Color = Color.Unspecified
+    todayColor: Color = MaterialTheme.appColors.progressBarComplete
 ) {
-    // Resolve sentinel values to theme colours at composition time
-    val resolvedComplete   = if (completeColor   == Color.Unspecified) MaterialTheme.colorScheme.tertiary else completeColor
-    val resolvedIncomplete = if (incompleteColor == Color.Unspecified) MaterialTheme.colorScheme.primary  else incompleteColor
-
     val progress = if (goal > 0) (current.toFloat() / goal).coerceIn(0f, 1f) else 0f
-    val isComplete = progress >= 1f
-    val barColor = if (isComplete) resolvedComplete else resolvedIncomplete
-
+    
     // Calculate prior progress (everything before today's additions)
     val priorCount = (current - todayCount).coerceAtLeast(0)
+    val hasTodaySegment = todayCount > 0
     val priorProgress = if (goal > 0) (priorCount.toFloat() / goal).coerceIn(0f, 1f) else 0f
-    val hasTodaySegment = todayCount > 0 && todayColor != Color.Unspecified
+    
+    val barColor = if (goal > 0 && current >= goal && !hasTodaySegment) todayColor else incompleteColor
 
     // Build the value label
     val displayLabel = valueLabel ?: buildString {
@@ -127,24 +123,18 @@ fun GoalProgressBar(
                     )
                 }
 
-                // Today's additions segment (today color)
+                // Today's additions segment (today color) - Anchored to the right
                 if (progress > priorProgress) {
-                    val startX = size.width * priorProgress
-                    val endX = size.width * progress
-                    drawRect(
+                    val todayProgressLength = progress - priorProgress
+                    val width = size.width * todayProgressLength
+                    val startX = size.width - width
+                    
+                    drawRoundRect(
                         color = todayColor,
                         topLeft = Offset(startX, 0f),
-                        size = Size(endX - startX, size.height)
+                        size = Size(width, size.height),
+                        cornerRadius = cornerRadius
                     )
-                    // Redraw the right end with rounded corner if at the end
-                    if (progress >= 1f) {
-                        drawRoundRect(
-                            color = todayColor,
-                            topLeft = Offset(startX, 0f),
-                            size = Size(endX - startX, size.height),
-                            cornerRadius = cornerRadius
-                        )
-                    }
                 }
             }
         } else {
