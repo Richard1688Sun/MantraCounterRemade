@@ -7,6 +7,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
+import androidx.compose.material3.OutlinedTextFieldDefaults.FocusedBorderThickness
+import androidx.compose.material3.OutlinedTextFieldDefaults.UnfocusedBorderThickness
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -63,7 +66,7 @@ fun HomeworkScreen(
                     Text(
                         stringResource(Res.string.homework_desc),
                         style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
@@ -90,7 +93,7 @@ fun HomeworkScreen(
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.weight(1f).padding(end = 16.dp)
                             )
-                            androidx.compose.foundation.layout.Box(
+                            Box(
                                 modifier = Modifier
                                     .width(64.dp)
                                     .height(36.dp)
@@ -99,7 +102,7 @@ fun HomeworkScreen(
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
-                                androidx.compose.foundation.text.BasicTextField(
+                                BasicTextField(
                                     value = textValue,
                                     onValueChange = { newValue ->
                                         val filtered = newValue.filter { it.isDigit() }
@@ -111,24 +114,27 @@ fun HomeworkScreen(
                                     singleLine = true,
                                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                                        color = MaterialTheme.colorScheme.onSurface
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer
                                     ),
                                     modifier = Modifier.fillMaxWidth(),
                                     decorationBox = { innerTextField ->
-                                        androidx.compose.material3.OutlinedTextFieldDefaults.DecorationBox(
+                                        OutlinedTextFieldDefaults.DecorationBox(
                                             value = textValue,
                                             innerTextField = innerTextField,
                                             enabled = true,
                                             singleLine = true,
                                             visualTransformation = androidx.compose.ui.text.input.VisualTransformation.None,
                                             interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
-                                            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                                             container = {
-                                                androidx.compose.material3.OutlinedTextFieldDefaults.ContainerBox(
+                                                OutlinedTextFieldDefaults.Container(
                                                     enabled = true,
                                                     isError = false,
                                                     interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
-                                                    colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors()
+                                                    colors = OutlinedTextFieldDefaults.colors(),
+                                                    shape = OutlinedTextFieldDefaults.shape,
+                                                    focusedBorderThickness = FocusedBorderThickness,
+                                                    unfocusedBorderThickness = UnfocusedBorderThickness,
                                                 )
                                             }
                                         )

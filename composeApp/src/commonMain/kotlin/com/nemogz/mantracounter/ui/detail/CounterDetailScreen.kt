@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Remove
@@ -45,6 +46,7 @@ import mantracounterremade.shared.generated.resources.Res
 import mantracounterremade.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.stringResource
+import kotlin.math.round
 
 @OptIn(KoinExperimentalAPI::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -169,12 +171,13 @@ fun CounterDetailScreen(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
+                            .padding(16.dp)
                             .weight(1f),
-                        shape = androidx.compose.ui.graphics.RectangleShape,
+                        shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.secondaryContainer,
                             contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
+                        ),
                     ) {
                         Text(
                             text = counter.count.toString(),

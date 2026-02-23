@@ -39,12 +39,14 @@ fun selectableCardColors(
     selectedColor: Color = lerp(MaterialTheme.colorScheme.secondaryContainer, Color.Black, 0.1f),
     editColor: Color    = MaterialTheme.colorScheme.secondaryContainer,
     completeColor: Color = MaterialTheme.colorScheme.tertiaryContainer,
-    defaultColor: Color = MaterialTheme.colorScheme.secondaryContainer
+    defaultColor: Color = MaterialTheme.colorScheme.secondaryContainer,
+    contentColor: Color = MaterialTheme.colorScheme.onSecondaryContainer
 ): CardColors = appCardColors(
     containerColor = when {
         isSelected -> selectedColor
         isEditMode -> editColor
         isComplete -> completeColor
         else       -> defaultColor
-    }
+    },
+    contentColor = contentColor
 )

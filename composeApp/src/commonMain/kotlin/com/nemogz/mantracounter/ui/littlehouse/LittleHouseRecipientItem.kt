@@ -153,7 +153,7 @@ fun LittleHouseRecipientItem(
                     Text(
                         text = "${recipient.burnedCount} ${stringResource(Res.string.lh_item_offered).lowercase()}",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 }
 
@@ -162,7 +162,7 @@ fun LittleHouseRecipientItem(
                     Text(
                         text = stringResource(Res.string.lh_target_label, formatFullDate(date)),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 }
 
@@ -179,8 +179,10 @@ fun LittleHouseRecipientItem(
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.secondary,
-                            contentColor = MaterialTheme.colorScheme.onSecondary
-                        ),
+                            contentColor = MaterialTheme.colorScheme.onSecondary,
+                            disabledContainerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f),
+                            disabledContentColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.4f)
+                        )
                     ) {
                         Text(
                             if (recipient.isGoalComplete) stringResource(Res.string.lh_item_goal_complete) else stringResource(Res.string.lh_item_allocate),
@@ -194,7 +196,9 @@ fun LittleHouseRecipientItem(
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.errorContainer,
-                            contentColor = MaterialTheme.colorScheme.onErrorContainer
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                            disabledContainerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f),
+                            disabledContentColor = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.4f)
                         )
                     ) {
                         Text(stringResource(Res.string.lh_item_unallocate), style = MaterialTheme.typography.labelLarge)

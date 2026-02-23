@@ -84,7 +84,7 @@ internal fun DayDetailPanel(
                     Text(
                         text = stringResource(Res.string.cal_tap_day_msg),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 }
             } else {
@@ -93,7 +93,7 @@ internal fun DayDetailPanel(
                     text = formatFullDate(selectedDate),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -102,7 +102,7 @@ internal fun DayDetailPanel(
                     Text(
                         text = stringResource(Res.string.cal_no_activity_msg),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 } else {
                     // ── Section 1: Homework Section ──
@@ -124,7 +124,7 @@ internal fun DayDetailPanel(
                                 Text(
                                     text = stringResource(Res.string.cal_status_label),
                                     style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSurface,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                     modifier = Modifier.weight(1f).padding(end = 16.dp)
@@ -164,7 +164,7 @@ internal fun DayDetailPanel(
                                         Text(
                                             text = stringResource(Res.string.cal_for_label),
                                             style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer,
                                             fontWeight = FontWeight.Medium,
                                             modifier = Modifier.padding(end = 8.dp)
                                         )
@@ -220,7 +220,7 @@ internal fun DayDetailPanel(
                                             Text(
                                                 text = entry.recipientName,
                                                 style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.onSurface,
+                                                color = MaterialTheme.colorScheme.onSecondaryContainer,
                                                 maxLines = 1,
                                                 overflow = TextOverflow.Ellipsis,
                                                 modifier = Modifier.weight(1f).padding(end = 16.dp)
@@ -293,7 +293,7 @@ private fun MantraBreakdownRow(name: String, start: Int, end: Int, homeworkGoal:
                 text = name,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f).padding(end = 16.dp)
@@ -302,7 +302,7 @@ private fun MantraBreakdownRow(name: String, start: Int, end: Int, homeworkGoal:
                 text = "$start → $end",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSecondaryContainer
             )
         }
         val appColors = MaterialTheme.appColors
@@ -361,7 +361,7 @@ private fun ColoredDetailLine(label: String, value: String, valueColor: Color, b
         Text(
             text = label,
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSecondaryContainer
         )
         Text(
             text = value,
@@ -387,7 +387,7 @@ private fun ExpandableSection(
     modifier: Modifier = Modifier,
     initiallyExpanded: Boolean = false,
     titleStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.titleLarge,
-    titleColor: Color = MaterialTheme.colorScheme.onSurface,
+    titleColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
     content: @Composable () -> Unit
 ) {
     var expanded by remember { mutableStateOf(initiallyExpanded) }
@@ -412,7 +412,7 @@ private fun ExpandableSection(
                               else Icons.Default.KeyboardArrowDown,
                 contentDescription = if (expanded) stringResource(Res.string.cal_collapse_desc) else stringResource(Res.string.cal_expand_desc),
                 modifier = Modifier.size(20.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSecondaryContainer
             )
         }
         AnimatedVisibility(
@@ -432,7 +432,7 @@ private fun DetailRow(
     label: String,
     value: String,
     labelStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.titleMedium,
-    labelColor: Color = MaterialTheme.colorScheme.onSurface,
+    labelColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
     fontWeight: FontWeight = FontWeight.Normal
 ) {
     Row(
@@ -453,7 +453,7 @@ private fun DetailRow(
             text = value,
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.primary
+            color = labelColor
         )
     }
 }
@@ -471,7 +471,7 @@ private fun SubExpandableSection(
         modifier = modifier.padding(bottom = 4.dp),
         initiallyExpanded = initiallyExpanded,
         titleStyle = MaterialTheme.typography.titleMedium,
-        titleColor = MaterialTheme.colorScheme.onSurface,
+        titleColor = MaterialTheme.colorScheme.onSecondaryContainer,
         content = content
     )
 }

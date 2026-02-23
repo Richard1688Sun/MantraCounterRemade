@@ -78,9 +78,11 @@ fun HomeScreenLittleHouseItem(
                 Button(
                     onClick = { showConvertDialog = true },
                     enabled = canConvert,
-                    colors = ButtonDefaults.buttonColors (
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary,
-                        containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                        disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.4f)
                     )
                 ) {
                     Text(stringResource(Res.string.lh_convert_button))

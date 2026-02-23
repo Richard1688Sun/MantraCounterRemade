@@ -53,6 +53,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.border
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.unit.sp
 import com.nemogz.mantracounter.ui.components.GoalProgressBar
 import com.nemogz.mantracounter.ui.components.selectableCardColors
@@ -143,17 +145,18 @@ fun HomeScreenCounterItem(
         ) {
             Column(
                 modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // Spacer for top floating icons if needed, or just padding
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
                     text = counter.name, 
-                    style = MaterialTheme.typography.bodyLarge, 
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     maxLines = 2,
-                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    overflow = Ellipsis
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 
@@ -172,7 +175,7 @@ fun HomeScreenCounterItem(
                     ) {
                         BasicText(
                             text = countStr,
-                            style = countStyle.copy(color = MaterialTheme.colorScheme.primary),
+                            style = countStyle.copy(color = MaterialTheme.colorScheme.onSecondaryContainer),
                             modifier = Modifier.weight(1f, fill = false), // Allow shrinking but don't force fill
                             autoSize = TextAutoSize.StepBased(minFontSize = 12.sp, maxFontSize = MaterialTheme.typography.displaySmall.fontSize),
                             maxLines = 1,
@@ -186,7 +189,7 @@ fun HomeScreenCounterItem(
                             Text(
                                 text = "/ ${counter.mantraType.mantraGoalCount}",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
                                 modifier = Modifier.padding(bottom = 6.dp) // Adjusted baseline
                             )
                         }
@@ -203,7 +206,8 @@ fun HomeScreenCounterItem(
                         label = stringResource(Res.string.homework_title),
                         current = counter.count,
                         goal = counter.homeworkGoal,
-                        valueLabel = "${counter.homeworkGoal}"
+                        valueLabel = "${counter.homeworkGoal}",
+                        textColor = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 }
                 

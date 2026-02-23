@@ -60,6 +60,8 @@ data class AppColors(
     val progressBarIncomplete: Color,
     /** Default color for completed progress or today's new progress in GoalProgressBar. */
     val progressBarComplete: Color,
+    /** Error color for failed operations. */
+    val errorColor: Color,
 )
 
 /** Composable extension to retrieve [AppColors] from the current [MaterialTheme]. */
@@ -83,4 +85,5 @@ val MaterialTheme.appColors: AppColors
         littleHouseDeductionRow   = Color(0xFFFFEBEE),       // red deduction background
         progressBarIncomplete     = Color(0xFF9E9E9E),       // generic grey for incomplete progress
         progressBarComplete       = Color(0xFF4CAF50),       // generic green for complete/today progress
+        errorColor                = Color(0xFFCE2317),                // generic red for errors
     )

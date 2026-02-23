@@ -40,7 +40,9 @@ import org.jetbrains.compose.resources.stringResource
 import com.nemogz.mantracounter.ui.util.formatRelativeDate
 import com.nemogz.mantracounter.ui.components.ConfirmActionDialog
 import com.nemogz.mantracounter.ui.components.appCardColors
+import com.nemogz.mantracounter.ui.theme.AppColors
 import com.nemogz.mantracounter.ui.theme.AppHaptics.LongTap
+import com.nemogz.mantracounter.ui.theme.appColors
 import io.github.compose.jindong.Jindong
 import io.github.compose.jindong.JindongProvider
 import kotlinx.datetime.LocalDate
@@ -76,7 +78,7 @@ fun HomeScreenHomeworkItem(
             if (missedHomeworkDays.isNotEmpty()) {
                 Text(
                     text = stringResource(Res.string.homework_missed_days_msg, missedHomeworkDays.size),
-                    color = MaterialTheme.colorScheme.error,
+                    color = MaterialTheme.appColors.errorColor,
                     style = MaterialTheme.typography.bodyMedium
                 )
             } else {
@@ -96,7 +98,13 @@ fun HomeScreenHomeworkItem(
                 Box {
                     Button(
                         onClick = { showMissedDaysMenu = true },
-                        enabled = missedHomeworkDays.isNotEmpty() && canCompleteHomework
+                        enabled = missedHomeworkDays.isNotEmpty() && canCompleteHomework,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                            disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.4f)
+                        )
                     ) {
                         Text(stringResource(Res.string.homework_complete_homework))
                         Spacer(modifier = Modifier.width(4.dp))
