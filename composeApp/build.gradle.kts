@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.room)
     alias(libs.plugins.kotlinSerialization)
 }
 
@@ -96,6 +95,3 @@ android {
     }
 }
 
-room {
-    schemaDirectory("$projectDir/schemas")
-}
