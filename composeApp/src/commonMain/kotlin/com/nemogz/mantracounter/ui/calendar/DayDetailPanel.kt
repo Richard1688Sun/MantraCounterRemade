@@ -3,6 +3,7 @@ package com.nemogz.mantracounter.ui.calendar
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import com.nemogz.mantracounter.ui.util.formatFullDate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -43,6 +44,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import mantracounterremade.composeapp.generated.resources.Res
+import mantracounterremade.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+import com.nemogz.mantracounter.ui.util.getLocalizedMantraName
 import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import com.nemogz.mantracounter.ui.components.GoalProgressBar
 import com.nemogz.mantracounter.ui.components.appCardColors
@@ -77,7 +82,7 @@ internal fun DayDetailPanel(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Tap a day to view activity details",
+                        text = stringResource(Res.string.cal_tap_day_msg),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -85,7 +90,7 @@ internal fun DayDetailPanel(
             } else {
                 // Date header
                 Text(
-                    text = formatDate(selectedDate),
+                    text = formatFullDate(selectedDate),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -95,21 +100,21 @@ internal fun DayDetailPanel(
 
                 if (activity == null) {
                     Text(
-                        text = "No activity recorded",
+                        text = stringResource(Res.string.cal_no_activity_msg),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 } else {
                     // ── Section 1: Homework Section ──
-                    ExpandableSection(title = "Homework", initiallyExpanded = true) {
+                    ExpandableSection(title = stringResource(Res.string.homework_title), initiallyExpanded = true) {
                         val hwCompletionDate = activity.activity.homeworkCompletedDate?.let {
                             LocalDate.fromEpochDays(it.toInt())
                         }
 
                         if (hwCompletionDate == null) {
-                            DetailRow("Status", "❌ Not Completed")
+                            DetailRow(stringResource(Res.string.cal_status_label), stringResource(Res.string.cal_not_completed))
                         } else if (hwCompletionDate == selectedDate) {
-                            DetailRow("Status", "✅ Completed")
+                            DetailRow(stringResource(Res.string.cal_status_label), stringResource(Res.string.cal_completed))
                         } else {
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
@@ -117,7 +122,7 @@ internal fun DayDetailPanel(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "Status",
+                                    text = stringResource(Res.string.cal_status_label),
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.onSurface,
                                     maxLines = 1,
@@ -126,7 +131,7 @@ internal fun DayDetailPanel(
                                 )
                                 Text(
                                     text = buildAnnotatedString {
-                                        append("✅ Done on ")
+                                        append(stringResource(Res.string.cal_done_on_prefix, ""))
                                         withStyle(
                                             SpanStyle(
                                                 color = MaterialTheme.colorScheme.primary,
@@ -134,7 +139,7 @@ internal fun DayDetailPanel(
                                                 fontWeight = FontWeight.SemiBold
                                             )
                                         ) {
-                                            append(formatDate(hwCompletionDate))
+                                            append(formatFullDate(hwCompletionDate))
                                         }
                                     },
                                     style = MaterialTheme.typography.bodyLarge,
@@ -146,7 +151,7 @@ internal fun DayDetailPanel(
                         if (homeworksCompletedHere.isNotEmpty()) {
                             val sortedHomeworks = homeworksCompletedHere.sortedByDescending { it.activity.date }
                             Spacer(modifier = Modifier.height(8.dp))
-                            SubExpandableSection("Homeworks Completed (${sortedHomeworks.size})") {
+                            SubExpandableSection(stringResource(Res.string.cal_homeworks_completed, sortedHomeworks.size)) {
                                 sortedHomeworks.forEach { completedActivity ->
                                     val forDate = LocalDate.fromEpochDays(completedActivity.activity.date.toInt())
                                     Row(
@@ -157,7 +162,7 @@ internal fun DayDetailPanel(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = "For",
+                                            text = stringResource(Res.string.cal_for_label),
                                             style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             fontWeight = FontWeight.Medium,
@@ -172,7 +177,7 @@ internal fun DayDetailPanel(
                                                         fontWeight = FontWeight.SemiBold
                                                     )
                                                 ) {
-                                                    append(formatDate(forDate))
+                                                    append(formatFullDate(forDate))
                                                 }
                                             },
                                             style = MaterialTheme.typography.bodyLarge,
@@ -187,15 +192,15 @@ internal fun DayDetailPanel(
                     SectionDivider()
 
                     // ── Section 2: Little House Section ──
-                    ExpandableSection(title = "Little Houses") {
-                        DetailRow("Converted Today", activity.activity.littleHousesConverted.toString())
+                    ExpandableSection(title = stringResource(Res.string.lh_houses_title)) {
+                        DetailRow(stringResource(Res.string.cal_converted_today), activity.activity.littleHousesConverted.toString())
 
                         if (activity.allocations.isNotEmpty()) {
                             val totalAllocatedToday = activity.allocations.sumOf { (it.endCount - it.startCount).coerceAtLeast(0) }
-                            DetailRow("Allocated Today", totalAllocatedToday.toString())
+                            DetailRow(stringResource(Res.string.cal_allocated_today), totalAllocatedToday.toString())
 
                             Spacer(modifier = Modifier.height(8.dp))
-                            SubExpandableSection("Allocation Breakdown") {
+                            SubExpandableSection(stringResource(Res.string.cal_allocation_breakdown)) {
                                 activity.allocations.forEach { entry ->
                                     if (entry.allocationGoal > 0) {
                                         GoalProgressBar(
@@ -222,8 +227,8 @@ internal fun DayDetailPanel(
                                             )
                                             Text(
                                                 text = buildString {
-                                                    append("${entry.endCount} total")
-                                                    if (todayAllocated > 0) append(" (+$todayAllocated today)")
+                                                append(stringResource(Res.string.cal_total_suffix, entry.endCount))
+                                                if (todayAllocated > 0) append(stringResource(Res.string.cal_today_added_suffix, todayAllocated))
                                                 },
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 fontWeight = FontWeight.SemiBold,
@@ -234,21 +239,21 @@ internal fun DayDetailPanel(
                                 }
                             }
                         } else {
-                            DetailRow("Allocated Today", "0")
+                            DetailRow(stringResource(Res.string.cal_allocated_today), "0")
                         }
                     }
 
                     SectionDivider()
 
                     // ── Section 3: Mantra Section ──
-                    ExpandableSection(title = "Mantras") {
+                    ExpandableSection(title = stringResource(Res.string.home_mantras)) {
                         // We count only newly recited amounts for the total
                         val totalRecitedThisDay = activity.mantras.sumOf { (it.endCount - it.startCount).coerceAtLeast(0) }
-                        DetailRow("Total Net Mantras Recited", totalRecitedThisDay.toString())
+                        DetailRow(stringResource(Res.string.cal_total_net_mantras), totalRecitedThisDay.toString())
 
                         if (activity.mantras.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(8.dp))
-                            SubExpandableSection("Mantra Breakdown") {
+                            SubExpandableSection(stringResource(Res.string.cal_mantra_breakdown)) {
                                 activity.mantras.forEach { entry ->
                                     val hwCompletionDate = activity.activity.homeworkCompletedDate?.let {
                                         LocalDate.fromEpochDays(it.toInt())
@@ -285,7 +290,7 @@ private fun MantraBreakdownRow(name: String, start: Int, end: Int, homeworkGoal:
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = name,
+                text = getLocalizedMantraName(name),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -328,20 +333,20 @@ private fun MantraBreakdownRow(name: String, start: Int, end: Int, homeworkGoal:
             val sign = if (grossRecited > 0) "+" else ""
             val color = if (grossRecited > 0) appColors.recitedMantraDot else appColors.homeworkDeductionDot
             val rowColor = if (grossRecited > 0) appColors.recitedMantraRow else appColors.homeworkDeductionRow
-            ColoredDetailLine("Gross Recited", "$sign$grossRecited", color, rowColor, indent = breakdownIndent)
+            ColoredDetailLine(stringResource(Res.string.cal_gross_recited), "$sign$grossRecited", color, rowColor, indent = breakdownIndent)
         }
         
         if (homeworkDeductions > 0) {
-            ColoredDetailLine("Homework Deduction", "-$homeworkDeductions", appColors.homeworkDeductionDot, appColors.homeworkDeductionRow, indent = breakdownIndent)
+            ColoredDetailLine(stringResource(Res.string.cal_homework_deduction), "-$homeworkDeductions", appColors.homeworkDeductionDot, appColors.homeworkDeductionRow, indent = breakdownIndent)
         }
         
         if (littleHouseDeductions > 0) {
-            ColoredDetailLine("Little House Deduction", "-$littleHouseDeductions", appColors.homeworkDeductionDot, appColors.homeworkDeductionRow, indent = breakdownIndent)
+            ColoredDetailLine(stringResource(Res.string.cal_lh_deduction), "-$littleHouseDeductions", appColors.homeworkDeductionDot, appColors.homeworkDeductionRow, indent = breakdownIndent)
         }
         
         if (netChange != 0) {
            val sign = if (netChange > 0) "+" else ""
-           ColoredDetailLine("Net Change", "$sign$netChange", if (netChange > 0) appColors.recitedMantraDot else appColors.homeworkDeductionDot, Color.Transparent, indent = breakdownIndent)
+           ColoredDetailLine(stringResource(Res.string.cal_net_change), "$sign$netChange", if (netChange > 0) appColors.recitedMantraDot else appColors.homeworkDeductionDot, Color.Transparent, indent = breakdownIndent)
         }
     }
 }
@@ -405,7 +410,7 @@ private fun ExpandableSection(
             Icon(
                 imageVector = if (expanded) Icons.Default.KeyboardArrowUp
                               else Icons.Default.KeyboardArrowDown,
-                contentDescription = if (expanded) "Collapse" else "Expand",
+                contentDescription = if (expanded) stringResource(Res.string.cal_collapse_desc) else stringResource(Res.string.cal_expand_desc),
                 modifier = Modifier.size(20.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -453,10 +458,6 @@ private fun DetailRow(
     }
 }
 
-internal fun formatDate(date: LocalDate): String {
-    val monthName = date.month.name.lowercase().replaceFirstChar { it.uppercase() }
-    return "$monthName ${date.day}, ${date.year}"
-}
 
 @Composable
 private fun SubExpandableSection(

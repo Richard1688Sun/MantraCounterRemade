@@ -34,6 +34,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mantracounterremade.composeapp.generated.resources.Res
+import mantracounterremade.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import com.nemogz.mantracounter.ui.util.formatRelativeDate
 import com.nemogz.mantracounter.ui.components.ConfirmActionDialog
 import com.nemogz.mantracounter.ui.components.appCardColors
@@ -68,17 +71,17 @@ fun HomeScreenHomeworkItem(
         modifier = modifier.fillMaxWidth().padding(bottom = 16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Homework", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
+            Text(stringResource(Res.string.homework_title), style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
             Spacer(modifier = Modifier.height(8.dp))
             if (missedHomeworkDays.isNotEmpty()) {
                 Text(
-                    text = "You have ${missedHomeworkDays.size} missed homework day(s).",
+                    text = stringResource(Res.string.homework_missed_days_msg, missedHomeworkDays.size),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodyMedium
                 )
             } else {
                 Text(
-                    text = "All caught up! Great job.",
+                    text = stringResource(Res.string.homework_all_caught_up),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -95,11 +98,11 @@ fun HomeScreenHomeworkItem(
                         onClick = { showMissedDaysMenu = true },
                         enabled = missedHomeworkDays.isNotEmpty() && canCompleteHomework
                     ) {
-                        Text("Complete Homework")
+                        Text(stringResource(Res.string.homework_complete_homework))
                         Spacer(modifier = Modifier.width(4.dp))
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = "Select day",
+                            contentDescription = stringResource(Res.string.homework_select_day_desc),
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -151,7 +154,7 @@ fun HomeScreenHomeworkItem(
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer
                     )
                 ) {
-                    Text("Goals")
+                    Text(stringResource(Res.string.homework_goals_btn))
                     Spacer(modifier = Modifier.width(4.dp))
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
@@ -165,14 +168,15 @@ fun HomeScreenHomeworkItem(
 
     pendingCatchUpDay?.let { day ->
         val dateStr = LocalDate.fromEpochDays(day.toInt()).toString()
+        val snackbarMsg = stringResource(Res.string.homework_snackbar_msg, dateStr)
         ConfirmActionDialog(
-            title = "Complete Homework",
-            body = "Complete homework for $dateStr? This will deduct mantra counts based on your homework goals.",
-            confirmText = "Complete",
+            title = stringResource(Res.string.homework_complete_homework),
+            body = stringResource(Res.string.homework_confirm_msg, dateStr),
+            confirmText = stringResource(Res.string.homework_complete_button),
             onConfirm = {
                 confirmDialogTrigger++
                 onCatchUpDay(day)
-                onShowSnackbar("Completed Homework for $dateStr")
+                onShowSnackbar(snackbarMsg)
                 pendingCatchUpDay = null
             },
             onDismiss = { pendingCatchUpDay = null }

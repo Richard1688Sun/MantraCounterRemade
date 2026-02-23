@@ -54,6 +54,11 @@ import kotlinx.datetime.YearMonth
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 
+import mantracounterremade.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+import com.nemogz.mantracounter.ui.util.getLocalizedMonthName
+import com.nemogz.mantracounter.ui.util.formatFullDate
+
 /**
  * A reusable date-picker dialog backed by kizitonwose's HorizontalCalendar.
  *
@@ -72,7 +77,7 @@ import kotlin.time.Clock
  */
 @Composable
 fun DatePickerDialog(
-    title: String = "Select Date",
+    title: String = stringResource(Res.string.picker_select_date),
     selectedDate: LocalDate? = null,
     onDateSelected: (LocalDate?) -> Unit,
     onDismiss: () -> Unit,
@@ -109,8 +114,7 @@ fun DatePickerDialog(
                     state = calendarState,
                     monthHeader = { calendarMonth ->
                         val yearMonth = calendarMonth.yearMonth
-                        val monthName = yearMonth.month.name.lowercase()
-                            .replaceFirstChar { it.uppercase() }
+                        val monthName = getLocalizedMonthName(yearMonth.month.ordinal)
 
                         // ← Month Year →
                         Row(
@@ -125,7 +129,7 @@ fun DatePickerDialog(
                             }) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                                    contentDescription = "Previous month"
+                                    contentDescription = stringResource(Res.string.picker_prev_month)
                                 )
                             }
 
@@ -161,7 +165,7 @@ fun DatePickerDialog(
                             }) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                    contentDescription = "Next month"
+                                    contentDescription = stringResource(Res.string.picker_next_month)
                                 )
                             }
                         }
@@ -226,14 +230,13 @@ fun DatePickerDialog(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         val d = pickedDate!!
-                        val mn = d.month.name.lowercase().replaceFirstChar { it.uppercase() }
                         Text(
-                            text = "Selected: $mn ${d.day}, ${d.year}",
+                            text = stringResource(Res.string.lh_target_label, formatFullDate(d)),
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.weight(1f)
                         )
                         IconButton(onClick = { pickedDate = null }) {
-                            Icon(Icons.Default.Clear, contentDescription = "Clear date")
+                            Icon(Icons.Default.Clear, contentDescription = stringResource(Res.string.lh_clear_date_desc))
                         }
                     }
                 }
@@ -244,12 +247,12 @@ fun DatePickerDialog(
                 onDateSelected(pickedDate)
                 onDismiss()
             }) {
-                Text("OK")
+                Text(stringResource(Res.string.picker_ok))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(Res.string.picker_cancel))
             }
         }
     )

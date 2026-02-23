@@ -1,0 +1,147 @@
+<resources>
+    <string name="mantra_dabei">大悲咒</string>
+    <string name="mantra_boruo">般若波罗蜜多心经</string>
+    <string name="mantra_wangshen">往生净土神咒</string>
+    <string name="mantra_qifo">七佛灭罪真言</string>
+    <string name="recipient_self">本人</string>
+
+    <string name="back">返回</string>
+    <string name="settings">设置</string>
+    <string name="subtract">减去</string>
+    <string name="add">添加</string>
+    <string name="edit">编辑</string>
+    <string name="done">完成</string>
+
+    <string name="home_mantras">经文</string>
+    <string name="home_tracking_calendar">打卡日历</string>
+    <string name="home_delete_mantras_title">删除经文？</string>
+    <string name="home_delete_mantras_message">您确定要删除这些经文吗: %1$s?</string>
+    <string name="home_delete">删除</string>
+    <string name="home_cancel">取消</string>
+
+    <string name="homework_title">功课</string>
+    <string name="homework_missed_days_msg">您有 %1$d 天没做功课了。</string>
+    <string name="homework_all_caught_up">全部完成了！太棒了。</string>
+    <string name="homework_goals_title">功课目标</string>
+    <string name="homework_desc">设置每种经文的每日功课目标。</string>
+    <string name="homework_complete_homework">完成功课</string>
+    <string name="homework_select_day_desc">选择日期</string>
+    <string name="homework_set_goals">设置目标</string>
+    <string name="homework_goals_btn">目标</string>
+    <string name="homework_complete_button">完成</string>
+    <string name="homework_confirm_msg">完成 %1$s 的功课？这将根据您的功课目标扣除经文计数。</string>
+    <string name="homework_snackbar_msg">已完成 %1$s 的功课</string>
+
+    <string name="lh_allocation_title">小房子分配</string>
+    <string name="lh_available_title">可用小房子</string>
+    <string name="lh_count_label">小房子数量: %1$d</string>
+    <string name="lh_convertible_label">可转换: %1$d</string>
+    <string name="lh_offering_recipients_title">赠与人</string>
+    <string name="lh_convert_button">转换</string>
+    <string name="lh_offerings_button">祈求</string>
+    <string name="lh_convert_dialog_title">转换小房子</string>
+    <string name="lh_convert_confirm_msg">这将扣除经文计数并将其转换为 1 个小房子。您确定吗？</string>
+    <string name="lh_convert_snackbar_msg">已转换 1 个小房子</string>
+    <string name="lh_convertible_houses_label">可转换的小房子: %1$d</string>
+    <string name="lh_new_recipient_title">新赠与人</string>
+    <string name="lh_edit_recipient_title">编辑赠与人</string>
+    <string name="lh_name_label">姓名</string>
+    <string name="lh_goal_label">目标 (0 = 无目标)</string>
+    <string name="lh_invalid_number_error">无效数字</string>
+    <string name="error_negative_count">计数不能为负数</string>
+    <string name="error_max_count">最大计数位 %1$d</string>
+    <string name="lh_no_target_date">无目标日期</string>
+    <string name="lh_pick_date_desc">选择日期</string>
+    <string name="lh_clear_date_desc">清除日期</string>
+    <string name="lh_create_button">创建</string>
+    <string name="lh_save_button">保存</string>
+    <string name="lh_cancel_button">取消</string>
+    <string name="lh_select_target_date_title">选择目标日期</string>
+    <string name="lh_error_no_houses">没有可用的小房子可以分配</string>
+    <string name="lh_error_unallocate">无法取消分配：该赠与人没有已点的经文</string>
+    <string name="lh_snackbar_allocate">已分配小房子给 %1$s</string>
+    <string name="lh_snackbar_unallocate">已从 %1$s 取消分配小房子</string>
+    <string name="lh_dialog_delete_title">删除赠与人？</string>
+    <string name="lh_dialog_delete_msg">您确定要删除: %1$s?</string>
+    <string name="lh_recipients_title">赠与人列表</string>
+    <string name="lh_houses_title">小房子</string>
+    <string name="lh_target_label">目标: %1$s</string>
+
+    <string name="cal_tap_day_msg">点击日期查看活动详情</string>
+    <string name="cal_no_activity_msg">无活动记录</string>
+    <string name="cal_status_label">状态</string>
+    <string name="cal_not_completed">❌ 未完成</string>
+    <string name="cal_completed">✅ 已完成</string>
+    <string name="cal_done_on_prefix">✅ 已于 %1$s 完成</string>
+    <string name="cal_homeworks_completed">已完成功课 (%1$d)</string>
+    <string name="cal_for_label">对应</string>
+    <string name="cal_converted_today">今日转换</string>
+    <string name="cal_allocated_today">今日点掉</string>
+    <string name="cal_allocation_breakdown">点掉详情</string>
+    <string name="cal_total_suffix">共 %1$d 个</string>
+    <string name="cal_today_added_suffix"> (今日 +%1$d)</string>
+    <string name="cal_total_net_mantras">当日净念经文数</string>
+    <string name="cal_mantra_breakdown">经文详情</string>
+    <string name="cal_gross_recited">毛念诵量</string>
+    <string name="cal_homework_deduction">功课扣除</string>
+    <string name="cal_lh_deduction">小房子扣除</string>
+    <string name="cal_net_change">当日净值</string>
+    <string name="cal_collapse_desc">折叠</string>
+    <string name="cal_expand_desc">展开</string>
+    <string name="cal_prev_month">上个月</string>
+    <string name="cal_next_month">下个月</string>
+    <string name="cal_legend_no_hw">功课未完</string>
+    <string name="cal_legend_hw_done">功课完成</string>
+    <string name="cal_legend_converted">已转换</string>
+    <string name="cal_legend_burned">已点掉</string>
+    <string name="lh_item_rotation">旋转</string>
+    <string name="lh_item_offered">已祈求</string>
+    <string name="lh_item_goal_complete">目标完成 ✅</string>
+    <string name="lh_item_allocate">分配</string>
+    <string name="lh_item_unallocate">取消分配</string>
+    <string name="lh_item_lotus_icon_desc">莲花图标</string>
+
+    <string name="dialog_edit_counter_title">编辑计数器</string>
+    <string name="dialog_new_mantra_title">新经文计数器</string>
+    <string name="dialog_mantra_name_label">经文名称</string>
+    <string name="dialog_initial_count_label">初始计数 (可选)</string>
+    <string name="dialog_count_label">计数</string>
+    <string name="dialog_save">保存</string>
+    <string name="dialog_cancel">取消</string>
+    <string name="dialog_create">创建</string>
+
+    <string name="picker_ok">确定</string>
+    <string name="picker_cancel">取消</string>
+    <string name="picker_prev_month">上个月</string>
+    <string name="picker_next_month">下个月</string>
+    <string name="picker_select_month">选择月份</string>
+    <string name="picker_select_year">选择年份</string>
+    <string name="picker_select_date">选择日期</string>
+    <string name="dialog_confirm">确定</string>
+
+    <string name="calendar_title">打卡日历</string>
+
+    <string name="detail_subtract_desc">减去</string>
+
+    <string name="date_today">今天</string>
+    <string name="date_yesterday">昨天</string>
+    <string name="date_days_ago">%1$d 天前</string>
+    <string name="date_1_week_ago">1 周前</string>
+    <string name="date_weeks_ago">%1$d 周前</string>
+    <string name="date_1_month_ago">1 个月前</string>
+    <string name="date_months_ago">%1$d 个月前</string>
+    <string name="date_years_ago">%1$d 年前</string>
+    <string name="date_pattern_full">%3$d年%1$s%2$d日</string>
+    <string name="month_1">1月</string>
+    <string name="month_2">2月</string>
+    <string name="month_3">3月</string>
+    <string name="month_4">4月</string>
+    <string name="month_5">5月</string>
+    <string name="month_6">6月</string>
+    <string name="month_7">7月</string>
+    <string name="month_8">8月</string>
+    <string name="month_9">9月</string>
+    <string name="month_10">10月</string>
+    <string name="month_11">11月</string>
+    <string name="month_12">12月</string>
+</resources>

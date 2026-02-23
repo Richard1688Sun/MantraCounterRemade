@@ -11,6 +11,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
+import 
 
 class MantraApplication : Application() {
     override fun onCreate() {
@@ -35,5 +36,7 @@ class MantraApplication : Application() {
                 android.util.Log.e("MantraApp", "Seeder failed", e)
             }
         }
+    }
+}
     }
 }

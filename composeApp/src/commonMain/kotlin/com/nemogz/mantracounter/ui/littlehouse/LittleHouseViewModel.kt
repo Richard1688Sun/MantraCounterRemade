@@ -10,6 +10,10 @@ import com.nemogz.mantracounter.shared.domain.usecase.GetLittleHouseCountUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.GetLittleHouseRecipientsUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.UnallocateLittleHouseUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.UpdateLittleHouseRecipientUseCase
+import com.nemogz.mantracounter.ui.util.UiText
+import mantracounterremade.composeapp.generated.resources.Res
+import mantracounterremade.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -52,7 +56,7 @@ class LittleHouseViewModel(
         viewModelScope.launch {
             val success = allocateLittleHouseUseCase(recipientId)
             if (!success) {
-                _uiState.value = _uiState.value.copy(error = "No little houses available to allocate")
+                _uiState.value = _uiState.value.copy(error = UiText.StringRes(Res.string.lh_error_no_houses))
             }
         }
     }
@@ -61,7 +65,7 @@ class LittleHouseViewModel(
         viewModelScope.launch {
             val success = unallocateLittleHouseUseCase(recipientId)
             if (!success) {
-                _uiState.value = _uiState.value.copy(error = "Cannot unallocate: no burned houses for this recipient")
+                _uiState.value = _uiState.value.copy(error = UiText.StringRes(Res.string.lh_error_unallocate))
             }
         }
     }

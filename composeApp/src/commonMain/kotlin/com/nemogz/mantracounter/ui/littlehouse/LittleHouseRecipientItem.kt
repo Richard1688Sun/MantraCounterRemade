@@ -47,7 +47,9 @@ import com.nemogz.mantracounter.ui.components.selectableCardColors
 import com.nemogz.mantracounter.ui.theme.LocalCustomColors
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
-import mantracounterremade.composeapp.generated.resources.Res
+import mantracounterremade.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+import com.nemogz.mantracounter.ui.util.formatFullDate
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -64,7 +66,7 @@ fun LittleHouseRecipientItem(
     modifier: Modifier = Modifier
 ) {
     // Jiggle Animation (Rotation)
-    val infiniteTransition = rememberInfiniteTransition(label = "jiggle_animation")
+    val infiniteTransition = rememberInfiniteTransition(label = stringResource(Res.string.lh_item_rotation))
     val rotation by infiniteTransition.animateFloat(
         initialValue = -1f,
         targetValue = 1f,
@@ -72,7 +74,7 @@ fun LittleHouseRecipientItem(
             animation = tween(150, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         ),
-        label = "rotation"
+        label = stringResource(Res.string.lh_item_rotation)
     )
 
     // Shake Animation (Translation X) for protected items
@@ -140,7 +142,7 @@ fun LittleHouseRecipientItem(
                     // When there's a goal, show only the progress bar (it displays "current / goal")
                     Spacer(modifier = Modifier.height(8.dp))
                     GoalProgressBar(
-                        label = "Offered",
+                        label = stringResource(Res.string.lh_item_offered),
                         current = recipient.burnedCount,
                         goal = recipient.goal,
                         showBorder = false
@@ -149,7 +151,7 @@ fun LittleHouseRecipientItem(
                 } else {
                     // No goal — just show the burned count as text
                     Text(
-                        text = "${recipient.burnedCount} offered",
+                        text = "${recipient.burnedCount} ${stringResource(Res.string.lh_item_offered).lowercase()}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -157,9 +159,8 @@ fun LittleHouseRecipientItem(
 
                 recipient.targetFinishDate?.let { epochDay ->
                     val date = LocalDate.fromEpochDays(epochDay.toInt())
-                    val monthName = date.month.name.lowercase().replaceFirstChar { it.uppercase() }
                     Text(
-                        text = "Target: $monthName ${date.day}, ${date.year}",
+                        text = stringResource(Res.string.lh_target_label, formatFullDate(date)),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -182,7 +183,7 @@ fun LittleHouseRecipientItem(
                         ),
                     ) {
                         Text(
-                            if (recipient.isGoalComplete) "Goal Complete ✅" else "Allocate",
+                            if (recipient.isGoalComplete) stringResource(Res.string.lh_item_goal_complete) else stringResource(Res.string.lh_item_allocate),
                             style = MaterialTheme.typography.labelLarge
                         )
                     }
@@ -196,7 +197,7 @@ fun LittleHouseRecipientItem(
                             contentColor = MaterialTheme.colorScheme.onErrorContainer
                         )
                     ) {
-                        Text("Unallocate", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(Res.string.lh_item_unallocate), style = MaterialTheme.typography.labelLarge)
                     }
                 }
             }
@@ -209,7 +210,7 @@ fun LittleHouseRecipientItem(
                     if (recipient.isDefault) {
                         SvgImage(
                             resource = Res.getUri("drawable/ic_lotus.svg"),
-                            contentDescription = "Lotus Icon",
+                            contentDescription = stringResource(Res.string.lh_item_lotus_icon_desc),
                             tint = LocalCustomColors.current.lotus,
                             modifier = Modifier.size(20.dp)
                         )

@@ -19,6 +19,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import mantracounterremade.composeapp.generated.resources.Res
+import mantracounterremade.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun CreateCounterDialog(
@@ -27,19 +31,19 @@ fun CreateCounterDialog(
 ) {
     var name by remember { mutableStateOf("") }
     var initialCountText by remember { mutableStateOf("0") }
-    var error by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf<StringResource?>(null) }
     
     // We could add target here if needed, but keeping it simple as per request
     
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("New Mantra Counter") },
+        title = { Text(stringResource(Res.string.dialog_new_mantra_title)) },
         text = {
             Column {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Mantra Name") },
+                    label = { Text(stringResource(Res.string.dialog_mantra_name_label)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -48,18 +52,18 @@ fun CreateCounterDialog(
                     onValueChange = { 
                         initialCountText = it
                         if (it.toIntOrNull() == null || it.toInt() < 0) {
-                            error = "Invalid Number"
+                            error = Res.string.lh_invalid_number_error
                         } else {
                             error = null
                         }
                     },
-                    label = { Text("Initial Count (Optional)") },
+                    label = { Text(stringResource(Res.string.dialog_initial_count_label)) },
                     isError = error != null,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
                  if (error != null) {
-                    Text(error ?: "", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(error!!), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                 }
             }
         },
@@ -73,12 +77,12 @@ fun CreateCounterDialog(
                 },
                 enabled = name.isNotBlank() && error == null
             ) {
-                Text("Create")
+                Text(stringResource(Res.string.dialog_create))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(Res.string.dialog_cancel))
             }
         }
     )

@@ -28,6 +28,11 @@ import androidx.compose.ui.window.Dialog
 import kotlinx.datetime.Month
 import kotlinx.datetime.YearMonth
 
+import mantracounterremade.composeapp.generated.resources.Res
+import mantracounterremade.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+import com.nemogz.mantracounter.ui.util.getLocalizedMonthName
+
 /**
  * A reusable month-picker grid dialog.
  *
@@ -47,7 +52,7 @@ fun MonthPickerDialog(
     onMonthSelected: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val monthNames = Month.entries.map { it.name.lowercase().replaceFirstChar { c -> c.uppercase() } }
+    val monthNames = Month.entries.map { getLocalizedMonthName(it.ordinal) }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -62,7 +67,7 @@ fun MonthPickerDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Select Month",
+                    text = stringResource(Res.string.picker_select_month),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -111,7 +116,7 @@ fun MonthPickerDialog(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 TextButton(onClick = onDismiss) {
-                    Text("Cancel")
+                    Text(stringResource(Res.string.picker_cancel))
                 }
             }
         }

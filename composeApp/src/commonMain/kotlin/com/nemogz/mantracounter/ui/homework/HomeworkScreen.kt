@@ -20,6 +20,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.nemogz.mantracounter.ui.components.appCardColors
 import org.koin.compose.viewmodel.koinViewModel
+import mantracounterremade.composeapp.generated.resources.Res
+import mantracounterremade.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,10 +35,10 @@ fun HomeworkScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Homework Goals") },
+                title = { Text(stringResource(Res.string.homework_goals_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(Res.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -58,7 +61,7 @@ fun HomeworkScreen(
                 item {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        "Set the daily homework goal for each mantra.",
+                        stringResource(Res.string.homework_desc),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

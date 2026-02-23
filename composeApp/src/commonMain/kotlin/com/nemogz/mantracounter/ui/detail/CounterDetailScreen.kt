@@ -41,6 +41,10 @@ import org.koin.core.annotation.KoinExperimentalAPI
 import com.nemogz.mantracounter.ui.theme.AppHaptics.ShortTap
 import io.github.compose.jindong.Jindong
 import io.github.compose.jindong.JindongProvider
+import mantracounterremade.composeapp.generated.resources.Res
+import mantracounterremade.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+import com.nemogz.mantracounter.ui.util.getLocalizedMantraName
 
 @OptIn(KoinExperimentalAPI::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -76,10 +80,10 @@ fun CounterDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(state.counter?.name ?: "Counter Detail") },
+                title = { Text(state.counter?.let { getLocalizedMantraName(it.name) } ?: stringResource(Res.string.home_counter_detail_fallback_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.back))
                     }
                 },
                 colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(
@@ -99,7 +103,7 @@ fun CounterDetailScreen(
                     containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                     contentColor = MaterialTheme.colorScheme.onTertiaryContainer
                 ) {
-                    Icon(Icons.Filled.Remove, contentDescription = "Subtract")
+                    Icon(Icons.Filled.Remove, contentDescription = stringResource(Res.string.subtract))
                 }
             }
         }
@@ -130,10 +134,10 @@ fun CounterDetailScreen(
                     // Progress bars near the top
                     if (showLittleHouseProgress) {
                         val lhGoal = counter.mantraType.mantraGoalCount
-                        val completedLh = counter.count / lhGoal
+                        val completingLh = counter.count / lhGoal
                         
                         GoalProgressBar(
-                            label = "Convertible Little Houses: $completedLh",
+                            label = stringResource(Res.string.lh_convertible_houses_label, completingLh),
                             current = counter.count % lhGoal,
                             goal = lhGoal,
                             incompleteColor = Color(0xFFFFCA28), // Golden color
@@ -145,7 +149,7 @@ fun CounterDetailScreen(
 
                     if (showHomeworkProgress) {
                         GoalProgressBar(
-                            label = "Homework",
+                            label = stringResource(Res.string.homework_title),
                             current = counter.count,
                             goal = counter.homeworkGoal,
                             modifier = Modifier.padding(horizontal = 24.dp).padding(bottom = 16.dp),

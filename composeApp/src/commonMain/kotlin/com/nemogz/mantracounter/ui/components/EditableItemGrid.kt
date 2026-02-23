@@ -30,6 +30,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
+import mantracounterremade.composeapp.generated.resources.Res
+import mantracounterremade.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * A reusable editable, reorderable grid/list of items.
@@ -88,7 +91,7 @@ fun <T> EditableItemGrid(
                     )
                 ) {
                     Text(
-                        text = "Add",
+                        text = stringResource(Res.string.add),
                         style = MaterialTheme.typography.labelLarge,
                     )
                 }
@@ -102,7 +105,7 @@ fun <T> EditableItemGrid(
                     ),
                 ) {
                     Text(
-                        text = "Delete",
+                        text = stringResource(Res.string.home_delete),
                         style = MaterialTheme.typography.labelLarge,
                     )
                 }
@@ -122,7 +125,7 @@ fun <T> EditableItemGrid(
                 )
             ) {
                 Text(
-                    text = if (isEditMode) "Done" else "Edit",
+                    text = if (isEditMode) stringResource(Res.string.done) else stringResource(Res.string.edit),
                     style = MaterialTheme.typography.labelLarge,
                 )
             }

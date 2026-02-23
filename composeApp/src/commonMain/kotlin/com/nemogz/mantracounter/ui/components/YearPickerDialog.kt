@@ -28,6 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import kotlinx.datetime.YearMonth
 
+import mantracounterremade.composeapp.generated.resources.Res
+import mantracounterremade.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+
 /**
  * A reusable year-picker grid dialog.
  *
@@ -61,7 +65,7 @@ fun YearPickerDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Select Year",
+                    text = stringResource(Res.string.picker_select_year),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -109,7 +113,7 @@ fun YearPickerDialog(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 TextButton(onClick = onDismiss) {
-                    Text("Cancel")
+                    Text(stringResource(Res.string.picker_cancel))
                 }
             }
         }

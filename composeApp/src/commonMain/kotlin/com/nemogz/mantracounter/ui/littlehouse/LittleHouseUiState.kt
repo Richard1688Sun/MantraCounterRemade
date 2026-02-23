@@ -1,6 +1,7 @@
 package com.nemogz.mantracounter.ui.littlehouse
 
 import com.nemogz.mantracounter.shared.domain.model.LittleHouseRecipient
+import com.nemogz.mantracounter.ui.util.UiText
 
 data class LittleHouseUiState(
     val recipients: List<LittleHouseRecipient> = emptyList(),
@@ -8,6 +9,6 @@ data class LittleHouseUiState(
     val isLoading: Boolean = false,
     val isEditMode: Boolean = false,
     val selectedRecipientIds: Set<String> = emptySet(),
-    val error: String? = null
+    val error: UiText? = null
 )
 

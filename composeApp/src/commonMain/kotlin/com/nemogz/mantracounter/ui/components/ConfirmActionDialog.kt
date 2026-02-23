@@ -6,12 +6,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 
+import mantracounterremade.composeapp.generated.resources.Res
+import mantracounterremade.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+
 @Composable
 fun ConfirmActionDialog(
     title: String,
     body: String,
-    confirmText: String = "Confirm",
-    cancelText: String = "Cancel",
+    confirmText: String = stringResource(Res.string.dialog_confirm),
+    cancelText: String = stringResource(Res.string.picker_cancel),
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {

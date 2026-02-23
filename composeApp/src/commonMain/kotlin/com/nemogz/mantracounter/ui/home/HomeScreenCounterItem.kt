@@ -57,7 +57,8 @@ import androidx.compose.ui.unit.sp
 import com.nemogz.mantracounter.ui.components.GoalProgressBar
 import com.nemogz.mantracounter.ui.components.selectableCardColors
 import mantracounterremade.composeapp.generated.resources.Res
-import mantracounterremade.composeapp.generated.resources.ic_lotus
+import mantracounterremade.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.*
 import com.nemogz.mantracounter.ui.theme.LocalCustomColors
 import org.jetbrains.compose.resources.painterResource
 
@@ -148,7 +149,7 @@ fun HomeScreenCounterItem(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = counter.name, 
+                    text = com.nemogz.mantracounter.ui.util.getLocalizedMantraName(counter.name), 
                     style = MaterialTheme.typography.bodyLarge, 
                     textAlign = TextAlign.Center,
                     maxLines = 2,
@@ -199,7 +200,7 @@ fun HomeScreenCounterItem(
                 ) {
                     // Homework Goal Progress
                     GoalProgressBar(
-                        label = "Homework",
+                        label = stringResource(Res.string.homework_title),
                         current = counter.count,
                         goal = counter.homeworkGoal,
                         valueLabel = "${counter.homeworkGoal}"
@@ -218,7 +219,7 @@ fun HomeScreenCounterItem(
                         if (isProtected) {
                             SvgImage(
                                 resource = Res.getUri("drawable/ic_lotus.svg"),
-                                contentDescription = "Lotus Icon",
+                                contentDescription = stringResource(Res.string.lh_item_lotus_icon_desc),
                                 tint = LocalCustomColors.current.lotus,
                                 modifier = Modifier.size(20.dp)
                             )

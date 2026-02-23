@@ -41,6 +41,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import mantracounterremade.composeapp.generated.resources.Res
+import mantracounterremade.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.getString
+import com.nemogz.mantracounter.ui.util.getLocalizedMantraName
+import com.nemogz.mantracounter.ui.util.UiText
 import com.nemogz.mantracounter.shared.domain.model.LittleHouseRecipient
 import com.nemogz.mantracounter.ui.components.ConfirmActionDialog
 import com.nemogz.mantracounter.ui.components.DatePickerDialog
@@ -54,9 +61,9 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import kotlin.time.Clock
 
-// Helper class for overwriting standard snackbars
 private data class SnackbarEvent(
-    val message: String,
+    val messageRes: StringResource,
+    val formatArg: String = "",
     val id: Long = Clock.System.now().toEpochMilliseconds()
 )
 
@@ -72,10 +79,8 @@ fun LittleHouseScreen(
     var allocationTrigger by remember { mutableStateOf(0) }
     var deallocationTrigger by remember { mutableStateOf(0) }
 
-    // State to hold our standard notification events
     var currentSnackbarEvent by remember { mutableStateOf<SnackbarEvent?>(null) }
 
-    // Set up the declarative haptic observers
     JindongProvider {
         if (allocationTrigger > 0) {
             Jindong(allocationTrigger) {
@@ -94,28 +99,28 @@ fun LittleHouseScreen(
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
     var recipientToEdit by remember { mutableStateOf<LittleHouseRecipient?>(null) }
 
-    // 1. Error Snackbar Effect (Preserved: errors will not be cancelled by normal messages)
-    LaunchedEffect(state.error) {
-        state.error?.let {
+    val errorMsg = state.error?.asString()
+    LaunchedEffect(errorMsg) {
+        errorMsg?.let {
             snackbarHostState.showSnackbar(it)
             viewModel.clearError()
         }
     }
 
-    // 2. Standard Snackbar Effect (Overwrites itself on every new event)
     LaunchedEffect(currentSnackbarEvent) {
         currentSnackbarEvent?.let { event ->
-            snackbarHostState.showSnackbar(event.message)
+            val message = getString(event.messageRes, event.formatArg)
+            snackbarHostState.showSnackbar(message)
         }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Little House Allocation") },
+                title = { Text(stringResource(Res.string.lh_allocation_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -138,14 +143,13 @@ fun LittleHouseScreen(
             Column(
                 modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp)
             ) {
-                // Little House count header
                 Card(
                     colors = appCardColors(MaterialTheme.colorScheme.primaryContainer),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "Available Little Houses",
+                            text = stringResource(Res.string.lh_available_title),
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -164,7 +168,7 @@ fun LittleHouseScreen(
                     items = state.recipients,
                     itemKey = { it.id },
                     columns = 1,
-                    title = "Recipients",
+                    title = stringResource(Res.string.lh_recipients_title),
                     isEditMode = state.isEditMode,
                     hasSelection = state.selectedRecipientIds.isNotEmpty(),
                     onToggleEditMode = viewModel::toggleEditMode,
@@ -182,14 +186,12 @@ fun LittleHouseScreen(
                             onAllocate = {
                                 allocationTrigger++
                                 viewModel.onAllocate(recipient.id)
-                                // Trigger overwrite snackbar
-                                currentSnackbarEvent = SnackbarEvent("Allocated Little House to ${recipient.name}")
+                                currentSnackbarEvent = SnackbarEvent(Res.string.lh_snackbar_allocate, recipient.name)
                             },
                             onUnallocate = {
                                 deallocationTrigger++
                                 viewModel.onUnallocate(recipient.id)
-                                // Trigger overwrite snackbar
-                                currentSnackbarEvent = SnackbarEvent("Unallocated Little House from ${recipient.name}")
+                                currentSnackbarEvent = SnackbarEvent(Res.string.lh_snackbar_unallocate, recipient.name)
                             },
                             onEdit = { recipientToEdit = recipient },
                             dragModifier = dragModifier
@@ -200,16 +202,19 @@ fun LittleHouseScreen(
         }
     }
 
-    // Bulk delete confirmation
     if (showDeleteConfirmDialog) {
-        val selectedNames = state.recipients
-            .filter { it.id in state.selectedRecipientIds }
-            .joinToString(", ") { it.name }
+        val selectedRecipients = state.recipients.filter { it.id in state.selectedRecipientIds }
+
+        val localizedNamesList = mutableListOf<String>()
+        for (recipient in selectedRecipients) {
+            localizedNamesList.add(getLocalizedMantraName(recipient.name))
+        }
+        val selectedNames = localizedNamesList.joinToString(", ")
 
         ConfirmActionDialog(
-            title = "Delete Recipients?",
-            body = "Are you sure you want to delete: $selectedNames?",
-            confirmText = "Delete",
+            title = stringResource(Res.string.lh_dialog_delete_title),
+            body = stringResource(Res.string.lh_dialog_delete_msg, selectedNames),
+            confirmText = stringResource(Res.string.home_delete),
             onConfirm = {
                 viewModel.deleteSelectedRecipients()
                 showDeleteConfirmDialog = false
@@ -218,7 +223,6 @@ fun LittleHouseScreen(
         )
     }
 
-    // Create dialog
     if (showCreateDialog) {
         CreateRecipientDialog(
             onDismiss = { showCreateDialog = false },
@@ -229,7 +233,6 @@ fun LittleHouseScreen(
         )
     }
 
-    // Edit dialog
     recipientToEdit?.let { recipient ->
         EditRecipientDialog(
             recipient = recipient,
@@ -253,17 +256,17 @@ private fun CreateRecipientDialog(
     var goalText by remember { mutableStateOf("0") }
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     var showDatePicker by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf<StringResource?>(null) } // Fixed: Now a StringResource
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("New Recipient") },
+        title = { Text(stringResource(Res.string.lh_new_recipient_title)) },
         text = {
             Column {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Name") },
+                    label = { Text(stringResource(Res.string.lh_name_label)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -271,16 +274,16 @@ private fun CreateRecipientDialog(
                     value = goalText,
                     onValueChange = {
                         goalText = it
-                        error = if (it.toIntOrNull() == null || it.toInt() < 0) "Invalid number" else null
+                        // Fixed: Assign the Resource ID directly, no stringResource() call here
+                        error = if (it.toIntOrNull() == null || it.toInt() < 0) Res.string.lh_invalid_number_error else null
                     },
-                    label = { Text("Goal (0 = no goal)") },
+                    label = { Text(stringResource(Res.string.lh_goal_label)) },
                     isError = error != null,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Date picker button
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
@@ -289,22 +292,27 @@ private fun CreateRecipientDialog(
                         text = selectedDate?.let {
                             val monthName = it.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
                             "$monthName ${it.day}, ${it.year}"
-                        } ?: "No target date",
+                        } ?: stringResource(Res.string.lh_no_target_date),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.weight(1f)
                     )
                     IconButton(onClick = { showDatePicker = true }) {
-                        Icon(Icons.Default.DateRange, contentDescription = "Pick date")
+                        Icon(Icons.Default.DateRange, contentDescription = stringResource(Res.string.lh_pick_date_desc))
                     }
                     if (selectedDate != null) {
                         IconButton(onClick = { selectedDate = null }) {
-                            Icon(Icons.Default.Clear, contentDescription = "Clear date")
+                            Icon(Icons.Default.Clear, contentDescription = stringResource(Res.string.lh_clear_date_desc))
                         }
                     }
                 }
 
-                if (error != null) {
-                    Text(error ?: "", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                // Fixed: Translate the stored resource ID when drawing the UI
+                error?.let { errorRes ->
+                    Text(
+                        text = stringResource(errorRes),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
         },
@@ -317,19 +325,19 @@ private fun CreateRecipientDialog(
                 },
                 enabled = name.isNotBlank() && error == null
             ) {
-                Text("Create")
+                Text(stringResource(Res.string.lh_create_button))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(Res.string.lh_cancel_button))
             }
         }
     )
 
     if (showDatePicker) {
         DatePickerDialog(
-            title = "Select Target Date",
+            title = stringResource(Res.string.lh_select_target_date_title),
             selectedDate = selectedDate,
             onDateSelected = { selectedDate = it },
             onDismiss = { showDatePicker = false }
@@ -351,17 +359,17 @@ private fun EditRecipientDialog(
         )
     }
     var showDatePicker by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf<StringResource?>(null) } // Fixed: Now a StringResource
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Edit Recipient") },
+        title = { Text(stringResource(Res.string.lh_edit_recipient_title)) },
         text = {
             Column {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Name") },
+                    label = { Text(stringResource(Res.string.lh_name_label)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -369,16 +377,16 @@ private fun EditRecipientDialog(
                     value = goalText,
                     onValueChange = {
                         goalText = it
-                        error = if (it.toIntOrNull() == null || it.toInt() < 0) "Invalid number" else null
+                        // Fixed: Assign the Resource ID directly
+                        error = if (it.toIntOrNull() == null || it.toInt() < 0) Res.string.lh_invalid_number_error else null
                     },
-                    label = { Text("Goal (0 = no goal)") },
+                    label = { Text(stringResource(Res.string.lh_goal_label)) },
                     isError = error != null,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Date picker button
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
@@ -387,22 +395,27 @@ private fun EditRecipientDialog(
                         text = selectedDate?.let {
                             val monthName = it.month.name.lowercase().replaceFirstChar { c -> c.uppercase() }
                             "$monthName ${it.day}, ${it.year}"
-                        } ?: "No target date",
+                        } ?: stringResource(Res.string.lh_no_target_date),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.weight(1f)
                     )
                     IconButton(onClick = { showDatePicker = true }) {
-                        Icon(Icons.Default.DateRange, contentDescription = "Pick date")
+                        Icon(Icons.Default.DateRange, contentDescription = stringResource(Res.string.lh_pick_date_desc))
                     }
                     if (selectedDate != null) {
                         IconButton(onClick = { selectedDate = null }) {
-                            Icon(Icons.Default.Clear, contentDescription = "Clear date")
+                            Icon(Icons.Default.Clear, contentDescription = stringResource(Res.string.lh_clear_date_desc))
                         }
                     }
                 }
 
-                if (error != null) {
-                    Text(error ?: "", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                // Fixed: Translate the stored resource ID when drawing the UI
+                error?.let { errorRes ->
+                    Text(
+                        text = stringResource(errorRes),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
         },
@@ -415,19 +428,19 @@ private fun EditRecipientDialog(
                 },
                 enabled = name.isNotBlank() && error == null
             ) {
-                Text("Save")
+                Text(stringResource(Res.string.lh_save_button))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(Res.string.lh_cancel_button))
             }
         }
     )
 
     if (showDatePicker) {
         DatePickerDialog(
-            title = "Select Target Date",
+            title = stringResource(Res.string.lh_select_target_date_title),
             selectedDate = selectedDate,
             onDateSelected = { selectedDate = it },
             onDismiss = { showDatePicker = false }

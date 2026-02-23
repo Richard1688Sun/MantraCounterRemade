@@ -26,6 +26,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mantracounterremade.composeapp.generated.resources.Res
+import mantracounterremade.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import com.nemogz.mantracounter.ui.components.ConfirmActionDialog
 import com.nemogz.mantracounter.ui.components.appCardColors
 import com.nemogz.mantracounter.ui.theme.AppHaptics.LongTap
@@ -59,13 +62,13 @@ fun HomeScreenLittleHouseItem(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                "Little House Count: $littleHouseCount",
+                stringResource(Res.string.lh_count_label, littleHouseCount),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             if (convertibleCount > 0) {
                 Text(
-                    text = "Convertible: $convertibleCount",
+                    text = stringResource(Res.string.lh_convertible_label, convertibleCount),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                 )
@@ -80,7 +83,7 @@ fun HomeScreenLittleHouseItem(
                         containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                 ) {
-                    Text("Convert")
+                    Text(stringResource(Res.string.lh_convert_button))
                 }
                 OutlinedButton(
                     onClick = onNavigateToLittleHouse,
@@ -89,7 +92,7 @@ fun HomeScreenLittleHouseItem(
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                     )
                 ) {
-                    Text("Offerings")
+                    Text(stringResource(Res.string.lh_offerings_button))
                     Spacer(modifier = Modifier.width(4.dp))
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
@@ -102,14 +105,15 @@ fun HomeScreenLittleHouseItem(
     }
 
     if (showConvertDialog) {
+        val snackbarMsg = stringResource(Res.string.lh_convert_snackbar_msg)
         ConfirmActionDialog(
-            title = "Convert Little House",
-            body = "This will deduct mantra counts and convert them into 1 Little House. Are you sure?",
-            confirmText = "Convert",
+            title = stringResource(Res.string.lh_convert_dialog_title),
+            body = stringResource(Res.string.lh_convert_confirm_msg),
+            confirmText = stringResource(Res.string.lh_convert_button),
             onConfirm = {
                 confirmDialogTrigger++
                 onConvert()
-                onShowSnackbar("Converted 1 Little House")
+                onShowSnackbar(snackbarMsg)
                 showConvertDialog = false
             },
             onDismiss = { showConvertDialog = false }

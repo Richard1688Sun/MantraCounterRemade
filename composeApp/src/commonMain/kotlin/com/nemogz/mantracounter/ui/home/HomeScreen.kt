@@ -42,6 +42,10 @@ import com.nemogz.mantracounter.shared.domain.model.Counter
 import com.nemogz.mantracounter.ui.components.EditableItemGrid
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
+import mantracounterremade.composeapp.generated.resources.Res
+import mantracounterremade.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
+import com.nemogz.mantracounter.ui.util.getLocalizedMantraName
 import kotlin.time.Clock
 
 // Helper class for overwriting standard snackbars
@@ -172,8 +176,8 @@ fun HomeContent(
 
         AlertDialog(
             onDismissRequest = { showDeleteConfirmDialog = false },
-            title = { Text("Delete Mantras?") },
-            text = { Text("Are you sure you want to delete these mantras: $selectedNames?") },
+            title = { Text(stringResource(Res.string.home_delete_mantras_title)) },
+            text = { Text(stringResource(Res.string.home_delete_mantras_message, selectedNames)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -182,12 +186,12 @@ fun HomeContent(
                     },
                     colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Delete")
+                    Text(stringResource(Res.string.home_delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteConfirmDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(Res.string.home_cancel))
                 }
             }
         )
@@ -223,7 +227,7 @@ fun HomeContent(
                 ) {
                     Icon(
                         imageVector = Icons.Default.DateRange,
-                        contentDescription = "Tracking Calendar",
+                        contentDescription = stringResource(Res.string.home_tracking_calendar),
                         tint = MaterialTheme.colorScheme.onTertiaryContainer,
                         modifier = Modifier.size(32.dp)
                     )
@@ -238,7 +242,7 @@ fun HomeContent(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
-                        contentDescription = "Settings",
+                        contentDescription = stringResource(Res.string.settings),
                         tint = MaterialTheme.colorScheme.onTertiaryContainer,
                         modifier = Modifier.size(32.dp)
                     )
@@ -259,7 +263,7 @@ fun HomeContent(
             items = state.counters,
             itemKey = { it.id },
             columns = 2,
-            title = "Mantras",
+            title = stringResource(Res.string.home_mantras),
             isEditMode = state.isEditMode,
             hasSelection = state.selectedCounterIds.isNotEmpty(),
             onToggleEditMode = onToggleEditMode,

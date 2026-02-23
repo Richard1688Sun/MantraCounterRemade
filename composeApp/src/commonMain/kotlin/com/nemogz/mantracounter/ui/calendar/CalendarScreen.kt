@@ -25,6 +25,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import org.jetbrains.compose.resources.stringResource
+import mantracounterremade.composeapp.generated.resources.Res
+import mantracounterremade.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.*
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -100,12 +104,12 @@ fun CalendarScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Tracking Calendar") },
+                title = { Text(stringResource(Res.string.home_tracking_calendar)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.back)
                         )
                     }
                 },
@@ -135,8 +139,7 @@ fun CalendarScreen(
                     state = calendarState,
                     monthHeader = { calendarMonth ->
                         val yearMonth = calendarMonth.yearMonth
-                        val monthName = yearMonth.month.name.lowercase()
-                            .replaceFirstChar { it.uppercase() }
+                        val monthName = com.nemogz.mantracounter.ui.util.getLocalizedMonthName(yearMonth.month.ordinal + 1)
 
                         // Navigation row: ← Month Year →
                         Row(
@@ -156,7 +159,7 @@ fun CalendarScreen(
                             }) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                                    contentDescription = "Previous month"
+                                    contentDescription = stringResource(Res.string.cal_prev_month)
                                 )
                             }
 
@@ -195,7 +198,7 @@ fun CalendarScreen(
                             }) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                    contentDescription = "Next month"
+                                    contentDescription = stringResource(Res.string.cal_next_month)
                                 )
                             }
                         }
@@ -248,11 +251,11 @@ fun CalendarScreen(
                     LegendDualItem(
                         noColor = colors.homeworkNotCompletedDot,
                         yesColor = colors.homeworkCompletedDot,
-                        noLabel = "No HW",
-                        yesLabel = "HW Done"
+                        noLabel = stringResource(Res.string.cal_legend_no_hw),
+                        yesLabel = stringResource(Res.string.cal_legend_hw_done)
                     )
-                    LegendItem(color = colors.convertedHouseDot, label = "Converted")
-                    LegendItem(color = colors.burnedHouseDot, label = "Burned")
+                    LegendItem(color = colors.convertedHouseDot, label = stringResource(Res.string.cal_legend_converted))
+                    LegendItem(color = colors.burnedHouseDot, label = stringResource(Res.string.cal_legend_burned))
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
