@@ -1,20 +1,9 @@
 package com.nemogz.mantracounter.ui.util
 
 import androidx.compose.runtime.Composable
-import mantracounterremade.composeapp.generated.resources.Res
-import mantracounterremade.composeapp.generated.resources.*
+import mantracounterremade.shared.generated.resources.Res
+import mantracounterremade.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
-
-@Composable
-fun getLocalizedMantraName(name: String): String = when (name) {
-    "Great Compassion Mantra" -> stringResource(Res.string.mantra_dabei)
-    "Heart Sutra" -> stringResource(Res.string.mantra_boruo)
-    "Amitabha Pure Land Rebirth Mantra" -> stringResource(Res.string.mantra_wangshen)
-    "Sapta Atita Tathagata Mantra" -> stringResource(Res.string.mantra_qifo)
-    "Guan Yin Bodhisattva's Mantra" -> stringResource(Res.string.mantra_dabei) // Fallback or specific? I'll stick to what's in resources.
-    "Self" -> stringResource(Res.string.recipient_self)
-    else -> name
-}
 
 @Composable
 fun formatFullDate(date: kotlinx.datetime.LocalDate): String {

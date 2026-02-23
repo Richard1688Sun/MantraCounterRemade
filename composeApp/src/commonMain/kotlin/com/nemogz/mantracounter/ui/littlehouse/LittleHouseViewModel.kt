@@ -11,8 +11,8 @@ import com.nemogz.mantracounter.shared.domain.usecase.GetLittleHouseRecipientsUs
 import com.nemogz.mantracounter.shared.domain.usecase.UnallocateLittleHouseUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.UpdateLittleHouseRecipientUseCase
 import com.nemogz.mantracounter.ui.util.UiText
-import mantracounterremade.composeapp.generated.resources.Res
-import mantracounterremade.composeapp.generated.resources.*
+import mantracounterremade.shared.generated.resources.Res
+import mantracounterremade.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

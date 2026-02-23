@@ -28,7 +28,8 @@ val viewModelModule = module {
             deleteCountersUseCase = get(),
             validateCounterCountUseCase = get(),
             checkDayRolloverUseCase = get(),
-            setCounterCountUseCase = get()
+            setCounterCountUseCase = get(),
+            databaseSeeder = get()
         )
     }
     factory {

@@ -42,10 +42,10 @@ import com.nemogz.mantracounter.shared.domain.model.Counter
 import com.nemogz.mantracounter.ui.components.EditableItemGrid
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
-import mantracounterremade.composeapp.generated.resources.Res
-import mantracounterremade.composeapp.generated.resources.*
+import mantracounterremade.shared.generated.resources.Res
+import mantracounterremade.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
-import com.nemogz.mantracounter.ui.util.getLocalizedMantraName
+import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Clock
 
 // Helper class for overwriting standard snackbars

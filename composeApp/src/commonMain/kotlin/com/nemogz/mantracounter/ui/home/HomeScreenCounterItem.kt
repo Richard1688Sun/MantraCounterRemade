@@ -44,8 +44,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.unit.dp
 import com.nemogz.mantracounter.ui.components.SvgImage
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.draw.clip
@@ -56,8 +56,8 @@ import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.ui.unit.sp
 import com.nemogz.mantracounter.ui.components.GoalProgressBar
 import com.nemogz.mantracounter.ui.components.selectableCardColors
-import mantracounterremade.composeapp.generated.resources.Res
-import mantracounterremade.composeapp.generated.resources.*
+import mantracounterremade.shared.generated.resources.Res
+import mantracounterremade.shared.generated.resources.*
 import org.jetbrains.compose.resources.*
 import com.nemogz.mantracounter.ui.theme.LocalCustomColors
 import org.jetbrains.compose.resources.painterResource
@@ -149,7 +149,7 @@ fun HomeScreenCounterItem(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = com.nemogz.mantracounter.ui.util.getLocalizedMantraName(counter.name), 
+                    text = counter.name, 
                     style = MaterialTheme.typography.bodyLarge, 
                     textAlign = TextAlign.Center,
                     maxLines = 2,

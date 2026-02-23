@@ -9,6 +9,9 @@ import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRecipientRe
 import com.nemogz.mantracounter.shared.domain.usecase.CheckDayRolloverUseCase
 import kotlinx.coroutines.flow.first
 
+import mantracounterremade.shared.generated.resources.Res
+import mantracounterremade.shared.generated.resources.*
+import org.jetbrains.compose.resources.getString
 class DatabaseSeeder(
     private val counterRepository: ICounterRepository,
     private val littleHouseRepository: ILittleHouseRepository,
@@ -25,25 +28,25 @@ class DatabaseSeeder(
                 Counter(
                     id = "dabei",
                     mantraType = MantraType.DaBei,
-                    name = "Great Compassion Mantra",
+                    name = getString(Res.string.mantra_dabei),
                     sortOrder = 0
                 ),
                 Counter(
                     id = "boruo",
                     mantraType = MantraType.BoRuo,
-                    name = "Heart Sutra",
+                    name = getString(Res.string.mantra_boruo),
                     sortOrder = 1
                 ),
                 Counter(
                     id = "wangshen",
                     mantraType = MantraType.WangShen,
-                    name = "Amitabha Pure Land Rebirth Mantra",
+                    name = getString(Res.string.mantra_wangshen),
                     sortOrder = 2
                 ),
                 Counter(
                     id = "qifo",
                     mantraType = MantraType.QiFo,
-                    name = "Sapta Atita Tathagata Mantra",
+                    name = getString(Res.string.mantra_qifo),
                     sortOrder = 3
                 )
             )
@@ -52,7 +55,7 @@ class DatabaseSeeder(
         }
 
         // 3. Ensure LittleHouse record exists
-        val lhCount = littleHouseRepository.getLittleHouseCount().first()
+        val currentLhCount = littleHouseRepository.getLittleHouseCount().first()
         if (currentCounters.isEmpty()) {
              littleHouseRepository.setLittleHouseCount(0)
         }
@@ -63,7 +66,7 @@ class DatabaseSeeder(
             recipientRepository.insert(
                 LittleHouseRecipient(
                     id = LittleHouseRecipient.DEFAULT_SELF_ID,
-                    name = "Self",
+                    name = getString(Res.string.recipient_self),
                     goal = 0,
                     sortOrder = 0
                 )

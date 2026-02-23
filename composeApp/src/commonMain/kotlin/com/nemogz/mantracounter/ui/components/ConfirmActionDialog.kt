@@ -6,8 +6,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 
-import mantracounterremade.composeapp.generated.resources.Res
-import mantracounterremade.composeapp.generated.resources.*
+import mantracounterremade.shared.generated.resources.Res
+import mantracounterremade.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 
 @Composable

@@ -1,8 +1,8 @@
 package com.nemogz.mantracounter.ui.util
 
 import androidx.compose.runtime.Composable
-import mantracounterremade.composeapp.generated.resources.Res
-import mantracounterremade.composeapp.generated.resources.*
+import mantracounterremade.shared.generated.resources.Res
+import mantracounterremade.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone

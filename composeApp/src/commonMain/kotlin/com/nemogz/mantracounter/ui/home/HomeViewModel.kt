@@ -35,15 +35,17 @@ class HomeViewModel(
     private val createCounterUseCase: com.nemogz.mantracounter.shared.domain.usecase.CreateCounterUseCase,
     private val deleteCountersUseCase: com.nemogz.mantracounter.shared.domain.usecase.DeleteCountersUseCase,
     private val checkDayRolloverUseCase: com.nemogz.mantracounter.shared.domain.usecase.CheckDayRolloverUseCase,
-    private val setCounterCountUseCase: SetCounterCountUseCase
+    private val setCounterCountUseCase: SetCounterCountUseCase,
+    private val databaseSeeder: com.nemogz.mantracounter.shared.data.local.DatabaseSeeder
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState(isLoading = true))
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
-        // Run checkDayRollover immediately on ViewModel creation
+        // Run database seeding and day rollover immediately on ViewModel creation
         viewModelScope.launch {
+            databaseSeeder.seed()
             checkDayRolloverUseCase()
         }
         viewModelScope.launch {

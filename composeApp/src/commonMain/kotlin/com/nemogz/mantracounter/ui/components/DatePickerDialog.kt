@@ -54,7 +54,7 @@ import kotlinx.datetime.YearMonth
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 
-import mantracounterremade.composeapp.generated.resources.*
+import mantracounterremade.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import com.nemogz.mantracounter.ui.util.getLocalizedMonthName
 import com.nemogz.mantracounter.ui.util.formatFullDate

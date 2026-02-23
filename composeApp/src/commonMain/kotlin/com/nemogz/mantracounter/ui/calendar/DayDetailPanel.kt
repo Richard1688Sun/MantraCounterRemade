@@ -44,10 +44,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import mantracounterremade.composeapp.generated.resources.Res
-import mantracounterremade.composeapp.generated.resources.*
+import mantracounterremade.shared.generated.resources.Res
+import mantracounterremade.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
-import com.nemogz.mantracounter.ui.util.getLocalizedMantraName
+import org.jetbrains.compose.resources.stringResource
 import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import com.nemogz.mantracounter.ui.components.GoalProgressBar
 import com.nemogz.mantracounter.ui.components.appCardColors
@@ -290,7 +290,7 @@ private fun MantraBreakdownRow(name: String, start: Int, end: Int, homeworkGoal:
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = getLocalizedMantraName(name),
+                text = name,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

@@ -41,10 +41,10 @@ import org.koin.core.annotation.KoinExperimentalAPI
 import com.nemogz.mantracounter.ui.theme.AppHaptics.ShortTap
 import io.github.compose.jindong.Jindong
 import io.github.compose.jindong.JindongProvider
-import mantracounterremade.composeapp.generated.resources.Res
-import mantracounterremade.composeapp.generated.resources.*
+import mantracounterremade.shared.generated.resources.Res
+import mantracounterremade.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
-import com.nemogz.mantracounter.ui.util.getLocalizedMantraName
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(KoinExperimentalAPI::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -80,7 +80,7 @@ fun CounterDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(state.counter?.let { getLocalizedMantraName(it.name) } ?: stringResource(Res.string.home_counter_detail_fallback_title)) },
+                title = { Text(state.counter?.name ?: stringResource(Res.string.home_counter_detail_fallback_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.back))

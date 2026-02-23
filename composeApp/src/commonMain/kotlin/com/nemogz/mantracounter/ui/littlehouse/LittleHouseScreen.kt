@@ -41,12 +41,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import mantracounterremade.composeapp.generated.resources.Res
-import mantracounterremade.composeapp.generated.resources.*
+import mantracounterremade.shared.generated.resources.Res
+import mantracounterremade.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
-import com.nemogz.mantracounter.ui.util.getLocalizedMantraName
+import org.jetbrains.compose.resources.getString
 import com.nemogz.mantracounter.ui.util.UiText
 import com.nemogz.mantracounter.shared.domain.model.LittleHouseRecipient
 import com.nemogz.mantracounter.ui.components.ConfirmActionDialog
@@ -207,7 +207,7 @@ fun LittleHouseScreen(
 
         val localizedNamesList = mutableListOf<String>()
         for (recipient in selectedRecipients) {
-            localizedNamesList.add(getLocalizedMantraName(recipient.name))
+            localizedNamesList.add(recipient.name)
         }
         val selectedNames = localizedNamesList.joinToString(", ")
 

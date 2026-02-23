@@ -47,7 +47,7 @@ import com.nemogz.mantracounter.ui.components.selectableCardColors
 import com.nemogz.mantracounter.ui.theme.LocalCustomColors
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
-import mantracounterremade.composeapp.generated.resources.*
+import mantracounterremade.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import com.nemogz.mantracounter.ui.util.formatFullDate
 
