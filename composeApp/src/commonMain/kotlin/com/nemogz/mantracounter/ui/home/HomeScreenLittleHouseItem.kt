@@ -28,6 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.nemogz.mantracounter.ui.components.ConfirmActionDialog
 import com.nemogz.mantracounter.ui.components.appCardColors
+import com.nemogz.mantracounter.ui.theme.AppHaptics.LongTap
+import io.github.compose.jindong.Jindong
+import io.github.compose.jindong.JindongProvider
 
 @Composable
 fun HomeScreenLittleHouseItem(
@@ -36,10 +39,20 @@ fun HomeScreenLittleHouseItem(
     canConvert: Boolean,
     onConvert: () -> Unit,
     onNavigateToLittleHouse: () -> Unit,
+    onShowSnackbar: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showConvertDialog by remember { mutableStateOf(false) }
+    var confirmDialogTrigger by remember { mutableStateOf(0) }
 
+    // Set up the declarative haptic observers
+    JindongProvider {
+        if (confirmDialogTrigger > 0) {
+            Jindong(confirmDialogTrigger) {
+                LongTap()
+            }
+        }
+    }
     Card(
         colors = appCardColors(MaterialTheme.colorScheme.primaryContainer),
         modifier = modifier.fillMaxWidth().padding(bottom = 8.dp)
@@ -93,7 +106,12 @@ fun HomeScreenLittleHouseItem(
             title = "Convert Little House",
             body = "This will deduct mantra counts and convert them into 1 Little House. Are you sure?",
             confirmText = "Convert",
-            onConfirm = onConvert,
+            onConfirm = {
+                confirmDialogTrigger++
+                onConvert()
+                onShowSnackbar("Converted 1 Little House")
+                showConvertDialog = false
+            },
             onDismiss = { showConvertDialog = false }
         )
     }

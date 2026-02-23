@@ -16,7 +16,6 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -47,9 +46,19 @@ import com.nemogz.mantracounter.ui.components.ConfirmActionDialog
 import com.nemogz.mantracounter.ui.components.DatePickerDialog
 import com.nemogz.mantracounter.ui.components.EditableItemGrid
 import com.nemogz.mantracounter.ui.components.appCardColors
+import com.nemogz.mantracounter.ui.theme.AppHaptics.LongTap
+import io.github.compose.jindong.Jindong
+import io.github.compose.jindong.JindongProvider
 import kotlinx.datetime.LocalDate
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
+import kotlin.time.Clock
+
+// Helper class for overwriting standard snackbars
+private data class SnackbarEvent(
+    val message: String,
+    val id: Long = Clock.System.now().toEpochMilliseconds()
+)
 
 @OptIn(KoinExperimentalAPI::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -60,15 +69,43 @@ fun LittleHouseScreen(
     val state by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    var allocationTrigger by remember { mutableStateOf(0) }
+    var deallocationTrigger by remember { mutableStateOf(0) }
+
+    // State to hold our standard notification events
+    var currentSnackbarEvent by remember { mutableStateOf<SnackbarEvent?>(null) }
+
+    // Set up the declarative haptic observers
+    JindongProvider {
+        if (allocationTrigger > 0) {
+            Jindong(allocationTrigger) {
+                LongTap()
+            }
+        }
+
+        if (deallocationTrigger > 0) {
+            Jindong(deallocationTrigger) {
+                LongTap()
+            }
+        }
+    }
+
     var showCreateDialog by remember { mutableStateOf(false) }
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
     var recipientToEdit by remember { mutableStateOf<LittleHouseRecipient?>(null) }
 
-    // Show error as snackbar
+    // 1. Error Snackbar Effect (Preserved: errors will not be cancelled by normal messages)
     LaunchedEffect(state.error) {
         state.error?.let {
             snackbarHostState.showSnackbar(it)
             viewModel.clearError()
+        }
+    }
+
+    // 2. Standard Snackbar Effect (Overwrites itself on every new event)
+    LaunchedEffect(currentSnackbarEvent) {
+        currentSnackbarEvent?.let { event ->
+            snackbarHostState.showSnackbar(event.message)
         }
     }
 
@@ -127,7 +164,7 @@ fun LittleHouseScreen(
                     items = state.recipients,
                     itemKey = { it.id },
                     columns = 1,
-                    title = "Offering Recipients",
+                    title = "Recipients",
                     isEditMode = state.isEditMode,
                     hasSelection = state.selectedRecipientIds.isNotEmpty(),
                     onToggleEditMode = viewModel::toggleEditMode,
@@ -142,8 +179,18 @@ fun LittleHouseScreen(
                             isSelected = state.selectedRecipientIds.contains(recipient.id),
                             onSelectionToggle = { viewModel.toggleSelection(recipient.id) },
                             canAllocate = state.littleHouseCount > 0,
-                            onAllocate = { viewModel.onAllocate(recipient.id) },
-                            onUnallocate = { viewModel.onUnallocate(recipient.id) },
+                            onAllocate = {
+                                allocationTrigger++
+                                viewModel.onAllocate(recipient.id)
+                                // Trigger overwrite snackbar
+                                currentSnackbarEvent = SnackbarEvent("Allocated Little House to ${recipient.name}")
+                            },
+                            onUnallocate = {
+                                deallocationTrigger++
+                                viewModel.onUnallocate(recipient.id)
+                                // Trigger overwrite snackbar
+                                currentSnackbarEvent = SnackbarEvent("Unallocated Little House from ${recipient.name}")
+                            },
                             onEdit = { recipientToEdit = recipient },
                             dragModifier = dragModifier
                         )

@@ -37,6 +37,9 @@ import androidx.compose.ui.unit.dp
 import com.nemogz.mantracounter.ui.util.formatRelativeDate
 import com.nemogz.mantracounter.ui.components.ConfirmActionDialog
 import com.nemogz.mantracounter.ui.components.appCardColors
+import com.nemogz.mantracounter.ui.theme.AppHaptics.LongTap
+import io.github.compose.jindong.Jindong
+import io.github.compose.jindong.JindongProvider
 import kotlinx.datetime.LocalDate
 
 @Composable
@@ -45,9 +48,20 @@ fun HomeScreenHomeworkItem(
     canCompleteHomework: Boolean,
     onCatchUpDay: (Long) -> Unit,
     onNavigateToHomework: () -> Unit,
+    onShowSnackbar: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var pendingCatchUpDay by remember { mutableStateOf<Long?>(null) }
+    var confirmDialogTrigger by remember { mutableStateOf(0) }
+
+    // Set up the declarative haptic observers
+    JindongProvider {
+        if (confirmDialogTrigger > 0) {
+            Jindong(confirmDialogTrigger) {
+                LongTap()
+            }
+        }
+    }
 
     Card(
         colors = appCardColors(MaterialTheme.colorScheme.primaryContainer),
@@ -137,7 +151,7 @@ fun HomeScreenHomeworkItem(
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer
                     )
                 ) {
-                    Text("Set Goals")
+                    Text("Goals")
                     Spacer(modifier = Modifier.width(4.dp))
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
@@ -155,7 +169,12 @@ fun HomeScreenHomeworkItem(
             title = "Complete Homework",
             body = "Complete homework for $dateStr? This will deduct mantra counts based on your homework goals.",
             confirmText = "Complete",
-            onConfirm = { onCatchUpDay(day) },
+            onConfirm = {
+                confirmDialogTrigger++
+                onCatchUpDay(day)
+                onShowSnackbar("Completed Homework for $dateStr")
+                pendingCatchUpDay = null
+            },
             onDismiss = { pendingCatchUpDay = null }
         )
     }

@@ -53,6 +53,8 @@ kotlin {
             implementation(libs.compose.components.resources)
             implementation(libs.coil.compose)
             implementation(libs.coil.svg)
+            implementation(libs.jindong.core)
+            implementation(libs.jindong.compose)
 
             
             implementation(libs.koin.core)

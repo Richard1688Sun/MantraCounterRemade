@@ -26,12 +26,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.setValue
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -40,6 +42,13 @@ import com.nemogz.mantracounter.shared.domain.model.Counter
 import com.nemogz.mantracounter.ui.components.EditableItemGrid
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
+import kotlin.time.Clock
+
+// Helper class for overwriting standard snackbars
+private data class SnackbarEvent(
+    val message: String,
+    val id: Long = Clock.System.now().toEpochMilliseconds()
+)
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
@@ -59,7 +68,21 @@ fun HomeScreen(
         onPauseOrDispose { }
     }
 
-    Scaffold { padding ->
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // State to hold our standard notification events
+    var currentSnackbarEvent by remember { mutableStateOf<SnackbarEvent?>(null) }
+
+    // Standard Snackbar Effect (Overwrites itself on every new event)
+    LaunchedEffect(currentSnackbarEvent) {
+        currentSnackbarEvent?.let { event ->
+            snackbarHostState.showSnackbar(event.message)
+        }
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { padding ->
         if (state.isLoading) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -86,6 +109,8 @@ fun HomeScreen(
                 onCreateCounter = { name, initialCount -> viewModel.onCreateCounter(name, 0, initialCount) },
                 onNavigateToCalendar = onNavigateToCalendar,
                 onNavigateToSettings = onNavigateToSettings,
+                // Simply update the event state; the LaunchedEffect handles the rest
+                onShowSnackbar = { msg -> currentSnackbarEvent = SnackbarEvent(msg) },
                 modifier = Modifier.padding(padding)
             )
         }
@@ -110,6 +135,7 @@ fun HomeContent(
     onCreateCounter: (String, Int) -> Unit,
     onNavigateToCalendar: () -> Unit,
     onNavigateToSettings: () -> Unit = {},
+    onShowSnackbar: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     // Edit/Create Dialog State
@@ -129,30 +155,21 @@ fun HomeContent(
             }
         )
     }
-    
+
     if (showCreateDialog) {
         com.nemogz.mantracounter.ui.dialog.CreateCounterDialog(
             onDismiss = { showCreateDialog = false },
             onConfirm = { name, initialCount ->
-                // ViewModel.onCreateCounter signature: (name, targetWait=0, initialCount)
-                // Here we treat targetWait as 0 for now as requested.
-                // We need to pass 3 args if we want initialCount.
-                // But the lambda passed in `onCreateCounter` passed to `HomeContent` needs to be updated too.
-                // The usage in `HomeScreen` passes `viewModel::onCreateCounter`.
-                // `viewModel::onCreateCounter` expects (String, Int, Int).
-                // But `HomeContent` defines it as `(String, Int) -> Unit`.
-                // I need to update definitions.
-                // For this replacement, I will assume I updated the definition.
                 onCreateCounter(name, initialCount)
                 showCreateDialog = false
             }
         )
     }
-    
+
     if (showDeleteConfirmDialog) {
         // Collect names of selected items
         val selectedNames = state.counters.filter { it.id in state.selectedCounterIds }.joinToString(", ") { it.name }
-        
+
         AlertDialog(
             onDismissRequest = { showDeleteConfirmDialog = false },
             title = { Text("Delete Mantras?") },
@@ -189,6 +206,7 @@ fun HomeContent(
                 canConvert = state.canConvertLittleHouse,
                 onConvert = onConvertLittleHouse,
                 onNavigateToLittleHouse = onNavigateToLittleHouse,
+                onShowSnackbar = onShowSnackbar,
                 modifier = Modifier.weight(1f)
             )
             Column(
@@ -233,7 +251,8 @@ fun HomeContent(
             missedHomeworkDays = state.missedHomeworkDays,
             canCompleteHomework = state.canCompleteHomework,
             onCatchUpDay = onCatchUpDay,
-            onNavigateToHomework = onNavigateToHomework
+            onNavigateToHomework = onNavigateToHomework,
+            onShowSnackbar = onShowSnackbar
         )
 
         EditableItemGrid(
@@ -266,5 +285,3 @@ fun HomeContent(
         )
     }
 }
-
-

@@ -27,6 +27,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +38,9 @@ import androidx.compose.ui.unit.sp
 import com.nemogz.mantracounter.ui.components.GoalProgressBar
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
+import com.nemogz.mantracounter.ui.theme.AppHaptics.ShortTap
+import io.github.compose.jindong.Jindong
+import io.github.compose.jindong.JindongProvider
 
 @OptIn(KoinExperimentalAPI::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -45,6 +51,24 @@ fun CounterDetailScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
 
+    // Haptic triggers
+    var decrementTrigger by remember { mutableStateOf(0) }
+    var incrementTrigger by remember { mutableStateOf(0) }
+
+    // Set up the declarative haptic observers
+    JindongProvider {
+        if (decrementTrigger > 0) {
+            Jindong(decrementTrigger) {
+                ShortTap()
+            }
+        }
+
+        if (incrementTrigger > 0) {
+            Jindong(incrementTrigger) {
+                ShortTap()
+            }
+        }
+    }
     LaunchedEffect(counterId) {
         viewModel.loadCounter(counterId)
     }
@@ -68,7 +92,10 @@ fun CounterDetailScreen(
         floatingActionButton = {
             if (!state.isLoading && state.counter != null) {
                 FloatingActionButton(
-                    onClick = viewModel::onDecrement,
+                    onClick = {
+                        decrementTrigger++
+                        viewModel.onDecrement()
+                    },
                     containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                     contentColor = MaterialTheme.colorScheme.onTertiaryContainer
                 ) {
@@ -132,7 +159,10 @@ fun CounterDetailScreen(
 
                     // Big Counter Button
                     Button(
-                        onClick = viewModel::onIncrement,
+                        onClick = {
+                            incrementTrigger++
+                            viewModel.onIncrement()
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f),
