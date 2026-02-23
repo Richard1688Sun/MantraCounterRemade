@@ -47,7 +47,7 @@ internal fun updateMantraRecitedForCountChange(
         // This handles counters created TODAY after the DayRollover occurred.
         // We initialize the startCount to the OLD count.
         val newEntry = MantraAndHomeworkDetailsEntity(
-            key = Uuid.random().toString(),
+            key = MantraAndHomeworkDetailsEntity.generateKey(activity.activity.date, counter.id),
             dailyActivityDate = activity.activity.date,
             mantraId = counter.id,
             mantraName = counter.name,
@@ -96,7 +96,7 @@ internal fun updateAllocationForRecipient(
         // If they allocate, their burned count doesn't change.
         // Let's just pass `recipient.burnedCount` as `startCount` because they were just created.
         val newEntry = LittleHouseAllocationDetailsEntity(
-            key = Uuid.random().toString(),
+            key = LittleHouseAllocationDetailsEntity.generateKey(activity.activity.date, recipient.id),
             dailyActivityDate = activity.activity.date,
             recipientId = recipient.id,
             recipientName = recipient.name,

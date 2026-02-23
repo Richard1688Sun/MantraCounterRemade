@@ -2,6 +2,7 @@ package com.nemogz.mantracounter.shared.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlin.random.Random
 
@@ -14,6 +15,9 @@ import kotlin.random.Random
             childColumns = ["dailyActivityDate"],
             onDelete = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        Index(value = ["dailyActivityDate", "recipientId"], unique = true)
     ]
 )
 data class LittleHouseAllocationDetailsEntity(
@@ -27,4 +31,8 @@ data class LittleHouseAllocationDetailsEntity(
     val startCount: Int,
     val endCount: Int,
     val allocationGoal: Int
-)
+) {
+    companion object {
+        fun generateKey(date: Long, recipientId: String): String = "alloc_${date}_$recipientId"
+    }
+}

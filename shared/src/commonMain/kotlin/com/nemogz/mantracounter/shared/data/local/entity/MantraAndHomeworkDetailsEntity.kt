@@ -2,6 +2,7 @@ package com.nemogz.mantracounter.shared.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
@@ -13,6 +14,9 @@ import androidx.room.PrimaryKey
             childColumns = ["dailyActivityDate"],
             onDelete = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        Index(value = ["dailyActivityDate", "mantraId"], unique = true)
     ]
 )
 data class MantraAndHomeworkDetailsEntity(
@@ -25,4 +29,8 @@ data class MantraAndHomeworkDetailsEntity(
     val startCount: Int,
     val endCount: Int,
     val homeworkGoal: Int
-)
+) {
+    companion object {
+        fun generateKey(date: Long, mantraId: String): String = "mantra_${date}_$mantraId"
+    }
+}

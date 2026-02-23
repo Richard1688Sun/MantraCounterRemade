@@ -51,7 +51,7 @@ class CheckDayRolloverUseCase(
 
         val initialMantras = counters.map {
             MantraAndHomeworkDetailsEntity(
-                key = Uuid.random().toString(),
+                key = MantraAndHomeworkDetailsEntity.generateKey(date, it.id),
                 dailyActivityDate = date,
                 mantraId = it.id,
                 mantraName = it.name,
@@ -64,7 +64,7 @@ class CheckDayRolloverUseCase(
 
         val initialAllocations = recipients.map {
             LittleHouseAllocationDetailsEntity(
-                key = Uuid.random().toString(),
+                key = LittleHouseAllocationDetailsEntity.generateKey(date, it.id),
                 dailyActivityDate = date,
                 recipientId = it.id,
                 recipientName = it.name,
