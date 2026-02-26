@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Button
@@ -31,21 +33,25 @@ import mantracounterremade.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import com.nemogz.mantracounter.ui.components.ConfirmActionDialog
 import com.nemogz.mantracounter.ui.components.appCardColors
+import com.nemogz.mantracounter.ui.dialog.EditLittleHouseDialog
 import com.nemogz.mantracounter.ui.theme.AppHaptics.LongTap
 import io.github.compose.jindong.Jindong
 import io.github.compose.jindong.JindongProvider
 
 @Composable
 fun HomeScreenLittleHouseItem(
+    littleHouseName: String,
     littleHouseCount: Int,
     convertibleCount: Int,
     canConvert: Boolean,
     onConvert: () -> Unit,
     onNavigateToLittleHouse: () -> Unit,
+    onUpdateLittleHouse: (String, Int) -> Unit,
     onShowSnackbar: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showConvertDialog by remember { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf(false) }
     var confirmDialogTrigger by remember { mutableStateOf(0) }
 
     // Set up the declarative haptic observers
@@ -59,13 +65,28 @@ fun HomeScreenLittleHouseItem(
     Card(
         colors = appCardColors(MaterialTheme.colorScheme.primaryContainer),
         modifier = modifier.fillMaxWidth().padding(bottom = 8.dp)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = { showEditDialog = true }
+                )
+            }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                stringResource(Res.string.lh_count_label, littleHouseCount),
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
+            Row(
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "$littleHouseName:", // Display the custom name here
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = littleHouseCount.toString(),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
             if (convertibleCount > 0) {
                 Text(
                     text = stringResource(Res.string.lh_convertible_label, convertibleCount),
@@ -119,6 +140,18 @@ fun HomeScreenLittleHouseItem(
                 showConvertDialog = false
             },
             onDismiss = { showConvertDialog = false }
+        )
+    }
+
+    if (showEditDialog) {
+        EditLittleHouseDialog(
+            initialName = littleHouseName,
+            initialCount = littleHouseCount,
+            onDismiss = { showEditDialog = false },
+            onConfirm = { newName, newCount ->
+                onUpdateLittleHouse(newName, newCount)
+                showEditDialog = false
+            }
         )
     }
 }

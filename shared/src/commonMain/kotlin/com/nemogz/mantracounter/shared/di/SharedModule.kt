@@ -51,7 +51,7 @@ val featureModule = module {
     factory { ConvertLittleHouseUseCase(get(), get(), get()) }
     factory { GetMissedHomeworkDaysUseCase(get()) }
     factory { CatchUpHomeworkUseCase(get()) }
-    factory { com.nemogz.mantracounter.shared.domain.usecase.CheckDayRolloverUseCase(get(), get(), get()) }
+    factory { com.nemogz.mantracounter.shared.domain.usecase.CheckDayRolloverUseCase(get(), get(), get(), get()) }
     factory { CompleteHomeworkUseCase(get(), get()) }
     factory { GetCounterByIdUseCase(get()) }
     factory { UpdateHomeworkAmountUseCase(get()) }
@@ -62,6 +62,8 @@ val featureModule = module {
     factory { ValidateCounterCountUseCase() }
     factory { SetCounterCountUseCase(get(), get()) }
     factory { com.nemogz.mantracounter.shared.domain.usecase.GetActivitiesForMonthUseCase(get()) }
+    factory { com.nemogz.mantracounter.shared.domain.usecase.UpdateLittleHouseUseCase(get(), get()) }
+    factory { com.nemogz.mantracounter.shared.domain.usecase.GetLittleHouseNameUseCase(get()) }
 
     // Little House Recipient Use Cases
     factory { GetLittleHouseRecipientsUseCase(get()) }

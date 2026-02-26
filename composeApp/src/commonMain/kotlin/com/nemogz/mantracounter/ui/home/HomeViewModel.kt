@@ -36,7 +36,9 @@ class HomeViewModel(
     private val deleteCountersUseCase: com.nemogz.mantracounter.shared.domain.usecase.DeleteCountersUseCase,
     private val checkDayRolloverUseCase: com.nemogz.mantracounter.shared.domain.usecase.CheckDayRolloverUseCase,
     private val setCounterCountUseCase: SetCounterCountUseCase,
-    private val databaseSeeder: com.nemogz.mantracounter.shared.data.local.DatabaseSeeder
+    private val databaseSeeder: com.nemogz.mantracounter.shared.data.local.DatabaseSeeder,
+    private val updateLittleHouseUseCase: com.nemogz.mantracounter.shared.domain.usecase.UpdateLittleHouseUseCase,
+    private val getLittleHouseNameUseCase: com.nemogz.mantracounter.shared.domain.usecase.GetLittleHouseNameUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState(isLoading = true))
@@ -46,18 +48,19 @@ class HomeViewModel(
         // Run database seeding and day rollover immediately on ViewModel creation
         viewModelScope.launch {
             databaseSeeder.seed()
-            checkDayRolloverUseCase()
         }
         viewModelScope.launch {
             combine(
                 getCountersUseCase(), 
                 getLittleHouseCountUseCase(),
-                getMissedHomeworkDaysUseCase()
-            ) { counters, littleHouseCount, missedDays ->
+                getMissedHomeworkDaysUseCase(),
+                getLittleHouseNameUseCase()
+            ) { counters, littleHouseCount, missedDays, littleHouseName ->
                 HomeUiState(
                     counters = counters.sortedBy { it.sortOrder },
                     littleHouseCount = littleHouseCount,
                     missedHomeworkDays = missedDays,
+                    littleHouseName = littleHouseName,
                     isLoading = false,
                     isEditMode = _uiState.value.isEditMode, 
                     selectedCounterIds = _uiState.value.selectedCounterIds
@@ -65,6 +68,12 @@ class HomeViewModel(
             }.collect { newState ->
                 _uiState.value = newState
             }
+        }
+    }
+
+    fun onUpdateLittleHouse(newName: String, newCount: Int) {
+        viewModelScope.launch {
+            updateLittleHouseUseCase(newName, newCount)
         }
     }
 
@@ -77,7 +86,7 @@ class HomeViewModel(
     fun catchUpDay(epochDay: Long) {
         viewModelScope.launch {
             // First deduct mantra counts — returns map of ID -> deducted amount, or null
-            val details = completeHomeworkUseCase()
+            val details = completeHomeworkUseCase(isCatchUp = true)
             if (details != null) {
                 // Convert details map to a proper JSON string
                 val detailsStr = buildString {

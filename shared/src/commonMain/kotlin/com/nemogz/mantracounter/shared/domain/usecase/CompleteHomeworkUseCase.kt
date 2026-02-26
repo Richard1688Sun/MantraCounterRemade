@@ -16,9 +16,10 @@ class CompleteHomeworkUseCase(
     /**
      * Checks if homework can be completed and deducts counts if possible.
      * Also logs the deductions in mantra details as homework reason.
+     * @param isCatchUp true if completing homework for a past day. If true, today's DailyActivity is NOT marked as completed.
      * @return A map of counter name -> deducted amount, or null if not enough counts.
      */
-    suspend operator fun invoke(): Map<String, Int>? {
+    suspend operator fun invoke(isCatchUp: Boolean = false): Map<String, Int>? {
         val counters = counterRepository.getAllCounters().first()
         
         // 1. Filter counters that have homework requirements
@@ -62,13 +63,18 @@ class CompleteHomeworkUseCase(
             )
         }
 
-        dailyActivityRepository.insertOrUpdateActivity(
+        // Only mark today's activity as completed if we are NOT catching up
+        val finalActivity = if (!isCatchUp) {
             updatedActivity.copy(
                 activity = updatedActivity.activity.copy(
                     homeworkCompletedDate = today
                 )
             )
-        )
+        } else {
+            updatedActivity
+        }
+
+        dailyActivityRepository.insertOrUpdateActivity(finalActivity)
 
         return details
     }

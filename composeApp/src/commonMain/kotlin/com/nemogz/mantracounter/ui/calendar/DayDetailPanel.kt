@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -60,6 +61,7 @@ internal fun DayDetailPanel(
     activity: DailyActivity?,
     /** Days whose homework was completed on selectedDate (from SQL query). */
     homeworksCompletedHere: List<DailyActivity> = emptyList(),
+    littleHouseName: String = stringResource(Res.string.lh_houses_title),
     /** Called when the user taps a navigation link to jump to another date. */
     onJumpToDate: (LocalDate) -> Unit = {},
     modifier: Modifier = Modifier
@@ -193,7 +195,20 @@ internal fun DayDetailPanel(
 
                     // ── Section 2: Little House Section ──
                     ExpandableSection(title = stringResource(Res.string.lh_houses_title)) {
-                        DetailRow(stringResource(Res.string.cal_converted_today), activity.activity.littleHousesConverted.toString())
+                        val lhStart = activity.activity.littleHouseStartCount
+                        val lhConvs = activity.activity.littleHousesConverted
+                        val lhManual = activity.activity.littleHouseManualIncrease
+                        val lhEnd = lhStart + lhManual - lhConvs // Conversions are normally spent, but wait: LittleHouse count goes UP on conversion, manual is +/-. 
+                        // Wait, conversion ADDS to Little House inventory.
+                        val derivedLhEnd = lhStart + lhConvs + lhManual
+                        
+                        LittleHouseBreakdownRow(
+                            name = littleHouseName,
+                            start = lhStart,
+                            end = derivedLhEnd,
+                            convertedToday = lhConvs,
+                            manualAdjustment = lhManual
+                        )
 
                         if (activity.allocations.isNotEmpty()) {
                             val totalAllocatedToday = activity.allocations.sumOf { (it.endCount - it.startCount).coerceAtLeast(0) }
@@ -247,8 +262,23 @@ internal fun DayDetailPanel(
 
                     // ── Section 3: Mantra Section ──
                     ExpandableSection(title = stringResource(Res.string.home_mantras)) {
-                        // We count only newly recited amounts for the total
-                        val totalRecitedThisDay = activity.mantras.sumOf { (it.endCount - it.startCount).coerceAtLeast(0) }
+                        // Calculate gross recited (netChange + totalDeductions)
+                        val totalRecitedThisDay = activity.mantras.sumOf { entry ->
+                            val netChange = entry.endCount - entry.startCount
+                            val hwCompletionDate = activity.activity.homeworkCompletedDate?.let { dateDays ->
+                                LocalDate.fromEpochDays(dateDays.toInt())
+                            }
+                            val homeworkCompletedToday = hwCompletionDate == selectedDate
+                            val homeworkDeductions = if (homeworkCompletedToday) entry.homeworkGoal else 0
+                            
+                            var littleHouseDeductions = 0
+                            if (activity.activity.littleHousesConverted > 0) {
+                               val perHouseGoal = com.nemogz.mantracounter.shared.domain.model.MantraType.getById(entry.mantraId).mantraGoalCount
+                               littleHouseDeductions = perHouseGoal * activity.activity.littleHousesConverted
+                            }
+                            
+                            (netChange + homeworkDeductions + littleHouseDeductions).coerceAtLeast(0)
+                        }
                         DetailRow(stringResource(Res.string.cal_total_net_mantras), totalRecitedThisDay.toString())
 
                         if (activity.mantras.isNotEmpty()) {
@@ -261,6 +291,7 @@ internal fun DayDetailPanel(
                                     val homeworkCompletedToday = hwCompletionDate == selectedDate
 
                                     MantraBreakdownRow(
+                                        id = entry.mantraId,
                                         name = entry.mantraName,
                                         start = entry.startCount,
                                         end = entry.endCount,
@@ -281,7 +312,7 @@ internal fun DayDetailPanel(
 // ── Mantra Breakdown Row ──
 
 @Composable
-private fun MantraBreakdownRow(name: String, start: Int, end: Int, homeworkGoal: Int, littleHousesConvertedToday: Int, homeworkCompletedToday: Boolean) {
+private fun MantraBreakdownRow(id: String, name: String, start: Int, end: Int, homeworkGoal: Int, littleHousesConvertedToday: Int, homeworkCompletedToday: Boolean) {
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
         // Header: mantra name and start → end
         Row(
@@ -313,13 +344,7 @@ private fun MantraBreakdownRow(name: String, start: Int, end: Int, homeworkGoal:
         // Reverse engineer the breakdown
         var littleHouseDeductions = 0
         if (littleHousesConvertedToday > 0) {
-           val perHouseGoal = when(name) {
-               "Great Compassion Mantra" -> 27
-               "Heart Sutra" -> 49
-               "Amitabha Pure Land Rebirth Mantra" -> 84
-               "Sapta Atita Tathagata Mantra" -> 87
-               else -> 0
-           }
+           val perHouseGoal = com.nemogz.mantracounter.shared.domain.model.MantraType.getById(id).mantraGoalCount
            littleHouseDeductions = perHouseGoal * littleHousesConvertedToday
         }
         
@@ -344,7 +369,7 @@ private fun MantraBreakdownRow(name: String, start: Int, end: Int, homeworkGoal:
             ColoredDetailLine(stringResource(Res.string.cal_lh_deduction), "-$littleHouseDeductions", appColors.homeworkDeductionDot, appColors.homeworkDeductionRow, indent = breakdownIndent)
         }
         
-        if (netChange != 0) {
+        if (netChange != 0 || totalDeductions > 0) {
            val sign = if (netChange > 0) "+" else ""
            ColoredDetailLine(stringResource(Res.string.cal_net_change), "$sign$netChange", if (netChange > 0) appColors.recitedMantraDot else appColors.homeworkDeductionDot, Color.Transparent, indent = breakdownIndent)
         }
@@ -352,7 +377,7 @@ private fun MantraBreakdownRow(name: String, start: Int, end: Int, homeworkGoal:
 }
 
 @Composable
-private fun ColoredDetailLine(label: String, value: String, valueColor: Color, backgroundColor: Color = Color.Transparent, indent: Dp = 0.dp) {
+private fun ColoredDetailLine(label: String, value: String, valueColor: Color, backgroundColor: Color = Color.Transparent, indent: Dp = 0.dp, style: TextStyle = MaterialTheme.typography.bodySmall) {
     Row(
         modifier = Modifier.fillMaxWidth().background(backgroundColor).padding(vertical = 1.dp).padding(start = indent),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -360,15 +385,62 @@ private fun ColoredDetailLine(label: String, value: String, valueColor: Color, b
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.bodySmall,
+            style = style,
             color = MaterialTheme.colorScheme.onSecondaryContainer
         )
         Text(
             text = value,
-            style = MaterialTheme.typography.bodySmall,
+            style = style,
             fontWeight = FontWeight.SemiBold,
             color = valueColor
         )
+    }
+}
+
+@Composable
+private fun LittleHouseBreakdownRow(name: String, start: Int, end: Int, convertedToday: Int, manualAdjustment: Int) {
+    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f).padding(end = 16.dp)
+            )
+            Text(
+                text = "$start → $end",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+        }
+        val appColors = MaterialTheme.appColors
+        val breakdownIndent = 16.dp
+
+        if (convertedToday > 0) {
+            ColoredDetailLine(stringResource(Res.string.cal_converted_today), "+$convertedToday", appColors.recitedMantraDot, appColors.recitedMantraRow, indent = breakdownIndent, style = MaterialTheme.typography.bodyMedium)
+        }
+
+        if (manualAdjustment != 0) {
+            val sign = if (manualAdjustment > 0) "+" else ""
+            val dotColor = if (manualAdjustment > 0) appColors.recitedMantraDot else appColors.homeworkDeductionDot
+            val rowColor = if (manualAdjustment > 0) appColors.recitedMantraRow else appColors.homeworkDeductionRow
+            ColoredDetailLine(stringResource(Res.string.cal_lh_manual_adjustment), "$sign$manualAdjustment", dotColor, rowColor, indent = breakdownIndent, style = MaterialTheme.typography.bodyMedium)
+        }
+
+        val netChange = end - start
+        if (netChange != 0 || convertedToday > 0 || manualAdjustment != 0) {
+            val sign = if (netChange > 0) "+" else ""
+            val color = if (netChange > 0) appColors.recitedMantraDot else appColors.homeworkDeductionDot
+            ColoredDetailLine(stringResource(Res.string.cal_net_change), "$sign$netChange", color, Color.Transparent, indent = breakdownIndent, style = MaterialTheme.typography.bodyMedium)
+        }
     }
 }
 

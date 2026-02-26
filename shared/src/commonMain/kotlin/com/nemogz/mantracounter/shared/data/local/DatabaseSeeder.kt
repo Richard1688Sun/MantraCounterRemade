@@ -55,10 +55,7 @@ class DatabaseSeeder(
         }
 
         // 3. Ensure LittleHouse record exists
-        val currentLhCount = littleHouseRepository.getLittleHouseCount().first()
-        if (currentCounters.isEmpty()) {
-             littleHouseRepository.setLittleHouseCount(0)
-        }
+        littleHouseRepository.insertInitialLittleHouseIfEmpty()
 
         // 4. Ensure default "Self" recipient exists
         val recipientCount = recipientRepository.getCount()

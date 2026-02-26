@@ -7,7 +7,9 @@ import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import com.nemogz.mantracounter.shared.domain.repository.ICounterRepository
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
 import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRecipientRepository
+import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRepository
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
@@ -18,7 +20,8 @@ import kotlin.uuid.Uuid
 class CheckDayRolloverUseCase(
     private val dailyActivityRepository: IDailyActivityRepository,
     private val counterRepository: ICounterRepository,
-    private val recipientRepository: ILittleHouseRecipientRepository
+    private val recipientRepository: ILittleHouseRecipientRepository,
+    private val littleHouseRepository: ILittleHouseRepository
 ) {
     /**
      * Ensures that DailyActivity rows exist from the most recent
@@ -48,6 +51,7 @@ class CheckDayRolloverUseCase(
     private suspend fun createNewDay(date: Long) {
         val counters = counterRepository.getAllCounters().first()
         val recipients = recipientRepository.getAll().first()
+        val lhCount = littleHouseRepository.getLittleHouseCount().first()
 
         val initialMantras = counters.map {
             MantraAndHomeworkDetailsEntity(
@@ -77,7 +81,7 @@ class CheckDayRolloverUseCase(
         }
 
         val emptyActivity = DailyActivity(
-            activity = DailyActivityEntity(date = date),
+            activity = DailyActivityEntity(date = date, littleHouseStartCount = lhCount),
             allocations = initialAllocations,
             mantras = initialMantras
         )

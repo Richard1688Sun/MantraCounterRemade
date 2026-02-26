@@ -11,5 +11,6 @@ data class CalendarUiState(
      * For the selected date: list of DailyActivity rows whose homework was completed on that date.
      * Populated via a DAO query when a day is selected.
      */
-    val homeworksCompletedOnSelectedDate: List<DailyActivity> = emptyList()
+    val homeworksCompletedOnSelectedDate: List<DailyActivity> = emptyList(),
+    val littleHouseName: String = "Little House"
 )

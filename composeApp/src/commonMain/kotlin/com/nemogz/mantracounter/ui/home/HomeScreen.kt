@@ -100,6 +100,7 @@ fun HomeScreen(
                 state = state,
                 onIncrement = viewModel::onIncrementCounter,
                 onConvertLittleHouse = viewModel::onConvertLittleHouse,
+                onUpdateLittleHouse = viewModel::onUpdateLittleHouse,
                 onNavigateToLittleHouse = onNavigateToLittleHouse,
                 onNavigateToHomework = onNavigateToHomework,
                 onCatchUpDay = viewModel::catchUpDay,
@@ -126,6 +127,7 @@ fun HomeContent(
     state: HomeUiState,
     onIncrement: (String) -> Unit,
     onConvertLittleHouse: () -> Unit,
+    onUpdateLittleHouse: (String, Int) -> Unit,
     onNavigateToLittleHouse: () -> Unit,
     onNavigateToHomework: () -> Unit,
     onCatchUpDay: (Long) -> Unit,
@@ -205,11 +207,13 @@ fun HomeContent(
             verticalAlignment = Alignment.Top
         ) {
             HomeScreenLittleHouseItem(
+                littleHouseName = state.littleHouseName,
                 littleHouseCount = state.littleHouseCount,
                 convertibleCount = state.convertibleLittleHouseCount,
                 canConvert = state.canConvertLittleHouse,
                 onConvert = onConvertLittleHouse,
                 onNavigateToLittleHouse = onNavigateToLittleHouse,
+                onUpdateLittleHouse = onUpdateLittleHouse,
                 onShowSnackbar = onShowSnackbar,
                 modifier = Modifier.weight(1f)
             )

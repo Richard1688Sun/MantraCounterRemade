@@ -20,5 +20,7 @@ data class DailyActivityEntity(
     val date: Long, // Epoch day
     /** FK → the epoch-day row on which this day's homework was actually performed. Null = not yet done. */
     val homeworkCompletedDate: Long? = null,
-    val littleHousesConverted: Int = 0
+    val littleHouseStartCount: Int = 0,
+    val littleHousesConverted: Int = 0,
+    val littleHouseManualIncrease: Int = 0
 )

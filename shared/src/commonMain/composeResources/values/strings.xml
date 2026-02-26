@@ -86,6 +86,7 @@
     <string name="cal_gross_recited">Gross Recited</string>
     <string name="cal_homework_deduction">Homework Deduction</string>
     <string name="cal_lh_deduction">Little House Deduction</string>
+    <string name="cal_lh_manual_adjustment">Manual Adjustment</string>
     <string name="cal_net_change">Net Change</string>
     <string name="cal_collapse_desc">Collapse</string>
     <string name="cal_expand_desc">Expand</string>

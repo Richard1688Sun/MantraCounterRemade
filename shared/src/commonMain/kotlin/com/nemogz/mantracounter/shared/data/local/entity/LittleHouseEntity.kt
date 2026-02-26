@@ -6,5 +6,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "little_house")
 data class LittleHouseEntity(
     @PrimaryKey val id: Int = 1, // Singleton row
+    val name: String = "Little House",
     val count: Int
 )

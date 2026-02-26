@@ -16,10 +16,10 @@ interface LittleHouseAllocationDetailsDao {
     @Query("SELECT * FROM little_house_allocation_details WHERE dailyActivityDate = :date")
     fun getDetailsByDateFlow(date: Long): Flow<List<LittleHouseAllocationDetailsEntity>>
 
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDetails(details: List<LittleHouseAllocationDetailsEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDetail(detail: LittleHouseAllocationDetailsEntity)
 
     @Query("UPDATE little_house_allocation_details SET endCount = :endCount, allocationGoal = :allocationGoal, recipientSortOrder = :recipientSortOrder, recipientTargetFinishDate = :recipientTargetFinishDate, recipientName = :recipientName WHERE `key` = :key")

@@ -265,6 +265,7 @@ fun CalendarScreen(
                     selectedDate = state.selectedDate,
                     activity = state.selectedDate?.let { state.activitiesByDate[it] },
                     homeworksCompletedHere = state.homeworksCompletedOnSelectedDate,
+                    littleHouseName = state.littleHouseName,
                     onJumpToDate = { targetDate ->
                         viewModel.onDaySelected(targetDate)
                         coroutineScope.launch {

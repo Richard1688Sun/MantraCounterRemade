@@ -15,7 +15,8 @@ import kotlin.time.Clock
 
 class CalendarViewModel(
     private val getActivitiesForMonthUseCase: GetActivitiesForMonthUseCase,
-    private val dailyActivityRepository: IDailyActivityRepository
+    private val dailyActivityRepository: IDailyActivityRepository,
+    private val getLittleHouseNameUseCase: com.nemogz.mantracounter.shared.domain.usecase.GetLittleHouseNameUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CalendarUiState(isLoading = true))
@@ -27,6 +28,12 @@ class CalendarViewModel(
     init {
         val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         loadMonth(today.year, today.month.ordinal + 1, forceReload = true)
+        
+        viewModelScope.launch {
+            getLittleHouseNameUseCase().collect { name ->
+                _uiState.value = _uiState.value.copy(littleHouseName = name)
+            }
+        }
     }
 
     fun onMonthChanged(year: Int, month: Int) {

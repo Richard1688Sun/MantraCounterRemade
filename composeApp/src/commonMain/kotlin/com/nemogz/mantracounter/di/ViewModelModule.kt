@@ -29,7 +29,9 @@ val viewModelModule = module {
             validateCounterCountUseCase = get(),
             checkDayRolloverUseCase = get(),
             setCounterCountUseCase = get(),
-            databaseSeeder = get()
+            databaseSeeder = get(),
+            updateLittleHouseUseCase = get(),
+            getLittleHouseNameUseCase = get()
         )
     }
     factory {
@@ -42,7 +44,7 @@ val viewModelModule = module {
         )
     }
     factory { CounterDetailViewModel(get(), get(), get(), get(), get()) }
-    factory { com.nemogz.mantracounter.ui.calendar.CalendarViewModel(get(), get()) }
+    factory { com.nemogz.mantracounter.ui.calendar.CalendarViewModel(get(), get(), get()) }
     factory {
         com.nemogz.mantracounter.ui.littlehouse.LittleHouseViewModel(
             getRecipientsUseCase = get(),

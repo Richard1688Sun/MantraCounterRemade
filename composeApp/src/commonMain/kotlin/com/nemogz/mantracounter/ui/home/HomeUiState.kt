@@ -7,6 +7,7 @@ data class HomeUiState(
     val counters: List<Counter> = emptyList(),
     val littleHouseCount: Int = 0,
     val missedHomeworkDays: List<Long> = emptyList(),
+    val littleHouseName: String = "",
     val isLoading: Boolean = false,
     val isEditMode: Boolean = false,
     val selectedCounterIds: Set<String> = emptySet(),

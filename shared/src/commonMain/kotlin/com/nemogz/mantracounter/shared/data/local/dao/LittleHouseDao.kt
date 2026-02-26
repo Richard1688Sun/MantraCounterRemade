@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LittleHouseDao {
-    @Query("SELECT count FROM little_house WHERE id = 1")
-    fun getLittleHouseCount(): Flow<Int?>
+    @Query("SELECT * FROM little_house WHERE id = 1")
+    fun getLittleHouse(): Flow<LittleHouseEntity?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: LittleHouseEntity)
@@ -20,4 +20,7 @@ interface LittleHouseDao {
     
     @Query("UPDATE little_house SET count = :count WHERE id = 1")
     suspend fun setCount(count: Int)
+
+    @Query("UPDATE little_house SET name = :name WHERE id = 1")
+    suspend fun setName(name: String)
 }

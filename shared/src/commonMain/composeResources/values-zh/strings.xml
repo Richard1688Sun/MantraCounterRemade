@@ -85,6 +85,7 @@
     <string name="cal_gross_recited">毛念诵量</string>
     <string name="cal_homework_deduction">功课扣除</string>
     <string name="cal_lh_deduction">小房子扣除</string>
+    <string name="cal_lh_manual_adjustment">手动调整</string>
     <string name="cal_net_change">当日净值</string>
     <string name="cal_collapse_desc">折叠</string>
     <string name="cal_expand_desc">展开</string>
