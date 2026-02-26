@@ -84,7 +84,7 @@ fun HomeScreenHomeworkItem(
             } else {
                 Text(
                     text = stringResource(Res.string.homework_all_caught_up),
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
