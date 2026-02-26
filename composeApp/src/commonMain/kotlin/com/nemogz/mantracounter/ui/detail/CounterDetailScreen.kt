@@ -58,6 +58,7 @@ fun CounterDetailScreen(
     val state by viewModel.uiState.collectAsState()
 
     // Haptic triggers
+    var isNavigatingBack by remember { mutableStateOf(false) }
     var decrementTrigger by remember { mutableStateOf(0) }
     var incrementTrigger by remember { mutableStateOf(0) }
 
@@ -84,7 +85,12 @@ fun CounterDetailScreen(
             TopAppBar(
                 title = { Text(state.counter?.name ?: stringResource(Res.string.home_counter_detail_fallback_title)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = {
+                        if (!isNavigatingBack) {
+                            isNavigatingBack = true
+                            onBack()
+                        }
+                    }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.back))
                     }
                 },
@@ -99,8 +105,10 @@ fun CounterDetailScreen(
             if (!state.isLoading && state.counter != null) {
                 FloatingActionButton(
                     onClick = {
-                        decrementTrigger++
-                        viewModel.onDecrement()
+                        if (!isNavigatingBack) {
+                            decrementTrigger++
+                            viewModel.onDecrement()
+                        }
                     },
                     containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                     contentColor = MaterialTheme.colorScheme.onTertiaryContainer
@@ -166,8 +174,10 @@ fun CounterDetailScreen(
                     // Big Counter Button
                     Button(
                         onClick = {
-                            incrementTrigger++
-                            viewModel.onIncrement()
+                            if (!isNavigatingBack) {
+                                incrementTrigger++
+                                viewModel.onIncrement()
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth()

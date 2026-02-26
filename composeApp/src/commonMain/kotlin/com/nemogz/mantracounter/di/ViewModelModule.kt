@@ -56,5 +56,6 @@ val viewModelModule = module {
             deleteRecipientUseCase = get()
         )
     }
+    factory { com.nemogz.mantracounter.ui.settings.SettingsViewModel(get()) }
     single { DatabaseSeeder(get(), get(), get(), get()) }
 }

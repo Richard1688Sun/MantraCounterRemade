@@ -36,6 +36,13 @@ val MIGRATION_8_9 = object : Migration(8, 9) {
     }
 }
 
+val MIGRATION_9_10 = object : Migration(9, 10) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS `app_settings` (`id` INTEGER NOT NULL, `vibrationsEnabled` INTEGER NOT NULL, `themeMode` TEXT NOT NULL, PRIMARY KEY(`id`))")
+        db.execSQL("INSERT OR IGNORE INTO `app_settings` (`id`, `vibrationsEnabled`, `themeMode`) VALUES (1, 1, 'SYSTEM')")
+    }
+}
+
 fun androidModule(context: Context) = module {
     single<AppDatabase> {
         Room.databaseBuilder(
@@ -43,7 +50,7 @@ fun androidModule(context: Context) = module {
             klass = AppDatabase::class.java,
             name = "mantra_counter.db"
         )
-        .addMigrations(MIGRATION_6_8, MIGRATION_7_8, MIGRATION_8_9)
+        .addMigrations(MIGRATION_6_8, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
         .fallbackToDestructiveMigration()
         .build()
     }

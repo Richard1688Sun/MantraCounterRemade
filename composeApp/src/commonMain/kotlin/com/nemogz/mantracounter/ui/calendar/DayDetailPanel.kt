@@ -136,7 +136,7 @@ internal fun DayDetailPanel(
                                         append(stringResource(Res.string.cal_done_on_prefix, ""))
                                         withStyle(
                                             SpanStyle(
-                                                color = MaterialTheme.colorScheme.primary,
+                                                color = MaterialTheme.colorScheme.onSecondaryContainer,
                                                 textDecoration = TextDecoration.Underline,
                                                 fontWeight = FontWeight.SemiBold
                                             )
@@ -174,7 +174,7 @@ internal fun DayDetailPanel(
                                             text = buildAnnotatedString {
                                                 withStyle(
                                                     SpanStyle(
-                                                        color = MaterialTheme.colorScheme.primary,
+                                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
                                                         textDecoration = TextDecoration.Underline,
                                                         fontWeight = FontWeight.SemiBold
                                                     )
@@ -186,6 +186,20 @@ internal fun DayDetailPanel(
                                             modifier = Modifier.clickable { onJumpToDate(forDate) }
                                         )
                                     }
+                                }
+                            }
+                        }
+                        val mantrasWithHomeworkForToday = activity.mantras.filter { it.homeworkGoal > 0 }
+                        if (mantrasWithHomeworkForToday.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            SubExpandableSection(stringResource(Res.string.cal_homework_breakdown)) {
+                                mantrasWithHomeworkForToday.forEach { entry ->
+                                    DetailRow(
+                                        label = entry.mantraName,
+                                        value = entry.homeworkGoal.toString(),
+                                        labelStyle = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Medium
+                                    )
                                 }
                             }
                         }

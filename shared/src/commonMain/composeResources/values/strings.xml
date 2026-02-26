@@ -75,6 +75,7 @@
     <string name="cal_completed">✅ Completed</string>
     <string name="cal_done_on_prefix">✅ Done on %1$s</string>
     <string name="cal_homeworks_completed">Homeworks Completed (%1$d)</string>
+    <string name="cal_homework_breakdown">Homework Breakdown</string>
     <string name="cal_for_label">For</string>
     <string name="cal_converted_today">Converted Today</string>
     <string name="cal_allocated_today">Allocated Today</string>
@@ -146,4 +147,8 @@
     <string name="month_10">October</string>
     <string name="month_11">November</string>
     <string name="month_12">December</string>
+    <string name="lh_add_manual">+ Add Manual House</string>
+    <string name="settings_vibrations">Haptic Feedback (Vibrations)</string>
+    <string name="settings_theme_mode">Theme Mode</string>
+    <string name="settings_theme_desc">Choose System, Light, or Dark mode</string>
 </resources>

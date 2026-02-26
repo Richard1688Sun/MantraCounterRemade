@@ -7,6 +7,7 @@ import com.nemogz.mantracounter.shared.data.repository.LittleHouseRecipientRepos
 import com.nemogz.mantracounter.shared.domain.repository.ICounterRepository
 import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRepository
 import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRecipientRepository
+import com.nemogz.mantracounter.shared.domain.repository.ISettingsRepository
 import com.nemogz.mantracounter.shared.domain.usecase.CompleteHomeworkUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.ConvertLittleHouseUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.GetCountersUseCase
@@ -37,9 +38,11 @@ val featureModule = module {
     single { get<AppDatabase>().littleHouseRecipientDao() }
     single { get<AppDatabase>().littleHouseAllocationDetailsDao() }
     single { get<AppDatabase>().mantraAndHomeworkDetailsDao() }
+    single { get<AppDatabase>().appSettingsDao() }
 
     // 2. Repositories
     single<ICounterRepository> { CounterRepositoryImpl(get()) }
+    single<ISettingsRepository> { com.nemogz.mantracounter.shared.data.repository.SettingsRepositoryImpl(get()) }
     single<ILittleHouseRepository> { LittleHouseRepositoryImpl(get()) }
     single<IDailyActivityRepository> { DailyActivityRepositoryImpl(get(), get(), get()) }
     single<ILittleHouseRecipientRepository> { LittleHouseRecipientRepositoryImpl(get()) }

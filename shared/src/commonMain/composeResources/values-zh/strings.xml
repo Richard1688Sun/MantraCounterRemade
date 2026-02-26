@@ -74,6 +74,7 @@
     <string name="cal_completed">✅ 已完成</string>
     <string name="cal_done_on_prefix">✅ 已于 %1$s 完成</string>
     <string name="cal_homeworks_completed">已完成功课 (%1$d)</string>
+    <string name="cal_homework_breakdown">功课详情</string>
     <string name="cal_for_label">对应</string>
     <string name="cal_converted_today">今日转换</string>
     <string name="cal_allocated_today">今日点掉</string>
@@ -145,4 +146,8 @@
     <string name="month_10">10月</string>
     <string name="month_11">11月</string>
     <string name="month_12">12月</string>
+    <string name="lh_add_manual">+ 添加遗漏小房子</string>
+    <string name="settings_vibrations">触觉反馈（振动）</string>
+    <string name="settings_theme_mode">主题模式</string>
+    <string name="settings_theme_desc">选择系统默认、浅色或深色模式</string>
 </resources>
