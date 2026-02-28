@@ -30,6 +30,7 @@ kizitonwose-calendar = "2.10.0"
 coil-compose = "3.3.0"
 coil-svg = "3.3.0"
 jindong = "1.1.0"
+gadulka = "1.10.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -51,6 +52,7 @@ coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil-c
 coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil-svg" }
 jindong-core = { module = "io.github.compose-jindong:jindong-core", version.ref = "jindong" }
 jindong-compose = { module = "io.github.compose-jindong:jindong-compose", version.ref = "jindong" }
+gadulka = { module = "eu.iamkonstantin.kotlin:gadulka", version.ref = "gadulka" }
 
 # Compose
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-libs" }

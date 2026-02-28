@@ -6,5 +6,8 @@ enum class ThemeMode {
 
 data class AppSettings(
     val vibrationsEnabled: Boolean = true,
+    val counterAudioEnabled: Boolean = true,
+    val littleHouseAudioEnabled: Boolean = true,
+    val homeworkAudioEnabled: Boolean = true,
     val themeMode: ThemeMode = ThemeMode.SYSTEM
 )

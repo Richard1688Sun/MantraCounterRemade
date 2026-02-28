@@ -42,10 +42,10 @@ import org.koin.core.annotation.KoinExperimentalAPI
 import com.nemogz.mantracounter.ui.theme.AppHaptics.ShortTap
 import io.github.compose.jindong.Jindong
 import io.github.compose.jindong.JindongProvider
-import mantracounterremade.shared.generated.resources.Res
 import mantracounterremade.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.resources.stringResource
+import com.nemogz.mantracounter.ui.theme.LocalVibrationsEnabled
+import eu.iamkonstantin.kotlin.gadulka.GadulkaPlayer
 import kotlin.math.round
 
 @OptIn(KoinExperimentalAPI::class, ExperimentalMaterial3Api::class)
@@ -61,18 +61,22 @@ fun CounterDetailScreen(
     var isNavigatingBack by remember { mutableStateOf(false) }
     var decrementTrigger by remember { mutableStateOf(0) }
     var incrementTrigger by remember { mutableStateOf(0) }
+    val audioPlayer = remember { GadulkaPlayer() }
+
+    val isVibrationsEnabled = LocalVibrationsEnabled.current
+    val isAudioEnabled = com.nemogz.mantracounter.ui.theme.LocalCounterAudioEnabled.current
 
     // Set up the declarative haptic observers
     JindongProvider {
         if (decrementTrigger > 0) {
             Jindong(decrementTrigger) {
-                ShortTap()
+                ShortTap(isVibrationsEnabled)
             }
         }
 
         if (incrementTrigger > 0) {
             Jindong(incrementTrigger) {
-                ShortTap()
+                ShortTap(isVibrationsEnabled)
             }
         }
     }
@@ -107,6 +111,7 @@ fun CounterDetailScreen(
                     onClick = {
                         if (!isNavigatingBack) {
                             decrementTrigger++
+                            if (isAudioEnabled) audioPlayer.play(Res.getUri("files/sfx/ding1.mp3"))
                             viewModel.onDecrement()
                         }
                     },
@@ -176,6 +181,7 @@ fun CounterDetailScreen(
                         onClick = {
                             if (!isNavigatingBack) {
                                 incrementTrigger++
+                                if (isAudioEnabled) audioPlayer.play(Res.getUri("files/sfx/ding1.mp3"))
                                 viewModel.onIncrement()
                             }
                         },

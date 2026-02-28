@@ -30,7 +30,7 @@ import com.nemogz.mantracounter.shared.data.local.entity.AppSettingsEntity
         MantraAndHomeworkDetailsEntity::class,
         AppSettingsEntity::class
     ],
-    version = 10
+    version = 11
 )
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {

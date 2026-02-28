@@ -58,6 +58,7 @@ import io.github.compose.jindong.Jindong
 import io.github.compose.jindong.JindongProvider
 import kotlinx.datetime.LocalDate
 import org.koin.compose.viewmodel.koinViewModel
+import com.nemogz.mantracounter.ui.theme.LocalVibrationsEnabled
 import org.koin.core.annotation.KoinExperimentalAPI
 import kotlin.time.Clock
 
@@ -80,17 +81,18 @@ fun LittleHouseScreen(
     var deallocationTrigger by remember { mutableStateOf(0) }
 
     var currentSnackbarEvent by remember { mutableStateOf<SnackbarEvent?>(null) }
+    val isVibrationsEnabled = LocalVibrationsEnabled.current
 
     JindongProvider {
         if (allocationTrigger > 0) {
             Jindong(allocationTrigger) {
-                LongTap()
+                LongTap(isVibrationsEnabled)
             }
         }
 
         if (deallocationTrigger > 0) {
             Jindong(deallocationTrigger) {
-                LongTap()
+                LongTap(isVibrationsEnabled)
             }
         }
     }

@@ -37,6 +37,8 @@ import com.nemogz.mantracounter.ui.dialog.EditLittleHouseDialog
 import com.nemogz.mantracounter.ui.theme.AppHaptics.LongTap
 import io.github.compose.jindong.Jindong
 import io.github.compose.jindong.JindongProvider
+import com.nemogz.mantracounter.ui.theme.LocalVibrationsEnabled
+import eu.iamkonstantin.kotlin.gadulka.GadulkaPlayer
 
 @Composable
 fun HomeScreenLittleHouseItem(
@@ -53,12 +55,16 @@ fun HomeScreenLittleHouseItem(
     var showConvertDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf(false) }
     var confirmDialogTrigger by remember { mutableStateOf(0) }
+    val audioPlayer = remember { GadulkaPlayer() }
+
+    val isVibrationsEnabled = LocalVibrationsEnabled.current
+    val isAudioEnabled = com.nemogz.mantracounter.ui.theme.LocalLittleHouseAudioEnabled.current
 
     // Set up the declarative haptic observers
     JindongProvider {
         if (confirmDialogTrigger > 0) {
             Jindong(confirmDialogTrigger) {
-                LongTap()
+                LongTap(isVibrationsEnabled)
             }
         }
     }
@@ -135,6 +141,7 @@ fun HomeScreenLittleHouseItem(
             confirmText = stringResource(Res.string.lh_convert_button),
             onConfirm = {
                 confirmDialogTrigger++
+                if (isAudioEnabled) audioPlayer.play(Res.getUri("files/sfx/littlehouse.mp3"))
                 onConvert()
                 onShowSnackbar(snackbarMsg)
                 showConvertDialog = false

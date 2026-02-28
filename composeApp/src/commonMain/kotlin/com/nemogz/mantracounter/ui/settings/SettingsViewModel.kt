@@ -26,6 +26,27 @@ class SettingsViewModel(
         }
     }
 
+    fun onCounterAudioToggled(enabled: Boolean) {
+        viewModelScope.launch {
+            val current = settingsState.value
+            settingsRepository.updateSettings(current.copy(counterAudioEnabled = enabled))
+        }
+    }
+
+    fun onLittleHouseAudioToggled(enabled: Boolean) {
+        viewModelScope.launch {
+            val current = settingsState.value
+            settingsRepository.updateSettings(current.copy(littleHouseAudioEnabled = enabled))
+        }
+    }
+
+    fun onHomeworkAudioToggled(enabled: Boolean) {
+        viewModelScope.launch {
+            val current = settingsState.value
+            settingsRepository.updateSettings(current.copy(homeworkAudioEnabled = enabled))
+        }
+    }
+
     fun onThemeModeChanged(mode: com.nemogz.mantracounter.shared.domain.model.ThemeMode) {
         viewModelScope.launch {
             val current = settingsState.value

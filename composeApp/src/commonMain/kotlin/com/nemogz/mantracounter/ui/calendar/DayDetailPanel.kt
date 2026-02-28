@@ -189,7 +189,7 @@ internal fun DayDetailPanel(
                                 }
                             }
                         }
-                        val mantrasWithHomeworkForToday = activity.mantras.filter { it.homeworkGoal > 0 }
+                        val mantrasWithHomeworkForToday = activity.mantras.filter { it.homeworkGoal > 0 }.sortedBy { it.mantraSortOrder }
                         if (mantrasWithHomeworkForToday.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(8.dp))
                             SubExpandableSection(stringResource(Res.string.cal_homework_breakdown)) {
@@ -298,7 +298,7 @@ internal fun DayDetailPanel(
                         if (activity.mantras.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(8.dp))
                             SubExpandableSection(stringResource(Res.string.cal_mantra_breakdown)) {
-                                activity.mantras.forEach { entry ->
+                                activity.mantras.sortedBy { it.mantraSortOrder }.forEach { entry ->
                                     val hwCompletionDate = activity.activity.homeworkCompletedDate?.let {
                                         LocalDate.fromEpochDays(it.toInt())
                                     }

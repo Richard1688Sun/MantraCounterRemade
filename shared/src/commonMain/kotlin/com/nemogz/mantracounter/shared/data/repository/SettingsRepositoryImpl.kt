@@ -15,6 +15,9 @@ class SettingsRepositoryImpl(
             if (entity != null) {
                 AppSettings(
                     vibrationsEnabled = entity.vibrationsEnabled,
+                    counterAudioEnabled = entity.counterAudioEnabled,
+                    littleHouseAudioEnabled = entity.littleHouseAudioEnabled,
+                    homeworkAudioEnabled = entity.homeworkAudioEnabled,
                     themeMode = try { com.nemogz.mantracounter.shared.domain.model.ThemeMode.valueOf(entity.themeMode) } catch (e: Exception) { com.nemogz.mantracounter.shared.domain.model.ThemeMode.SYSTEM }
                 )
             } else {
@@ -27,6 +30,9 @@ class SettingsRepositoryImpl(
         appSettingsDao.upsertSettings(
             AppSettingsEntity(
                 vibrationsEnabled = settings.vibrationsEnabled,
+                counterAudioEnabled = settings.counterAudioEnabled,
+                littleHouseAudioEnabled = settings.littleHouseAudioEnabled,
+                homeworkAudioEnabled = settings.homeworkAudioEnabled,
                 themeMode = settings.themeMode.name
             )
         )

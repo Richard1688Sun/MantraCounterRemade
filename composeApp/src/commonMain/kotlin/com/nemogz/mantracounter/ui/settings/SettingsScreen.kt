@@ -71,6 +71,39 @@ fun SettingsScreen(
                 }
             )
             HorizontalDivider()
+
+            ListItem(
+                headlineContent = { Text(stringResource(Res.string.settings_counter_audio)) },
+                trailingContent = {
+                    Switch(
+                        checked = settings.counterAudioEnabled,
+                        onCheckedChange = { viewModel.onCounterAudioToggled(it) }
+                    )
+                }
+            )
+            HorizontalDivider()
+
+            ListItem(
+                headlineContent = { Text(stringResource(Res.string.settings_little_house_audio)) },
+                trailingContent = {
+                    Switch(
+                        checked = settings.littleHouseAudioEnabled,
+                        onCheckedChange = { viewModel.onLittleHouseAudioToggled(it) }
+                    )
+                }
+            )
+            HorizontalDivider()
+
+            ListItem(
+                headlineContent = { Text(stringResource(Res.string.settings_homework_audio)) },
+                trailingContent = {
+                    Switch(
+                        checked = settings.homeworkAudioEnabled,
+                        onCheckedChange = { viewModel.onHomeworkAudioToggled(it) }
+                    )
+                }
+            )
+            HorizontalDivider()
             
             ListItem(
                 headlineContent = { Text(stringResource(Res.string.settings_theme_mode)) },

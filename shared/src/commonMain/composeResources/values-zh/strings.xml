@@ -148,6 +148,9 @@
     <string name="month_12">12月</string>
     <string name="lh_add_manual">+ 添加遗漏小房子</string>
     <string name="settings_vibrations">触觉反馈（振动）</string>
+    <string name="settings_counter_audio">计数器音频</string>
+    <string name="settings_little_house_audio">小房子音频</string>
+    <string name="settings_homework_audio">功课音频</string>
     <string name="settings_theme_mode">主题模式</string>
     <string name="settings_theme_desc">选择系统默认、浅色或深色模式</string>
 </resources>

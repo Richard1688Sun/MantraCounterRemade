@@ -54,6 +54,7 @@ kotlin {
             implementation(libs.coil.svg)
             implementation(libs.jindong.core)
             implementation(libs.jindong.compose)
+            implementation(libs.gadulka)
 
             
             implementation(libs.koin.core)

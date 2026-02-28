@@ -149,6 +149,9 @@
     <string name="month_12">December</string>
     <string name="lh_add_manual">+ Add Manual House</string>
     <string name="settings_vibrations">Haptic Feedback (Vibrations)</string>
+    <string name="settings_counter_audio">Counter Audio</string>
+    <string name="settings_little_house_audio">Little House Audio</string>
+    <string name="settings_homework_audio">Homework Audio</string>
     <string name="settings_theme_mode">Theme Mode</string>
     <string name="settings_theme_desc">Choose System, Light, or Dark mode</string>
 </resources>

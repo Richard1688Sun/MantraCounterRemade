@@ -8,5 +8,8 @@ data class AppSettingsEntity(
     @PrimaryKey
     val id: Int = 1,
     val vibrationsEnabled: Boolean = true,
+    val counterAudioEnabled: Boolean = true,
+    val littleHouseAudioEnabled: Boolean = true,
+    val homeworkAudioEnabled: Boolean = true,
     val themeMode: String = "SYSTEM" // Can be "SYSTEM", "LIGHT", "DARK"
 )

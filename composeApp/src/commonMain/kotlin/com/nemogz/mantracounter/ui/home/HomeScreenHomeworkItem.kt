@@ -45,7 +45,9 @@ import com.nemogz.mantracounter.ui.theme.AppHaptics.LongTap
 import com.nemogz.mantracounter.ui.theme.appColors
 import io.github.compose.jindong.Jindong
 import io.github.compose.jindong.JindongProvider
+import com.nemogz.mantracounter.ui.theme.LocalVibrationsEnabled
 import kotlinx.datetime.LocalDate
+import eu.iamkonstantin.kotlin.gadulka.GadulkaPlayer
 
 @Composable
 fun HomeScreenHomeworkItem(
@@ -58,12 +60,16 @@ fun HomeScreenHomeworkItem(
 ) {
     var pendingCatchUpDay by remember { mutableStateOf<Long?>(null) }
     var confirmDialogTrigger by remember { mutableStateOf(0) }
+    val audioPlayer = remember { GadulkaPlayer() }
+
+    val isVibrationsEnabled = LocalVibrationsEnabled.current
+    val isAudioEnabled = com.nemogz.mantracounter.ui.theme.LocalHomeworkAudioEnabled.current
 
     // Set up the declarative haptic observers
     JindongProvider {
         if (confirmDialogTrigger > 0) {
             Jindong(confirmDialogTrigger) {
-                LongTap()
+                LongTap(isVibrationsEnabled)
             }
         }
     }
@@ -183,6 +189,7 @@ fun HomeScreenHomeworkItem(
             confirmText = stringResource(Res.string.homework_complete_button),
             onConfirm = {
                 confirmDialogTrigger++
+                if (isAudioEnabled) audioPlayer.play(Res.getUri("files/sfx/littlehouse.mp3"))
                 onCatchUpDay(day)
                 onShowSnackbar(snackbarMsg)
                 pendingCatchUpDay = null

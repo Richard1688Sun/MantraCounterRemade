@@ -6,6 +6,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -16,8 +17,12 @@ import androidx.navigation.toRoute
 import com.nemogz.mantracounter.shared.domain.model.AppSettings
 import com.nemogz.mantracounter.shared.domain.model.ThemeMode
 import com.nemogz.mantracounter.shared.domain.repository.ISettingsRepository
+import com.nemogz.mantracounter.shared.util.platformLog
 import com.nemogz.mantracounter.ui.theme.AppTheme
 import com.nemogz.mantracounter.ui.theme.LocalVibrationsEnabled
+import com.nemogz.mantracounter.ui.theme.LocalCounterAudioEnabled
+import com.nemogz.mantracounter.ui.theme.LocalLittleHouseAudioEnabled
+import com.nemogz.mantracounter.ui.theme.LocalHomeworkAudioEnabled
 import com.nemogz.mantracounter.ui.detail.CounterDetailScreen
 import com.nemogz.mantracounter.ui.home.HomeScreen
 import com.nemogz.mantracounter.ui.littlehouse.LittleHouseScreen
@@ -38,7 +43,10 @@ fun App() {
     }
 
     CompositionLocalProvider(
-        LocalVibrationsEnabled provides settings.vibrationsEnabled
+        LocalVibrationsEnabled provides settings.vibrationsEnabled,
+        LocalCounterAudioEnabled provides settings.counterAudioEnabled,
+        LocalLittleHouseAudioEnabled provides settings.littleHouseAudioEnabled,
+        LocalHomeworkAudioEnabled provides settings.homeworkAudioEnabled
     ) {
         AppTheme(darkTheme = darkTheme) {
             Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
