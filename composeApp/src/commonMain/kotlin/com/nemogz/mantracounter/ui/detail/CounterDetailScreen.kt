@@ -3,12 +3,10 @@ package com.nemogz.mantracounter.ui.detail
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -46,7 +44,6 @@ import mantracounterremade.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import com.nemogz.mantracounter.ui.theme.LocalVibrationsEnabled
 import eu.iamkonstantin.kotlin.gadulka.GadulkaPlayer
-import kotlin.math.round
 
 @OptIn(KoinExperimentalAPI::class, ExperimentalMaterial3Api::class)
 @Composable

@@ -46,8 +46,6 @@ import mantracounterremade.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
-import org.jetbrains.compose.resources.getString
-import com.nemogz.mantracounter.ui.util.UiText
 import com.nemogz.mantracounter.shared.domain.model.LittleHouseRecipient
 import com.nemogz.mantracounter.ui.components.ConfirmActionDialog
 import com.nemogz.mantracounter.ui.components.DatePickerDialog
@@ -322,7 +320,7 @@ private fun CreateRecipientDialog(
             Button(
                 onClick = {
                     val goal = goalText.toIntOrNull() ?: 0
-                    val targetEpochDay = selectedDate?.toEpochDays()?.toLong()
+                    val targetEpochDay = selectedDate?.toEpochDays()
                     onConfirm(name, goal, targetEpochDay)
                 },
                 enabled = name.isNotBlank() && error == null
@@ -425,7 +423,7 @@ private fun EditRecipientDialog(
             Button(
                 onClick = {
                     val goal = goalText.toIntOrNull() ?: 0
-                    val targetEpochDay = selectedDate?.toEpochDays()?.toLong()
+                    val targetEpochDay = selectedDate?.toEpochDays()
                     onConfirm(recipient.copy(name = name, goal = goal, targetFinishDate = targetEpochDay))
                 },
                 enabled = name.isNotBlank() && error == null

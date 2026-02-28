@@ -1,7 +1,6 @@
 package com.nemogz.mantracounter.ui.theme
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.compositionLocalOf
 import com.nemogz.mantracounter.shared.util.platformLog
 import io.github.compose.jindong.JindongScope
 import io.github.compose.jindong.core.model.HapticIntensity

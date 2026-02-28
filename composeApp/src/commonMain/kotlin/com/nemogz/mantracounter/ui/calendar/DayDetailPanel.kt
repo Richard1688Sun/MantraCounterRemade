@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.dp
 import mantracounterremade.shared.generated.resources.Res
 import mantracounterremade.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.resources.stringResource
 import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import com.nemogz.mantracounter.ui.components.GoalProgressBar
 import com.nemogz.mantracounter.ui.components.appCardColors
@@ -212,8 +211,6 @@ internal fun DayDetailPanel(
                         val lhStart = activity.activity.littleHouseStartCount
                         val lhConvs = activity.activity.littleHousesConverted
                         val lhManual = activity.activity.littleHouseManualIncrease
-                        val lhEnd = lhStart + lhManual - lhConvs // Conversions are normally spent, but wait: LittleHouse count goes UP on conversion, manual is +/-. 
-                        // Wait, conversion ADDS to Little House inventory.
                         val derivedLhEnd = lhStart + lhConvs + lhManual
                         
                         LittleHouseBreakdownRow(
@@ -472,7 +469,7 @@ private fun ExpandableSection(
     title: String,
     modifier: Modifier = Modifier,
     initiallyExpanded: Boolean = false,
-    titleStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.titleLarge,
+    titleStyle: TextStyle = MaterialTheme.typography.titleLarge,
     titleColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
     content: @Composable () -> Unit
 ) {
@@ -517,7 +514,7 @@ private fun ExpandableSection(
 private fun DetailRow(
     label: String,
     value: String,
-    labelStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.titleMedium,
+    labelStyle: TextStyle = MaterialTheme.typography.titleMedium,
     labelColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
     fontWeight: FontWeight = FontWeight.Normal
 ) {

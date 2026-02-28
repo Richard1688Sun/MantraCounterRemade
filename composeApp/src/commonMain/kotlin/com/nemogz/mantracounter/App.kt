@@ -6,7 +6,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -17,7 +16,6 @@ import androidx.navigation.toRoute
 import com.nemogz.mantracounter.shared.domain.model.AppSettings
 import com.nemogz.mantracounter.shared.domain.model.ThemeMode
 import com.nemogz.mantracounter.shared.domain.repository.ISettingsRepository
-import com.nemogz.mantracounter.shared.util.platformLog
 import com.nemogz.mantracounter.ui.theme.AppTheme
 import com.nemogz.mantracounter.ui.theme.LocalVibrationsEnabled
 import com.nemogz.mantracounter.ui.theme.LocalCounterAudioEnabled

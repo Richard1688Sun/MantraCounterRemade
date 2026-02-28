@@ -1,0 +1,415 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 11,
+    "identityHash": "77ca33a152ec9c9b170ee0aac3a65764",
+    "entities": [
+      {
+        "tableName": "counters",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `mantraId` TEXT NOT NULL, `name` TEXT NOT NULL, `count` INTEGER NOT NULL, `homeworkGoal` INTEGER NOT NULL, `sortOrder` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mantraId",
+            "columnName": "mantraId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "count",
+            "columnName": "count",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "homeworkGoal",
+            "columnName": "homeworkGoal",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sortOrder",
+            "columnName": "sortOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "little_house",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `count` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "count",
+            "columnName": "count",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "daily_activity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`date` INTEGER NOT NULL, `homeworkCompletedDate` INTEGER, `littleHouseStartCount` INTEGER NOT NULL, `littleHousesConverted` INTEGER NOT NULL, `littleHouseManualIncrease` INTEGER NOT NULL, PRIMARY KEY(`date`), FOREIGN KEY(`homeworkCompletedDate`) REFERENCES `daily_activity`(`date`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "homeworkCompletedDate",
+            "columnName": "homeworkCompletedDate",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "littleHouseStartCount",
+            "columnName": "littleHouseStartCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "littleHousesConverted",
+            "columnName": "littleHousesConverted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "littleHouseManualIncrease",
+            "columnName": "littleHouseManualIncrease",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "date"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "daily_activity",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "homeworkCompletedDate"
+            ],
+            "referencedColumns": [
+              "date"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "little_house_recipients",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `goal` INTEGER NOT NULL, `targetFinishDate` INTEGER, `burnedCount` INTEGER NOT NULL, `sortOrder` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "goal",
+            "columnName": "goal",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "targetFinishDate",
+            "columnName": "targetFinishDate",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "burnedCount",
+            "columnName": "burnedCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sortOrder",
+            "columnName": "sortOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "little_house_allocation_details",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` TEXT NOT NULL, `dailyActivityDate` INTEGER NOT NULL, `recipientId` TEXT NOT NULL, `recipientName` TEXT NOT NULL, `recipientSortOrder` INTEGER NOT NULL, `recipientTargetFinishDate` INTEGER, `startCount` INTEGER NOT NULL, `endCount` INTEGER NOT NULL, `allocationGoal` INTEGER NOT NULL, PRIMARY KEY(`key`), FOREIGN KEY(`dailyActivityDate`) REFERENCES `daily_activity`(`date`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "key",
+            "columnName": "key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dailyActivityDate",
+            "columnName": "dailyActivityDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recipientId",
+            "columnName": "recipientId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recipientName",
+            "columnName": "recipientName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recipientSortOrder",
+            "columnName": "recipientSortOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recipientTargetFinishDate",
+            "columnName": "recipientTargetFinishDate",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "startCount",
+            "columnName": "startCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "endCount",
+            "columnName": "endCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "allocationGoal",
+            "columnName": "allocationGoal",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "key"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_little_house_allocation_details_dailyActivityDate_recipientId",
+            "unique": true,
+            "columnNames": [
+              "dailyActivityDate",
+              "recipientId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_little_house_allocation_details_dailyActivityDate_recipientId` ON `${TABLE_NAME}` (`dailyActivityDate`, `recipientId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "daily_activity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "dailyActivityDate"
+            ],
+            "referencedColumns": [
+              "date"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "mantra_and_homework_details",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` TEXT NOT NULL, `dailyActivityDate` INTEGER NOT NULL, `mantraId` TEXT NOT NULL, `mantraName` TEXT NOT NULL, `mantraSortOrder` INTEGER NOT NULL, `startCount` INTEGER NOT NULL, `endCount` INTEGER NOT NULL, `homeworkGoal` INTEGER NOT NULL, PRIMARY KEY(`key`), FOREIGN KEY(`dailyActivityDate`) REFERENCES `daily_activity`(`date`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "key",
+            "columnName": "key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dailyActivityDate",
+            "columnName": "dailyActivityDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mantraId",
+            "columnName": "mantraId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mantraName",
+            "columnName": "mantraName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mantraSortOrder",
+            "columnName": "mantraSortOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startCount",
+            "columnName": "startCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "endCount",
+            "columnName": "endCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "homeworkGoal",
+            "columnName": "homeworkGoal",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "key"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_mantra_and_homework_details_dailyActivityDate_mantraId",
+            "unique": true,
+            "columnNames": [
+              "dailyActivityDate",
+              "mantraId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_mantra_and_homework_details_dailyActivityDate_mantraId` ON `${TABLE_NAME}` (`dailyActivityDate`, `mantraId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "daily_activity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "dailyActivityDate"
+            ],
+            "referencedColumns": [
+              "date"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "app_settings",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `vibrationsEnabled` INTEGER NOT NULL, `counterAudioEnabled` INTEGER NOT NULL, `littleHouseAudioEnabled` INTEGER NOT NULL, `homeworkAudioEnabled` INTEGER NOT NULL, `themeMode` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vibrationsEnabled",
+            "columnName": "vibrationsEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "counterAudioEnabled",
+            "columnName": "counterAudioEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "littleHouseAudioEnabled",
+            "columnName": "littleHouseAudioEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "homeworkAudioEnabled",
+            "columnName": "homeworkAudioEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "themeMode",
+            "columnName": "themeMode",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '77ca33a152ec9c9b170ee0aac3a65764')"
+    ]
+  }
+}

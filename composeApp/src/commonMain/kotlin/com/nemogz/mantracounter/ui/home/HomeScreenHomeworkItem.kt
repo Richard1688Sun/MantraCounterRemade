@@ -17,10 +17,11 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -40,7 +41,6 @@ import org.jetbrains.compose.resources.stringResource
 import com.nemogz.mantracounter.ui.util.formatRelativeDate
 import com.nemogz.mantracounter.ui.components.ConfirmActionDialog
 import com.nemogz.mantracounter.ui.components.appCardColors
-import com.nemogz.mantracounter.ui.theme.AppColors
 import com.nemogz.mantracounter.ui.theme.AppHaptics.LongTap
 import com.nemogz.mantracounter.ui.theme.appColors
 import io.github.compose.jindong.Jindong
@@ -155,7 +155,11 @@ fun HomeScreenHomeworkItem(
                             )
                             // Divider between items (not after the last one)
                             if (index < missedHomeworkDays.size - 1) {
-                                Divider(modifier = Modifier.padding(horizontal = 8.dp))
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(horizontal = 8.dp),
+                                    thickness = DividerDefaults.Thickness,
+                                    color = DividerDefaults.color
+                                )
                             }
                         }
                     }
