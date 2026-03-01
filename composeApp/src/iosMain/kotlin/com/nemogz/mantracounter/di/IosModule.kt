@@ -3,7 +3,6 @@ package com.nemogz.mantracounter.di
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.nemogz.mantracounter.shared.data.local.AppDatabase
-import com.nemogz.mantracounter.shared.data.local.instantiateImpl
 import kotlinx.cinterop.ExperimentalForeignApi
 import org.koin.dsl.module
 import platform.Foundation.NSDocumentDirectory
@@ -21,8 +20,7 @@ fun getDatabaseBuilder(): androidx.room.RoomDatabase.Builder<AppDatabase> {
     )
     val dbFilePath = requireNotNull(documentDirectory?.path) + "/mantra_counter.db"
     return Room.databaseBuilder<AppDatabase>(
-        name = dbFilePath,
-        factory =  { AppDatabase::class.instantiateImpl() }
+        name = dbFilePath
     ).setDriver(BundledSQLiteDriver())
 }
 
