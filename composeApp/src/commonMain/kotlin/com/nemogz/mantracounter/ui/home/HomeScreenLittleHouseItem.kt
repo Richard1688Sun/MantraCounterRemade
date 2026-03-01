@@ -37,8 +37,12 @@ import com.nemogz.mantracounter.ui.theme.AppHaptics.LongTap
 import io.github.compose.jindong.Jindong
 import io.github.compose.jindong.JindongProvider
 import com.nemogz.mantracounter.ui.theme.LocalVibrationsEnabled
-import eu.iamkonstantin.kotlin.gadulka.GadulkaPlayer
-
+import com.nemogz.mantracounter.ui.util.rememberPlatformContext
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
+import app.lexilabs.basic.sound.SoundBoard
+import app.lexilabs.basic.sound.SoundByte
+import app.lexilabs.basic.sound.play
 @Composable
 fun HomeScreenLittleHouseItem(
     littleHouseName: String,
@@ -54,7 +58,16 @@ fun HomeScreenLittleHouseItem(
     var showConvertDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf(false) }
     var confirmDialogTrigger by remember { mutableStateOf(0) }
-    val audioPlayer = remember { GadulkaPlayer() }
+    val scope = rememberCoroutineScope()
+    
+    @OptIn(app.lexilabs.basic.sound.ExperimentalBasicSound::class)
+    val platformContext = rememberPlatformContext()
+    val soundBoard = remember { 
+        SoundBoard(platformContext).apply {
+            load(SoundByte("littlehouse", Res.getUri("files/sfx/littlehouse.mp3")))
+            powerUp()
+        } 
+    }
 
     val isVibrationsEnabled = LocalVibrationsEnabled.current
     val isAudioEnabled = com.nemogz.mantracounter.ui.theme.LocalLittleHouseAudioEnabled.current
@@ -140,7 +153,9 @@ fun HomeScreenLittleHouseItem(
             confirmText = stringResource(Res.string.lh_convert_button),
             onConfirm = {
                 confirmDialogTrigger++
-                if (isAudioEnabled) audioPlayer.play(Res.getUri("files/sfx/littlehouse.mp3"))
+                if (isAudioEnabled) {
+                    soundBoard.mixer.play("littlehouse")
+                }
                 onConvert()
                 onShowSnackbar(snackbarMsg)
                 showConvertDialog = false

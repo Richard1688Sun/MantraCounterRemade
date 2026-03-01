@@ -31,7 +31,7 @@ kizitonwose-calendar = "2.10.0"
 coil-compose = "3.4.0"
 coil-svg = "3.4.0"
 jindong = "1.1.0"
-gadulka = "1.10.0"
+lexilabs-basic = "0.2.6-beta02"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -53,7 +53,7 @@ coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil-c
 coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil-svg" }
 jindong-core = { module = "io.github.compose-jindong:jindong-core", version.ref = "jindong" }
 jindong-compose = { module = "io.github.compose-jindong:jindong-compose", version.ref = "jindong" }
-gadulka = { module = "eu.iamkonstantin.kotlin:gadulka", version.ref = "gadulka" }
+lexilabs-basic-sound = { module = "app.lexilabs.basic:basic-sound", version.ref = "lexilabs-basic" }
 
 # Compose
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-libs" }

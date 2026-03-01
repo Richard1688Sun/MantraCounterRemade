@@ -43,7 +43,12 @@ import io.github.compose.jindong.JindongProvider
 import mantracounterremade.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import com.nemogz.mantracounter.ui.theme.LocalVibrationsEnabled
-import eu.iamkonstantin.kotlin.gadulka.GadulkaPlayer
+import com.nemogz.mantracounter.ui.util.rememberPlatformContext
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
+import app.lexilabs.basic.sound.SoundBoard
+import app.lexilabs.basic.sound.SoundByte
+import app.lexilabs.basic.sound.play
 
 @OptIn(KoinExperimentalAPI::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -58,7 +63,15 @@ fun CounterDetailScreen(
     var isNavigatingBack by remember { mutableStateOf(false) }
     var decrementTrigger by remember { mutableStateOf(0) }
     var incrementTrigger by remember { mutableStateOf(0) }
-    val audioPlayer = remember { GadulkaPlayer() }
+    val scope = rememberCoroutineScope()
+
+    val platformContext = rememberPlatformContext()
+    val soundBoard = remember { 
+        SoundBoard(platformContext).apply {
+            load(SoundByte("ding", Res.getUri("files/sfx/ding1.mp3")))
+            powerUp()
+        } 
+    }
 
     val isVibrationsEnabled = LocalVibrationsEnabled.current
     val isAudioEnabled = com.nemogz.mantracounter.ui.theme.LocalCounterAudioEnabled.current
@@ -108,7 +121,9 @@ fun CounterDetailScreen(
                     onClick = {
                         if (!isNavigatingBack) {
                             decrementTrigger++
-                            if (isAudioEnabled) audioPlayer.play(Res.getUri("files/sfx/ding1.mp3"))
+                            if (isAudioEnabled) {
+                                soundBoard.mixer.play("ding")
+                            }
                             viewModel.onDecrement()
                         }
                     },
@@ -178,7 +193,9 @@ fun CounterDetailScreen(
                         onClick = {
                             if (!isNavigatingBack) {
                                 incrementTrigger++
-                                if (isAudioEnabled) audioPlayer.play(Res.getUri("files/sfx/ding1.mp3"))
+                                if (isAudioEnabled) {
+                                    soundBoard.mixer.play("ding")
+                                }
                                 viewModel.onIncrement()
                             }
                         },
