@@ -31,7 +31,6 @@ val viewModelModule = module {
             getCountersUseCase = get(),
             updateCounterUseCase = get(),
             getMissedHomeworkDaysUseCase = get(),
-            completeHomeworkUseCase = get()
         )
     }
     factory { CounterDetailViewModel(get(), get(), get(), get(), get()) }

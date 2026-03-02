@@ -1,11 +1,10 @@
 package com.nemogz.mantracounter.shared.domain.usecase
 
 
-import com.nemogz.mantracounter.shared.domain.model.DailyActivity
+import com.nemogz.mantracounter.shared.domain.model.LittleHouseAllocationDetails
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
 import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRepository
 import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRecipientRepository
-import kotlinx.coroutines.flow.first
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
@@ -33,17 +32,10 @@ class UnallocateLittleHouseUseCase(
         recipientRepository.incrementBurnedCount(recipientId, -1)
 
         // 3. Update daily activity log
-        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
-        val activity = dailyActivityRepository.getDailyActivityByDate(today)
-        if (activity == null) {
-            com.nemogz.mantracounter.shared.util.platformLog("DailyActivity", "ERROR: DailyActivity missing for today in UnallocateLittleHouseUseCase")
-            return true
-        }
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays()
+        val key = LittleHouseAllocationDetails.generateKey(today, recipientId)
 
-        // Add or update allocation using the new logic
-        val updatedActivity = updateAllocationForRecipient(activity, recipient, newBurnedCount)
-
-        dailyActivityRepository.updateActivity(updatedActivity)
+        dailyActivityRepository.updateAllocationCount(key, newBurnedCount)
 
         return true
     }

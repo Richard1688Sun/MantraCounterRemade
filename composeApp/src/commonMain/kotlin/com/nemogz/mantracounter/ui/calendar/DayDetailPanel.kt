@@ -276,11 +276,9 @@ internal fun DayDetailPanel(
                         // Calculate gross recited (netChange + totalDeductions)
                         val totalRecitedThisDay = activity.mantras.sumOf { entry ->
                             val netChange = entry.endCount - entry.startCount
-                            val hwCompletionDate = activity.activity.homeworkCompletedDate?.let { dateDays ->
-                                LocalDate.fromEpochDays(dateDays.toInt())
+                            val homeworkDeductions = homeworksCompletedHere.sumOf { completedDay ->
+                                completedDay.mantras.find { it.mantraId == entry.mantraId }?.homeworkGoal ?: 0
                             }
-                            val homeworkCompletedToday = hwCompletionDate == selectedDate
-                            val homeworkDeductions = if (homeworkCompletedToday) entry.homeworkGoal else 0
                             
                             var littleHouseDeductions = 0
                             if (activity.activity.littleHousesConverted > 0) {
@@ -296,19 +294,17 @@ internal fun DayDetailPanel(
                             Spacer(modifier = Modifier.height(8.dp))
                             SubExpandableSection(stringResource(Res.string.cal_mantra_breakdown)) {
                                 activity.mantras.sortedBy { it.mantraSortOrder }.forEach { entry ->
-                                    val hwCompletionDate = activity.activity.homeworkCompletedDate?.let {
-                                        LocalDate.fromEpochDays(it.toInt())
+                                    val homeworkDeductions = homeworksCompletedHere.sumOf { completedDay ->
+                                        completedDay.mantras.find { it.mantraId == entry.mantraId }?.homeworkGoal ?: 0
                                     }
-                                    val homeworkCompletedToday = hwCompletionDate == selectedDate
 
                                     MantraBreakdownRow(
                                         id = entry.mantraId,
                                         name = entry.mantraName,
                                         start = entry.startCount,
                                         end = entry.endCount,
-                                        homeworkGoal = entry.homeworkGoal,
-                                        littleHousesConvertedToday = activity.activity.littleHousesConverted,
-                                        homeworkCompletedToday = homeworkCompletedToday
+                                        homeworkDeductions = homeworkDeductions,
+                                        littleHousesConvertedToday = activity.activity.littleHousesConverted
                                     )
                                 }
                             }
@@ -323,7 +319,7 @@ internal fun DayDetailPanel(
 // ── Mantra Breakdown Row ──
 
 @Composable
-private fun MantraBreakdownRow(id: String, name: String, start: Int, end: Int, homeworkGoal: Int, littleHousesConvertedToday: Int, homeworkCompletedToday: Boolean) {
+private fun MantraBreakdownRow(id: String, name: String, start: Int, end: Int, homeworkDeductions: Int, littleHousesConvertedToday: Int) {
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
         // Header: mantra name and start → end
         Row(
@@ -358,8 +354,6 @@ private fun MantraBreakdownRow(id: String, name: String, start: Int, end: Int, h
            val perHouseGoal = com.nemogz.mantracounter.shared.domain.model.MantraType.getById(id).mantraGoalCount
            littleHouseDeductions = perHouseGoal * littleHousesConvertedToday
         }
-        
-        val homeworkDeductions = if (homeworkCompletedToday) homeworkGoal else 0
         
         val totalDeductions = littleHouseDeductions + homeworkDeductions
         val grossRecited = netChange + totalDeductions

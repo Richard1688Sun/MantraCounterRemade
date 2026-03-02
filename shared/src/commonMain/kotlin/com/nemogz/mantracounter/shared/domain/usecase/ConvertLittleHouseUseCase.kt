@@ -5,7 +5,7 @@ import com.nemogz.mantracounter.shared.domain.repository.ICounterRepository
 import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRepository
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
 
-import com.nemogz.mantracounter.shared.domain.model.DailyActivity
+import com.nemogz.mantracounter.shared.domain.model.MantraAndHomeworkDetails
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -60,15 +60,9 @@ class ConvertLittleHouseUseCase(
             littleHouseRepository.incrementLittleHouseCount(setsToConvert)
 
             // Log conversion in daily activity
-            val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
-            val activity = dailyActivityRepository.getDailyActivityByDate(today)
-            if (activity == null) {
-                com.nemogz.mantracounter.shared.util.platformLog("DailyActivity", "ERROR: DailyActivity missing for today in ConvertLittleHouseUseCase")
-                return setsToConvert
-            }
+            val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays()
 
             // Log little house deductions
-            var updatedActivity : DailyActivity = activity
             val deductions = listOf(
                 dabei to newDabeiCount,
                 boruo to newBoruoCount,
@@ -76,18 +70,11 @@ class ConvertLittleHouseUseCase(
                 qifo to newQifoCount
             )
             for ((counter, newCount) in deductions) {
-                updatedActivity = updateMantraRecitedForCountChange(
-                    updatedActivity, counter, counter.count, newCount
-                )
+                val key = MantraAndHomeworkDetails.generateKey(today, counter.id)
+                dailyActivityRepository.updateMantraCount(key, newCount)
             }
 
-            dailyActivityRepository.updateActivity(
-                updatedActivity.copy(
-                    activity = updatedActivity.activity.copy(
-                        littleHousesConverted = updatedActivity.activity.littleHousesConverted + setsToConvert
-                    )
-                )
-            )
+            dailyActivityRepository.incrementLittleHousesConverted(today, setsToConvert)
         }
 
         return setsToConvert

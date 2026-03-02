@@ -1,9 +1,7 @@
 package com.nemogz.mantracounter.shared.domain.usecase
 
-import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import com.nemogz.mantracounter.shared.domain.repository.ICounterRepository
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
-import com.nemogz.mantracounter.shared.util.platformLog
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -20,7 +18,7 @@ class CompleteHomeworkUseCase(
      * @return A map of counter name -> deducted amount, or null if not enough counts.
      */
     suspend operator fun invoke(targetDate: Long? = null): Map<String, Int>? {
-        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays()
         val dateToComplete = targetDate ?: today
 
         val counters = counterRepository.getAllCounters().first()
@@ -52,30 +50,16 @@ class CompleteHomeworkUseCase(
         counterRepository.updateCounts(idsToUpdate, newCounts)
 
         // 4. Log homework deductions in TODAY'S mantra details (because the action happened today)
-        val todayActivity = dailyActivityRepository.getDailyActivityByDate(today)
-        if (todayActivity == null) {
-            platformLog("DailyActivity", "ERROR: DailyActivity missing for today in CompleteHomeworkUseCase")
-            return details
-        }
-        var updatedTodayActivity: DailyActivity = todayActivity
-
         homeworkCounters.forEach { counter ->
             val oldCount = oldCounts[counter.name] ?: counter.count
             val newCount = oldCount - counter.homeworkGoal
-            updatedTodayActivity = updateMantraRecitedForCountChange(
-                updatedTodayActivity, counter, oldCount, newCount
-            )
+            val key = com.nemogz.mantracounter.shared.domain.model.MantraAndHomeworkDetails.generateKey(today, counter.id)
+            dailyActivityRepository.updateMantraCount(key, newCount)
         }
 
         // 5. Mark the target day as completed
         if (dateToComplete == today) {
-            // It's today, we can just update the same activity object we already modified
-            updatedTodayActivity = updatedTodayActivity.copy(
-                activity = updatedTodayActivity.activity.copy(
-                    homeworkCompletedDate = today
-                )
-            )
-            dailyActivityRepository.updateActivity(updatedTodayActivity)
+            dailyActivityRepository.updateHomeworkCompletedDate(today, today)
 
             // 6. Update today's goals in the DAO to match current state (for consistency)
             val finalTodayActivity = dailyActivityRepository.getDailyActivityByDate(today)
@@ -87,17 +71,9 @@ class CompleteHomeworkUseCase(
             }
         } else {
             // We're catching up a past day.
-            // Save today's deductions first...
-            dailyActivityRepository.updateActivity(updatedTodayActivity)
-
-            // ...then load the past day and mark it completed.
-            val targetActivity = dailyActivityRepository.getDailyActivityByDate(dateToComplete)
-            if (targetActivity != null) {
-                dailyActivityRepository.updateActivity(
-                    targetActivity.copy(
-                        activity = targetActivity.activity.copy(homeworkCompletedDate = today)
-                    )
-                )
+            // Deductions for today were already saved above. 
+            // Mark the past day as completed.
+            dailyActivityRepository.updateHomeworkCompletedDate(dateToComplete, today)
 
                 // Ensure all current counters have a detail record for that past day so the goals are recorded
                 val finalTargetActivity = dailyActivityRepository.getDailyActivityByDate(dateToComplete)
@@ -122,9 +98,6 @@ class CompleteHomeworkUseCase(
                     }
                 }
             }
-        }
-
-
         return details
     }
 }

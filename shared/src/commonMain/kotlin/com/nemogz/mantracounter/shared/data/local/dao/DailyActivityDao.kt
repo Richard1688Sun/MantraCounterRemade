@@ -41,4 +41,13 @@ interface DailyActivityDao {
     /** Returns a count of rows whose homework was performed on [date]. */
     @Query("SELECT COUNT(*) FROM daily_activity WHERE homeworkCompletedDate = :date")
     suspend fun countActivitiesCompletedOnDate(date: Long): Int
+
+    @Query("UPDATE daily_activity SET homeworkCompletedDate = :homeworkCompletedDate WHERE date = :date")
+    suspend fun updateHomeworkCompletedDate(date: Long, homeworkCompletedDate: Long?)
+
+    @Query("UPDATE daily_activity SET littleHousesConverted = littleHousesConverted + :amount WHERE date = :date")
+    suspend fun incrementLittleHousesConverted(date: Long, amount: Int)
+
+    @Query("UPDATE daily_activity SET littleHouseManualIncrease = :manualIncrease WHERE date = :date")
+    suspend fun updateLittleHouseManualIncrease(date: Long, manualIncrease: Int)
 }

@@ -2,13 +2,12 @@ package com.nemogz.mantracounter.shared.domain.usecase
 
 
 import com.nemogz.mantracounter.shared.domain.model.Counter
-import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import com.nemogz.mantracounter.shared.domain.repository.ICounterRepository
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
-import com.nemogz.mantracounter.shared.util.platformLog
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
+import com.nemogz.mantracounter.shared.domain.model.MantraAndHomeworkDetails
 
 class IncrementCounterUseCase(
     private val counterRepository: ICounterRepository,
@@ -20,15 +19,8 @@ class IncrementCounterUseCase(
         counterRepository.updateCount(counter.id, newCounter.count)
 
         // Log daily activity update
-        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
-        val activity = dailyActivityRepository.getDailyActivityByDate(today)
-        if (activity == null) {
-            platformLog("DailyActivity", "ERROR: DailyActivity missing for today in IncrementCounterUseCase")
-            return
-        }
-        val updatedActivity = updateMantraRecitedForCountChange(
-            activity, counter, oldCount, newCounter.count
-        )
-        dailyActivityRepository.updateActivity(updatedActivity)
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays()
+        val key = MantraAndHomeworkDetails.generateKey(today, counter.id)
+        dailyActivityRepository.updateMantraCount(key, newCounter.count)
     }
 }

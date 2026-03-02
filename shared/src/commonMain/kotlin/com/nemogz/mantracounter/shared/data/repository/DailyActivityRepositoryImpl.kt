@@ -3,7 +3,6 @@ package com.nemogz.mantracounter.shared.data.repository
 import com.nemogz.mantracounter.shared.data.local.dao.DailyActivityDao
 import com.nemogz.mantracounter.shared.data.local.dao.LittleHouseAllocationDetailsDao
 import com.nemogz.mantracounter.shared.data.local.dao.MantraAndHomeworkDetailsDao
-import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
 import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
 import com.nemogz.mantracounter.shared.data.mapper.toDomain
@@ -81,50 +80,6 @@ class DailyActivityRepositoryImpl(
         mantraDao.insertDetails(activity.mantras.map { it.toEntity() })
     }
 
-    override suspend fun updateActivity(activity: DailyActivity) {
-        dao.updateActivity(activity.activity.toEntity())
-        
-        val existingAllocations = allocationDao.getDetailsByDate(activity.activity.date).associateBy { it.key }
-        activity.allocations.forEach { newAlloc ->
-            val existingAlloc = existingAllocations[newAlloc.key]
-            if (existingAlloc != null) {
-                if (existingAlloc.endCount != newAlloc.endCount) {
-                    allocationDao.updateAllocationCount(newAlloc.key, newAlloc.endCount)
-                }
-                if (existingAlloc.allocationGoal != newAlloc.allocationGoal) {
-                    allocationDao.updateAllocationGoal(newAlloc.key, newAlloc.allocationGoal)
-                }
-                if (existingAlloc.recipientSortOrder != newAlloc.recipientSortOrder || 
-                    existingAlloc.recipientTargetFinishDate != newAlloc.recipientTargetFinishDate || 
-                    existingAlloc.recipientName != newAlloc.recipientName) {
-                    allocationDao.updateAllocationDetails(
-                        newAlloc.key, 
-                        newAlloc.recipientSortOrder, 
-                        newAlloc.recipientTargetFinishDate, 
-                        newAlloc.recipientName
-                    )
-                }
-            }
-        }
-
-        val existingMantras = mantraDao.getDetailsByDate(activity.activity.date).associateBy { it.key }
-        activity.mantras.forEach { newMantra ->
-            val existingMantra = existingMantras[newMantra.key]
-            if (existingMantra != null) {
-                if (existingMantra.endCount != newMantra.endCount) {
-                    mantraDao.updateMantraCount(newMantra.key, newMantra.endCount)
-                }
-                if (existingMantra.homeworkGoal != newMantra.homeworkGoal) {
-                    mantraDao.updateMantraGoal(newMantra.key, newMantra.homeworkGoal)
-                }
-                if (existingMantra.mantraSortOrder != newMantra.mantraSortOrder ||
-                    existingMantra.mantraName != newMantra.mantraName) {
-                    mantraDao.updateMantraDetails(newMantra.key, newMantra.mantraSortOrder, newMantra.mantraName)
-                }
-            }
-        }
-    }
-
     override suspend fun insertMantraDetail(detail: com.nemogz.mantracounter.shared.domain.model.MantraAndHomeworkDetails) {
         mantraDao.insertDetail(detail.toEntity())
     }
@@ -165,5 +120,37 @@ class DailyActivityRepositoryImpl(
 
     override suspend fun updateMantraGoal(key: String, homeworkGoal: Int) {
         mantraDao.updateMantraGoal(key, homeworkGoal)
+    }
+
+    override suspend fun updateMantraCount(key: String, endCount: Int) {
+        mantraDao.updateMantraCount(key, endCount)
+    }
+
+    override suspend fun updateAllocationCount(key: String, endCount: Int) {
+        allocationDao.updateAllocationCount(key, endCount)
+    }
+
+    override suspend fun updateAllocationGoal(key: String, allocationGoal: Int) {
+        allocationDao.updateAllocationGoal(key, allocationGoal)
+    }
+
+    override suspend fun updateHomeworkCompletedDate(date: Long, homeworkCompletedDate: Long?) {
+        dao.updateHomeworkCompletedDate(date, homeworkCompletedDate)
+    }
+
+    override suspend fun incrementLittleHousesConverted(date: Long, amount: Int) {
+        dao.incrementLittleHousesConverted(date, amount)
+    }
+
+    override suspend fun updateLittleHouseManualIncrease(date: Long, manualIncrease: Int) {
+        dao.updateLittleHouseManualIncrease(date, manualIncrease)
+    }
+
+    override suspend fun updateMantraDetails(key: String, sortOrder: Int, name: String) {
+        mantraDao.updateMantraDetails(key, sortOrder, name)
+    }
+
+    override suspend fun updateAllocationDetails(key: String, sortOrder: Int, targetFinishDate: Long?, name: String) {
+        allocationDao.updateAllocationDetails(key, sortOrder, targetFinishDate, name)
     }
 }

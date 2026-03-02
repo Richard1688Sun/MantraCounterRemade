@@ -1,7 +1,6 @@
 package com.nemogz.mantracounter.shared.domain.usecase
 
 
-import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
 import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRepository
 import com.nemogz.mantracounter.shared.util.platformLog
@@ -27,7 +26,7 @@ class UpdateLittleHouseUseCase(
 
         if (oldCount != newCount) {
             val netChange = newCount - oldCount
-            val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
+            val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays()
             val activity = dailyActivityRepository.getDailyActivityByDate(today)
             if (activity == null) {
                 platformLog("DailyActivity", "ERROR: DailyActivity missing for today in UpdateLittleHouseUseCase")
@@ -37,11 +36,7 @@ class UpdateLittleHouseUseCase(
             val currentManualIncrease = activity.activity.littleHouseManualIncrease
             val newManualIncrease = currentManualIncrease + netChange
 
-            dailyActivityRepository.updateActivity(
-                activity.copy(
-                    activity = activity.activity.copy(littleHouseManualIncrease = newManualIncrease)
-                )
-            )
+            dailyActivityRepository.updateLittleHouseManualIncrease(today, newManualIncrease)
         }
     }
 }

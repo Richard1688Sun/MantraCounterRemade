@@ -22,7 +22,6 @@ class HomeworkViewModel(
     private val getCountersUseCase: GetCountersUseCase,
     private val updateCounterUseCase: UpdateCounterUseCase,
     private val getMissedHomeworkDaysUseCase: GetMissedHomeworkDaysUseCase,
-    completeHomeworkUseCase: Any,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeworkUiState(isLoading = true))

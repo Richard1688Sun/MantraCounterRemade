@@ -9,12 +9,10 @@ import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepositor
 import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRecipientRepository
 import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRepository
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 class CheckDayRolloverUseCase(
@@ -62,7 +60,7 @@ class CheckDayRolloverUseCase(
                 mantraSortOrder = it.sortOrder,
                 startCount = it.count,
                 endCount = it.count,
-                homeworkGoal = 0
+                homeworkGoal = it.homeworkGoal
             )
         }
 
