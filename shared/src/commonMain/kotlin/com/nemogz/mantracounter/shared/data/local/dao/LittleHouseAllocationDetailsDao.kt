@@ -22,8 +22,14 @@ interface LittleHouseAllocationDetailsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDetail(detail: LittleHouseAllocationDetailsEntity)
 
-    @Query("UPDATE little_house_allocation_details SET endCount = :endCount, allocationGoal = :allocationGoal, recipientSortOrder = :recipientSortOrder, recipientTargetFinishDate = :recipientTargetFinishDate, recipientName = :recipientName WHERE `key` = :key")
-    suspend fun updateMutableFields(key: String, endCount: Int, allocationGoal: Int, recipientSortOrder: Int, recipientTargetFinishDate: Long?, recipientName: String)
+    @Query("UPDATE little_house_allocation_details SET endCount = :endCount WHERE `key` = :key")
+    suspend fun updateAllocationCount(key: String, endCount: Int)
+
+    @Query("UPDATE little_house_allocation_details SET allocationGoal = :allocationGoal WHERE `key` = :key")
+    suspend fun updateAllocationGoal(key: String, allocationGoal: Int)
+
+    @Query("UPDATE little_house_allocation_details SET recipientSortOrder = :recipientSortOrder, recipientTargetFinishDate = :recipientTargetFinishDate, recipientName = :recipientName WHERE `key` = :key")
+    suspend fun updateAllocationDetails(key: String, recipientSortOrder: Int, recipientTargetFinishDate: Long?, recipientName: String)
 
     @Query("DELETE FROM little_house_allocation_details WHERE dailyActivityDate = :date")
     suspend fun deleteDetailsByDate(date: Long)

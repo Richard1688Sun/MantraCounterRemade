@@ -1,6 +1,6 @@
 package com.nemogz.mantracounter.shared.domain.usecase
 
-import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
+
 import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
 import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRepository
@@ -34,12 +34,16 @@ class UnallocateLittleHouseUseCase(
 
         // 3. Update daily activity log
         val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
-        val activity = dailyActivityRepository.getDailyActivityByDate(today) ?: DailyActivity(DailyActivityEntity(date = today), emptyList(), emptyList())
+        val activity = dailyActivityRepository.getDailyActivityByDate(today)
+        if (activity == null) {
+            com.nemogz.mantracounter.shared.util.platformLog("DailyActivity", "ERROR: DailyActivity missing for today in UnallocateLittleHouseUseCase")
+            return true
+        }
 
         // Add or update allocation using the new logic
         val updatedActivity = updateAllocationForRecipient(activity, recipient, newBurnedCount)
 
-        dailyActivityRepository.insertOrUpdateActivity(updatedActivity)
+        dailyActivityRepository.updateActivity(updatedActivity)
 
         return true
     }

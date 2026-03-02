@@ -22,8 +22,14 @@ interface MantraAndHomeworkDetailsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDetail(detail: MantraAndHomeworkDetailsEntity)
 
-    @Query("UPDATE mantra_and_homework_details SET endCount = :endCount, homeworkGoal = :homeworkGoal, mantraSortOrder = :mantraSortOrder, mantraName = :mantraName WHERE `key` = :key")
-    suspend fun updateMutableFields(key: String, endCount: Int, homeworkGoal: Int, mantraSortOrder: Int, mantraName: String)
+    @Query("UPDATE mantra_and_homework_details SET endCount = :endCount WHERE `key` = :key")
+    suspend fun updateMantraCount(key: String, endCount: Int)
+
+    @Query("UPDATE mantra_and_homework_details SET homeworkGoal = :homeworkGoal WHERE `key` = :key")
+    suspend fun updateMantraGoal(key: String, homeworkGoal: Int)
+
+    @Query("UPDATE mantra_and_homework_details SET mantraSortOrder = :mantraSortOrder, mantraName = :mantraName WHERE `key` = :key")
+    suspend fun updateMantraDetails(key: String, mantraSortOrder: Int, mantraName: String)
 
     @Query("DELETE FROM mantra_and_homework_details WHERE dailyActivityDate = :date")
     suspend fun deleteDetailsByDate(date: Long)

@@ -1,7 +1,5 @@
 package com.nemogz.mantracounter.shared.domain.model
 
-import com.nemogz.mantracounter.shared.data.local.entity.LittleHouseRecipientEntity
-
 data class LittleHouseRecipient(
     val id: String,
     val name: String,
@@ -18,26 +16,3 @@ data class LittleHouseRecipient(
         const val DEFAULT_SELF_ID = "self"
     }
 }
-
-fun LittleHouseRecipientEntity.toDomain(): LittleHouseRecipient {
-    return LittleHouseRecipient(
-        id = id,
-        name = name,
-        goal = goal,
-        targetFinishDate = targetFinishDate,
-        burnedCount = burnedCount,
-        sortOrder = sortOrder
-    )
-}
-
-fun LittleHouseRecipient.toEntity(): LittleHouseRecipientEntity {
-    return LittleHouseRecipientEntity(
-        id = id,
-        name = name,
-        goal = goal,
-        targetFinishDate = targetFinishDate,
-        burnedCount = burnedCount,
-        sortOrder = sortOrder
-    )
-}
-

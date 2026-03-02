@@ -28,7 +28,6 @@ class HomeViewModel(
     private val convertLittleHouseUseCase: ConvertLittleHouseUseCase,
     private val getMissedHomeworkDaysUseCase: GetMissedHomeworkDaysUseCase,
     private val completeHomeworkUseCase: CompleteHomeworkUseCase,
-    private val catchUpHomeworkUseCase: com.nemogz.mantracounter.shared.domain.usecase.CatchUpHomeworkUseCase,
     private val updateCountersUseCase: UpdateCountersUseCase, // New dependency
     private val updateCounterUseCase: UpdateCounterUseCase,  // New dependency
     private val validateCounterCountUseCase: ValidateCounterCountUseCase, // New dependency
@@ -85,20 +84,7 @@ class HomeViewModel(
 
     fun catchUpDay(epochDay: Long) {
         viewModelScope.launch {
-            // First deduct mantra counts — returns map of ID -> deducted amount, or null
-            val details = completeHomeworkUseCase(isCatchUp = true)
-            if (details != null) {
-                // Convert details map to a proper JSON string
-                val detailsStr = buildString {
-                    append("{")
-                    append(details.entries.joinToString(",") { (key, value) ->
-                        "\"$key\":\"$value\""
-                    })
-                    append("}")
-                }
-                // Then mark the day as completed with the details
-                catchUpHomeworkUseCase(epochDay, detailsStr)
-            }
+            completeHomeworkUseCase(targetDate = epochDay)
         }
     }
 
@@ -159,20 +145,7 @@ class HomeViewModel(
 
     fun onCompleteHomework() {
         viewModelScope.launch {
-            val today = kotlin.time.Clock.System.now()
-                .toLocalDateTime(TimeZone.currentSystemDefault())
-                .date.toEpochDays().toLong()
-            val details = completeHomeworkUseCase()
-            if (details != null) {
-                val detailsStr = buildString {
-                    append("{")
-                    append(details.entries.joinToString(",") { (key, value) ->
-                        "\"$key\":\"$value\""
-                    })
-                    append("}")
-                }
-                catchUpHomeworkUseCase(today, detailsStr)
-            }
+            completeHomeworkUseCase()
         }
     }
 

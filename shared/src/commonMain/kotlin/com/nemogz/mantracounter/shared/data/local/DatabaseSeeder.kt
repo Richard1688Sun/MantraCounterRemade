@@ -51,7 +51,7 @@ class DatabaseSeeder(
                 )
             )
 
-            defaults.forEach { counterRepository.saveCounter(it) }
+            defaults.forEach { counterRepository.insertCounter(it) }
         }
 
         // 3. Ensure LittleHouse record exists
@@ -60,7 +60,7 @@ class DatabaseSeeder(
         // 4. Ensure default "Self" recipient exists
         val recipientCount = recipientRepository.getCount()
         if (recipientCount == 0) {
-            recipientRepository.insert(
+            recipientRepository.insertLittleHouseRecipient(
                 LittleHouseRecipient(
                     id = LittleHouseRecipient.DEFAULT_SELF_ID,
                     name = getString(Res.string.recipient_self),

@@ -25,7 +25,7 @@ interface DailyActivityDao {
     @Query("SELECT * FROM daily_activity ORDER BY date DESC")
     fun getAllActivitiesFlow(): Flow<List<DailyActivityEntity>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.NONE)
     suspend fun insertActivity(activity: DailyActivityEntity)
 
     @Update

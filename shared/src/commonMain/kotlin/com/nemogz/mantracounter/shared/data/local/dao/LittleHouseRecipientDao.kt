@@ -19,8 +19,8 @@ interface LittleHouseRecipientDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: LittleHouseRecipientEntity)
 
-    @Update
-    suspend fun update(entity: LittleHouseRecipientEntity)
+    @Query("UPDATE little_house_recipients SET name = :name, goal = :goal, sortOrder = :sortOrder, targetFinishDate = :targetFinishDate WHERE id = :id")
+    suspend fun updateDetails(id: String, name: String, goal: Int, sortOrder: Int, targetFinishDate: Long?)
 
     @Query("DELETE FROM little_house_recipients WHERE id = :id")
     suspend fun deleteById(id: String)

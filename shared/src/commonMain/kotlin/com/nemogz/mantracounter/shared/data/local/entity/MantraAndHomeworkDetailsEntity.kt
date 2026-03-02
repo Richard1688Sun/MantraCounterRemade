@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.nemogz.mantracounter.shared.domain.model.MantraAndHomeworkDetails
 
 @Entity(
     tableName = "mantra_and_homework_details",
@@ -31,6 +32,7 @@ data class MantraAndHomeworkDetailsEntity(
     val homeworkGoal: Int
 ) {
     companion object {
-        fun generateKey(date: Long, mantraId: String): String = "mantra_${date}_$mantraId"
+        fun generateKey(date: Long, mantraId: String): String = 
+            MantraAndHomeworkDetails.generateKey(date, mantraId)
     }
 }

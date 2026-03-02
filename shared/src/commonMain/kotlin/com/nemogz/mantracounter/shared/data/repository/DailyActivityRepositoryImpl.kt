@@ -6,6 +6,8 @@ import com.nemogz.mantracounter.shared.data.local.dao.MantraAndHomeworkDetailsDa
 import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
 import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
+import com.nemogz.mantracounter.shared.data.mapper.toDomain
+import com.nemogz.mantracounter.shared.data.mapper.toEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -27,7 +29,11 @@ class DailyActivityRepositoryImpl(
         val activity = dao.getDailyActivityByDate(date) ?: return null
         val allocations = allocationDao.getDetailsByDate(date)
         val mantras = mantraDao.getDetailsByDate(date)
-        return DailyActivity(activity, allocations, mantras)
+        return DailyActivity(
+            activity.toDomain(), 
+            allocations.map { it.toDomain() }, 
+            mantras.map { it.toDomain() }
+        )
     }
 
     override fun getDailyActivityByDateFlow(date: Long): Flow<DailyActivity?> {
@@ -37,7 +43,11 @@ class DailyActivityRepositoryImpl(
             mantraDao.getDetailsByDateFlow(date)
         ) { activity, allocations, mantras ->
             if (activity == null) null
-            else DailyActivity(activity, allocations, mantras)
+            else DailyActivity(
+                activity.toDomain(), 
+                allocations.map { it.toDomain() }, 
+                mantras.map { it.toDomain() }
+            )
         }
     }
 
@@ -52,7 +62,7 @@ class DailyActivityRepositoryImpl(
                 // doesn't fully support all Relation annotations easily yet, we can do this 
                 // if it's not a huge dataset, or we fallback if performance drops.
                 DailyActivity(
-                    activity = activity,
+                    activity = activity.toDomain(),
                     allocations = emptyList(), // Provide lazily if needed, or query them
                     mantras = emptyList()     // Ideally we query them beforehand, but flow might block.
                     // Given the use cases, returning empty here might be acceptable 
@@ -65,44 +75,62 @@ class DailyActivityRepositoryImpl(
         }
     }
 
-    override suspend fun insertOrUpdateActivity(activity: DailyActivity) {
-        val existing = dao.getDailyActivityByDate(activity.activity.date)
-        if (existing == null) {
-            dao.insertActivity(activity.activity)
-        } else {
-            dao.updateActivity(activity.activity)
-        }
+    override suspend fun insertActivity(activity: DailyActivity) {
+        dao.insertActivity(activity.activity.toEntity())
+        allocationDao.insertDetails(activity.allocations.map { it.toEntity() })
+        mantraDao.insertDetails(activity.mantras.map { it.toEntity() })
+    }
+
+    override suspend fun updateActivity(activity: DailyActivity) {
+        dao.updateActivity(activity.activity.toEntity())
         
         val existingAllocations = allocationDao.getDetailsByDate(activity.activity.date).associateBy { it.key }
         activity.allocations.forEach { newAlloc ->
-            if (existingAllocations.containsKey(newAlloc.key)) {
-                allocationDao.updateMutableFields(
-                    key = newAlloc.key,
-                    endCount = newAlloc.endCount,
-                    allocationGoal = newAlloc.allocationGoal,
-                    recipientSortOrder = newAlloc.recipientSortOrder,
-                    recipientTargetFinishDate = newAlloc.recipientTargetFinishDate,
-                    recipientName = newAlloc.recipientName
-                )
-            } else {
-                allocationDao.insertDetail(newAlloc)
+            val existingAlloc = existingAllocations[newAlloc.key]
+            if (existingAlloc != null) {
+                if (existingAlloc.endCount != newAlloc.endCount) {
+                    allocationDao.updateAllocationCount(newAlloc.key, newAlloc.endCount)
+                }
+                if (existingAlloc.allocationGoal != newAlloc.allocationGoal) {
+                    allocationDao.updateAllocationGoal(newAlloc.key, newAlloc.allocationGoal)
+                }
+                if (existingAlloc.recipientSortOrder != newAlloc.recipientSortOrder || 
+                    existingAlloc.recipientTargetFinishDate != newAlloc.recipientTargetFinishDate || 
+                    existingAlloc.recipientName != newAlloc.recipientName) {
+                    allocationDao.updateAllocationDetails(
+                        newAlloc.key, 
+                        newAlloc.recipientSortOrder, 
+                        newAlloc.recipientTargetFinishDate, 
+                        newAlloc.recipientName
+                    )
+                }
             }
         }
 
         val existingMantras = mantraDao.getDetailsByDate(activity.activity.date).associateBy { it.key }
         activity.mantras.forEach { newMantra ->
-            if (existingMantras.containsKey(newMantra.key)) {
-                mantraDao.updateMutableFields(
-                    key = newMantra.key,
-                    endCount = newMantra.endCount,
-                    homeworkGoal = newMantra.homeworkGoal,
-                    mantraSortOrder = newMantra.mantraSortOrder,
-                    mantraName = newMantra.mantraName
-                )
-            } else {
-                mantraDao.insertDetail(newMantra)
+            val existingMantra = existingMantras[newMantra.key]
+            if (existingMantra != null) {
+                if (existingMantra.endCount != newMantra.endCount) {
+                    mantraDao.updateMantraCount(newMantra.key, newMantra.endCount)
+                }
+                if (existingMantra.homeworkGoal != newMantra.homeworkGoal) {
+                    mantraDao.updateMantraGoal(newMantra.key, newMantra.homeworkGoal)
+                }
+                if (existingMantra.mantraSortOrder != newMantra.mantraSortOrder ||
+                    existingMantra.mantraName != newMantra.mantraName) {
+                    mantraDao.updateMantraDetails(newMantra.key, newMantra.mantraSortOrder, newMantra.mantraName)
+                }
             }
         }
+    }
+
+    override suspend fun insertMantraDetail(detail: com.nemogz.mantracounter.shared.domain.model.MantraAndHomeworkDetails) {
+        mantraDao.insertDetail(detail.toEntity())
+    }
+
+    override suspend fun insertAllocationDetail(detail: com.nemogz.mantracounter.shared.domain.model.LittleHouseAllocationDetails) {
+        allocationDao.insertDetail(detail.toEntity())
     }
 
     override suspend fun getActivitiesBetweenDates(startDate: Long, endDate: Long): List<DailyActivity> {
@@ -110,7 +138,11 @@ class DailyActivityRepositoryImpl(
         return activities.map { activity ->
             val allocations = allocationDao.getDetailsByDate(activity.date)
             val mantras = mantraDao.getDetailsByDate(activity.date)
-            DailyActivity(activity, allocations, mantras)
+            DailyActivity(
+                activity.toDomain(), 
+                allocations.map { it.toDomain() }, 
+                mantras.map { it.toDomain() }
+            )
         }
     }
 
@@ -119,11 +151,19 @@ class DailyActivityRepositoryImpl(
         return activities.map { activity ->
             val allocations = allocationDao.getDetailsByDate(activity.date)
             val mantras = mantraDao.getDetailsByDate(activity.date)
-            DailyActivity(activity, allocations, mantras)
+            DailyActivity(
+                activity.toDomain(), 
+                allocations.map { it.toDomain() }, 
+                mantras.map { it.toDomain() }
+            )
         }
     }
 
     override suspend fun countActivitiesCompletedOnDate(date: Long): Int {
         return dao.countActivitiesCompletedOnDate(date)
+    }
+
+    override suspend fun updateMantraGoal(key: String, homeworkGoal: Int) {
+        mantraDao.updateMantraGoal(key, homeworkGoal)
     }
 }

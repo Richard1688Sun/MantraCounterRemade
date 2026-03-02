@@ -45,4 +45,7 @@ interface CounterDao {
 
     @Query("UPDATE counters SET name = :name WHERE id = :id")
     suspend fun updateName(id: String, name: String)
+
+    @Query("UPDATE counters SET homeworkGoal = :homeworkGoal WHERE id = :id")
+    suspend fun updateHomeworkGoal(id: String, homeworkGoal: Int)
 }

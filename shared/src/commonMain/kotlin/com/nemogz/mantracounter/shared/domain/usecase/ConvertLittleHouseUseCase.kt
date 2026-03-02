@@ -4,7 +4,7 @@ import com.nemogz.mantracounter.shared.domain.model.MantraType
 import com.nemogz.mantracounter.shared.domain.repository.ICounterRepository
 import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRepository
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
-import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
+
 import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.TimeZone
@@ -61,10 +61,14 @@ class ConvertLittleHouseUseCase(
 
             // Log conversion in daily activity
             val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
-            val activity = dailyActivityRepository.getDailyActivityByDate(today) ?: DailyActivity(DailyActivityEntity(date = today), emptyList(), emptyList())
+            val activity = dailyActivityRepository.getDailyActivityByDate(today)
+            if (activity == null) {
+                com.nemogz.mantracounter.shared.util.platformLog("DailyActivity", "ERROR: DailyActivity missing for today in ConvertLittleHouseUseCase")
+                return setsToConvert
+            }
 
             // Log little house deductions
-            var updatedActivity = activity
+            var updatedActivity : DailyActivity = activity
             val deductions = listOf(
                 dabei to newDabeiCount,
                 boruo to newBoruoCount,
@@ -73,11 +77,11 @@ class ConvertLittleHouseUseCase(
             )
             for ((counter, newCount) in deductions) {
                 updatedActivity = updateMantraRecitedForCountChange(
-                    updatedActivity, counter, counter.count, newCount, counter.homeworkGoal
+                    updatedActivity, counter, counter.count, newCount
                 )
             }
 
-            dailyActivityRepository.insertOrUpdateActivity(
+            dailyActivityRepository.updateActivity(
                 updatedActivity.copy(
                     activity = updatedActivity.activity.copy(
                         littleHousesConverted = updatedActivity.activity.littleHousesConverted + setsToConvert

@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import kotlin.random.Random
+import com.nemogz.mantracounter.shared.domain.model.LittleHouseAllocationDetails
 
 @Entity(
     tableName = "little_house_allocation_details",
@@ -33,6 +33,7 @@ data class LittleHouseAllocationDetailsEntity(
     val allocationGoal: Int
 ) {
     companion object {
-        fun generateKey(date: Long, recipientId: String): String = "alloc_${date}_$recipientId"
+        fun generateKey(date: Long, recipientId: String): String = 
+            LittleHouseAllocationDetails.generateKey(date, recipientId)
     }
 }

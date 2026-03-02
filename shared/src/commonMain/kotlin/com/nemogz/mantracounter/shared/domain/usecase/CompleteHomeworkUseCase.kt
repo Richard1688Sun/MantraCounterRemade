@@ -1,9 +1,9 @@
 package com.nemogz.mantracounter.shared.domain.usecase
 
-import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
 import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import com.nemogz.mantracounter.shared.domain.repository.ICounterRepository
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
+import com.nemogz.mantracounter.shared.util.platformLog
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -14,22 +14,23 @@ class CompleteHomeworkUseCase(
     private val dailyActivityRepository: IDailyActivityRepository
 ) {
     /**
-     * Checks if homework can be completed and deducts counts if possible.
-     * Also logs the deductions in mantra details as homework reason.
-     * @param isCatchUp true if completing homework for a past day. If true, today's DailyActivity is NOT marked as completed.
+     * Deducts homework requirements from counters and marks the specified day as completed today.
+     * Logs the deductions in today's mantra details as a homework reason.
+     * @param targetDate The epoch day being marked as complete (defaults to today).
      * @return A map of counter name -> deducted amount, or null if not enough counts.
      */
-    suspend operator fun invoke(isCatchUp: Boolean = false): Map<String, Int>? {
+    suspend operator fun invoke(targetDate: Long? = null): Map<String, Int>? {
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
+        val dateToComplete = targetDate ?: today
+
         val counters = counterRepository.getAllCounters().first()
         
         // 1. Filter counters that have homework requirements
         val homeworkCounters = counters.filter { it.homeworkGoal > 0 }
-        
         if (homeworkCounters.isEmpty()) return null
 
         // 2. Check availability
         val allSatisfied = homeworkCounters.all { it.hasEnoughForHomework() }
-        
         if (!allSatisfied) return null
 
         // 3. Deduct counts and build details map
@@ -50,31 +51,79 @@ class CompleteHomeworkUseCase(
 
         counterRepository.updateCounts(idsToUpdate, newCounts)
 
-        // 4. Log homework deductions in mantra details
-        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
-        val activity = dailyActivityRepository.getDailyActivityByDate(today) ?: DailyActivity(DailyActivityEntity(date = today), emptyList(), emptyList())
-        var updatedActivity = activity
+        // 4. Log homework deductions in TODAY'S mantra details (because the action happened today)
+        val todayActivity = dailyActivityRepository.getDailyActivityByDate(today)
+        if (todayActivity == null) {
+            platformLog("DailyActivity", "ERROR: DailyActivity missing for today in CompleteHomeworkUseCase")
+            return details
+        }
+        var updatedTodayActivity: DailyActivity = todayActivity
 
         homeworkCounters.forEach { counter ->
             val oldCount = oldCounts[counter.name] ?: counter.count
             val newCount = oldCount - counter.homeworkGoal
-            updatedActivity = updateMantraRecitedForCountChange(
-                updatedActivity, counter, oldCount, newCount, counter.homeworkGoal
+            updatedTodayActivity = updateMantraRecitedForCountChange(
+                updatedTodayActivity, counter, oldCount, newCount
             )
         }
 
-        // Only mark today's activity as completed if we are NOT catching up
-        val finalActivity = if (!isCatchUp) {
-            updatedActivity.copy(
-                activity = updatedActivity.activity.copy(
+        // 5. Mark the target day as completed
+        if (dateToComplete == today) {
+            // It's today, we can just update the same activity object we already modified
+            updatedTodayActivity = updatedTodayActivity.copy(
+                activity = updatedTodayActivity.activity.copy(
                     homeworkCompletedDate = today
                 )
             )
+            dailyActivityRepository.updateActivity(updatedTodayActivity)
+
+            // 6. Update today's goals in the DAO to match current state (for consistency)
+            val finalTodayActivity = dailyActivityRepository.getDailyActivityByDate(today)
+            finalTodayActivity?.mantras?.forEach { mantra ->
+                val matchingCounter = counters.find { it.id == mantra.mantraId }
+                if (matchingCounter != null) {
+                    dailyActivityRepository.updateMantraGoal(mantra.key, matchingCounter.homeworkGoal)
+                }
+            }
         } else {
-            updatedActivity
+            // We're catching up a past day.
+            // Save today's deductions first...
+            dailyActivityRepository.updateActivity(updatedTodayActivity)
+
+            // ...then load the past day and mark it completed.
+            val targetActivity = dailyActivityRepository.getDailyActivityByDate(dateToComplete)
+            if (targetActivity != null) {
+                dailyActivityRepository.updateActivity(
+                    targetActivity.copy(
+                        activity = targetActivity.activity.copy(homeworkCompletedDate = today)
+                    )
+                )
+
+                // Ensure all current counters have a detail record for that past day so the goals are recorded
+                val finalTargetActivity = dailyActivityRepository.getDailyActivityByDate(dateToComplete)
+                counters.forEach { counter ->
+                    val existingMantra = finalTargetActivity?.mantras?.find { it.mantraId == counter.id }
+                    val key = com.nemogz.mantracounter.shared.domain.model.MantraAndHomeworkDetails.generateKey(dateToComplete, counter.id)
+
+                    if (existingMantra == null) {
+                        val newDetail = com.nemogz.mantracounter.shared.domain.model.MantraAndHomeworkDetails(
+                            key = key,
+                            dailyActivityDate = dateToComplete,
+                            mantraId = counter.id,
+                            mantraName = counter.name,
+                            mantraSortOrder = counter.sortOrder,
+                            startCount = 0,
+                            endCount = 0,
+                            homeworkGoal = counter.homeworkGoal
+                        )
+                        dailyActivityRepository.insertMantraDetail(newDetail)
+                    } else {
+                        dailyActivityRepository.updateMantraGoal(key, counter.homeworkGoal)
+                    }
+                }
+            }
         }
 
-        dailyActivityRepository.insertOrUpdateActivity(finalActivity)
 
         return details
     }

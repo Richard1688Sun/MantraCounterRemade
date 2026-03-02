@@ -3,8 +3,6 @@ package com.nemogz.mantracounter.ui.homework
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nemogz.mantracounter.shared.domain.model.Counter
-import com.nemogz.mantracounter.shared.domain.usecase.CatchUpHomeworkUseCase
-import com.nemogz.mantracounter.shared.domain.usecase.CompleteHomeworkUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.GetCountersUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.GetMissedHomeworkDaysUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.UpdateCounterUseCase
@@ -24,8 +22,7 @@ class HomeworkViewModel(
     private val getCountersUseCase: GetCountersUseCase,
     private val updateCounterUseCase: UpdateCounterUseCase,
     private val getMissedHomeworkDaysUseCase: GetMissedHomeworkDaysUseCase,
-    private val catchUpHomeworkUseCase: CatchUpHomeworkUseCase,
-    private val completeHomeworkUseCase: CompleteHomeworkUseCase
+    completeHomeworkUseCase: Any,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeworkUiState(isLoading = true))
@@ -53,25 +50,6 @@ class HomeworkViewModel(
         if (targetGoal != counter.homeworkGoal) {
             viewModelScope.launch {
                 updateCounterUseCase(counter.copy(homeworkGoal = targetGoal))
-            }
-        }
-    }
-
-    fun catchUpDay(date: Long) {
-        viewModelScope.launch {
-            val details = completeHomeworkUseCase()
-            if (details != null) {
-                val detailsStr = buildString {
-                    append("{")
-                    append(details.entries.joinToString(",") { (key, value) ->
-                        "\"$key\":\"$value\""
-                    })
-                    append("}")
-                }
-                catchUpHomeworkUseCase(date, detailsStr)
-            } else {
-                // Still mark as caught up even without deductions
-                catchUpHomeworkUseCase(date)
             }
         }
     }

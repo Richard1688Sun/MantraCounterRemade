@@ -1,7 +1,5 @@
 package com.nemogz.mantracounter.shared.domain.usecase
 
-import com.nemogz.mantracounter.shared.data.local.entity.LittleHouseAllocationDetailsEntity
-import com.nemogz.mantracounter.shared.data.local.entity.MantraAndHomeworkDetailsEntity
 import com.nemogz.mantracounter.shared.domain.model.DailyActivity
 import com.nemogz.mantracounter.shared.domain.model.LittleHouseRecipient
 import com.nemogz.mantracounter.shared.domain.model.Counter
@@ -18,7 +16,7 @@ enum class MantraChangeReason {
 }
 
 /**
- * Updates a MantraAndHomeworkDetailsEntity for a given mantra change.
+ * Updates a MantraAndHomeworkDetails for a given mantra change.
  *
  * @param activity The current DailyActivity domain model.
  * @param counter The counter being modified.
@@ -31,8 +29,7 @@ internal fun updateMantraRecitedForCountChange(
     activity: DailyActivity,
     counter: Counter,
     oldCount: Int,
-    newCount: Int,
-    homeworkGoal: Int
+    newCount: Int
 ): DailyActivity {
     val delta = newCount - oldCount
     if (delta == 0) return activity
@@ -42,28 +39,14 @@ internal fun updateMantraRecitedForCountChange(
 
     if (existingIndex != -1) {
         val existing = mantras[existingIndex]
-        mantras[existingIndex] = existing.copy(endCount = newCount, homeworkGoal = homeworkGoal)
-    } else {
-        // This handles counters created TODAY after the DayRollover occurred.
-        // We initialize the startCount to the OLD count.
-        val newEntry = MantraAndHomeworkDetailsEntity(
-            key = MantraAndHomeworkDetailsEntity.generateKey(activity.activity.date, counter.id),
-            dailyActivityDate = activity.activity.date,
-            mantraId = counter.id,
-            mantraName = counter.name,
-            mantraSortOrder = counter.sortOrder,
-            startCount = oldCount,
-            endCount = newCount,
-            homeworkGoal = homeworkGoal
-        )
-        mantras.add(newEntry)
+        mantras[existingIndex] = existing.copy(endCount = newCount)
     }
 
     return activity.copy(mantras = mantras)
 }
 
 /**
- * Updates a LittleHouseAllocationDetailsEntity for a given recipient allocation or burn.
+ * Updates a LittleHouseAllocationDetails for a given recipient allocation or burn.
  *
  * @param activity The current DailyActivity domain model.
  * @param recipient The recipient being modified.
@@ -87,26 +70,6 @@ internal fun updateAllocationForRecipient(
             recipientTargetFinishDate = recipient.targetFinishDate,
             allocationGoal = recipient.goal
         )
-    } else {
-        // This handles recipients created TODAY after the DayRollover occurred.
-        // We initialize the startCount at whatever their burnedCount was prior to this change.
-        // Assuming we pass in the newBurnedCount, we can infer startCount = newBurnedCount - delta
-        // But since we don't have delta for recipients yet, wait...
-        // The burned count only changes when they burn or allocate.
-        // If they allocate, their burned count doesn't change.
-        // Let's just pass `recipient.burnedCount` as `startCount` because they were just created.
-        val newEntry = LittleHouseAllocationDetailsEntity(
-            key = LittleHouseAllocationDetailsEntity.generateKey(activity.activity.date, recipient.id),
-            dailyActivityDate = activity.activity.date,
-            recipientId = recipient.id,
-            recipientName = recipient.name,
-            recipientSortOrder = recipient.sortOrder,
-            recipientTargetFinishDate = recipient.targetFinishDate,
-            startCount = recipient.burnedCount, // This is an approximation since they could be allocating
-            endCount = newBurnedCount,
-            allocationGoal = recipient.goal
-        )
-        allocations.add(newEntry)
     }
 
     return activity.copy(allocations = allocations)

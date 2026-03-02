@@ -22,12 +22,19 @@ import com.nemogz.mantracounter.shared.domain.usecase.SetCounterCountUseCase
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
 import com.nemogz.mantracounter.shared.data.repository.DailyActivityRepositoryImpl
 import com.nemogz.mantracounter.shared.domain.usecase.GetMissedHomeworkDaysUseCase
-import com.nemogz.mantracounter.shared.domain.usecase.CatchUpHomeworkUseCase
+
 import com.nemogz.mantracounter.shared.domain.usecase.AllocateLittleHouseUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.CheckDayRolloverUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.CreateCounterUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.CreateLittleHouseRecipientUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.DeleteCountersUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.DeleteLittleHouseRecipientUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.GetActivitiesForMonthUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.GetLittleHouseNameUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.GetLittleHouseRecipientsUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.UnallocateLittleHouseUseCase
 import com.nemogz.mantracounter.shared.domain.usecase.UpdateLittleHouseRecipientUseCase
+import com.nemogz.mantracounter.shared.domain.usecase.UpdateLittleHouseUseCase
 import org.koin.dsl.module
 
 val featureModule = module {
@@ -53,26 +60,26 @@ val featureModule = module {
     factory { GetLittleHouseCountUseCase(get()) }
     factory { ConvertLittleHouseUseCase(get(), get(), get()) }
     factory { GetMissedHomeworkDaysUseCase(get()) }
-    factory { CatchUpHomeworkUseCase(get()) }
-    factory { com.nemogz.mantracounter.shared.domain.usecase.CheckDayRolloverUseCase(get(), get(), get(), get()) }
+
+    factory { CheckDayRolloverUseCase(get(), get(), get(), get()) }
     factory { CompleteHomeworkUseCase(get(), get()) }
     factory { GetCounterByIdUseCase(get()) }
     factory { UpdateHomeworkAmountUseCase(get()) }
     factory { UpdateCountersUseCase(get(), get()) }
     factory { UpdateCounterUseCase(get(), get()) }
-    factory { com.nemogz.mantracounter.shared.domain.usecase.CreateCounterUseCase(get()) }
-    factory { com.nemogz.mantracounter.shared.domain.usecase.DeleteCountersUseCase(get()) }
+    factory { CreateCounterUseCase(get(), get()) }
+    factory { DeleteCountersUseCase(get()) }
     factory { ValidateCounterCountUseCase() }
     factory { SetCounterCountUseCase(get(), get()) }
-    factory { com.nemogz.mantracounter.shared.domain.usecase.GetActivitiesForMonthUseCase(get()) }
-    factory { com.nemogz.mantracounter.shared.domain.usecase.UpdateLittleHouseUseCase(get(), get()) }
-    factory { com.nemogz.mantracounter.shared.domain.usecase.GetLittleHouseNameUseCase(get()) }
+    factory { GetActivitiesForMonthUseCase(get()) }
+    factory { UpdateLittleHouseUseCase(get(), get()) }
+    factory { GetLittleHouseNameUseCase(get()) }
 
     // Little House Recipient Use Cases
     factory { GetLittleHouseRecipientsUseCase(get()) }
-    factory { CreateLittleHouseRecipientUseCase(get()) }
+    factory { CreateLittleHouseRecipientUseCase(get(), get()) }
     factory { UpdateLittleHouseRecipientUseCase(get(), get()) }
     factory { DeleteLittleHouseRecipientUseCase(get()) }
     factory { AllocateLittleHouseUseCase(get(), get(), get()) }
-    factory { com.nemogz.mantracounter.shared.domain.usecase.UnallocateLittleHouseUseCase(get(), get(), get()) }
+    factory { UnallocateLittleHouseUseCase(get(), get(), get()) }
 }

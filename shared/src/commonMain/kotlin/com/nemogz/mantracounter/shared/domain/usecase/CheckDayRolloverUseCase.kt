@@ -1,9 +1,9 @@
 package com.nemogz.mantracounter.shared.domain.usecase
 
-import com.nemogz.mantracounter.shared.data.local.entity.DailyActivityEntity
-import com.nemogz.mantracounter.shared.data.local.entity.LittleHouseAllocationDetailsEntity
-import com.nemogz.mantracounter.shared.data.local.entity.MantraAndHomeworkDetailsEntity
 import com.nemogz.mantracounter.shared.domain.model.DailyActivity
+import com.nemogz.mantracounter.shared.domain.model.DailyActivitySummary
+import com.nemogz.mantracounter.shared.domain.model.LittleHouseAllocationDetails
+import com.nemogz.mantracounter.shared.domain.model.MantraAndHomeworkDetails
 import com.nemogz.mantracounter.shared.domain.repository.ICounterRepository
 import com.nemogz.mantracounter.shared.domain.repository.IDailyActivityRepository
 import com.nemogz.mantracounter.shared.domain.repository.ILittleHouseRecipientRepository
@@ -31,7 +31,7 @@ class CheckDayRolloverUseCase(
      * When creating a new day, we snapshot the current counts to initialize startCount.
      */
     suspend operator fun invoke() {
-        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays().toLong()
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays()
         val mostRecent = dailyActivityRepository.getMostRecentActivityDate()
 
         if (mostRecent == null) {
@@ -54,21 +54,21 @@ class CheckDayRolloverUseCase(
         val lhCount = littleHouseRepository.getLittleHouseCount().first()
 
         val initialMantras = counters.map {
-            MantraAndHomeworkDetailsEntity(
-                key = MantraAndHomeworkDetailsEntity.generateKey(date, it.id),
+            MantraAndHomeworkDetails(
+                key = MantraAndHomeworkDetails.generateKey(date, it.id),
                 dailyActivityDate = date,
                 mantraId = it.id,
                 mantraName = it.name,
                 mantraSortOrder = it.sortOrder,
                 startCount = it.count,
                 endCount = it.count,
-                homeworkGoal = it.homeworkGoal
+                homeworkGoal = 0
             )
         }
 
         val initialAllocations = recipients.map {
-            LittleHouseAllocationDetailsEntity(
-                key = LittleHouseAllocationDetailsEntity.generateKey(date, it.id),
+            LittleHouseAllocationDetails(
+                key = LittleHouseAllocationDetails.generateKey(date, it.id),
                 dailyActivityDate = date,
                 recipientId = it.id,
                 recipientName = it.name,
@@ -81,11 +81,11 @@ class CheckDayRolloverUseCase(
         }
 
         val emptyActivity = DailyActivity(
-            activity = DailyActivityEntity(date = date, littleHouseStartCount = lhCount),
+            activity = DailyActivitySummary(date = date, littleHouseStartCount = lhCount),
             allocations = initialAllocations,
             mantras = initialMantras
         )
 
-        dailyActivityRepository.insertOrUpdateActivity(emptyActivity)
+        dailyActivityRepository.insertActivity(emptyActivity)
     }
 }
